@@ -26,11 +26,10 @@ export class AllExceptionsFilter implements ExceptionFilter {
       const response = exception.getResponse();
       message =
         typeof response === 'string' ? response : (response as any).message;
-    } else if (exception instanceof Error) {
-      // Jangan ekspos detail Error generik di produksi
-      // Di development bisa: message = exception.stack;
-      // Di produksi, log error asli dan kembalikan pesan generik
+    } else {
+      // Log semua exception yang bukan HttpException
       console.error('Unhandled Exception:', exception); // Log error asli
+      // Pesan error tetap generik untuk non-HttpException
     }
 
     // Struktur respons error

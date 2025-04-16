@@ -1,9 +1,9 @@
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { PassportStrategy } from '@nestjs/passport';
 import { Injectable } from '@nestjs/common';
-import { jwtConstants } from '@src/auth/constants';
 import * as fs from 'fs';
 import { ConfigService } from '@nestjs/config';
+import { Algorithm } from 'jsonwebtoken';
 import { Role } from '@src/auth/roles/roles.enum';
 
 // Definisikan tipe untuk payload JWT
@@ -17,13 +17,28 @@ interface JwtPayload {
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
-  constructor(private configService: ConfigService) {
+  constructor(configService: ConfigService) {
+    const publicKeyPath = configService.get<string>('JWT_PUBLIC_KEY_PATH');
+    const algorithm = configService.get<string>(
+      'JWT_ACCESS_ALGORITHM',
+      'RS256', // Default
+    );
+
+    if (
+      ![
+        'RS256',
+        'HS256',
+        'ES256' /* tambahkan algo lain jika perlu */,
+      ].includes(algorithm)
+    ) {
+      throw new Error(`Unsupported JWT algorithm specified: ${algorithm}`);
+    }
+
     let publicKey: string;
     try {
-      // Baca path dari konstanta (atau bisa dari configService)
-      const publicKeyPath = jwtConstants.access.publicKeyPath;
-      // const publicKeyPath = configService.get<string>('JWT_PUBLIC_KEY_PATH');
-
+      if (!publicKeyPath) {
+        throw new Error('JWT_PUBLIC_KEY_PATH not found in configuration.');
+      }
       publicKey = fs.readFileSync(publicKeyPath, 'utf8');
     } catch (error) {
       console.error(
@@ -37,8 +52,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
       secretOrKey: publicKey,
-      // Algoritma dari konstanta
-      algorithms: [jwtConstants.access.algorithm],
+      algorithms: [algorithm as Algorithm],
     });
   }
 
@@ -46,10 +60,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
    * Validasi payload token.
    * Nilai yang dikembalikan akan ditambahkan ke objek Request sebagai `req.user`.
    */
-  // Metode ini bisa sinkron jika tidak ada operasi async di dalamnya
   validate(payload: JwtPayload) {
-    // Payload sudah divalidasi oleh passport-jwt berdasarkan secret dan expiration
-    // Kembalikan data yang ingin Anda ekspos di req.user
     return {
       userId: payload.sub,
       email: payload.email,
