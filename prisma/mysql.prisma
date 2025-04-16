@@ -16,7 +16,20 @@ datasource db {
 
 // Model contoh untuk database MySQL
 model UserMysql {
-  id    Int     @id @default(autoincrement())
-  email String  @unique
-  name  String?
+  id                 Int      @id @default(autoincrement())
+  email              String   @unique
+  name               String?
+  password           String
+  hashedRefreshToken String?  @db.Text
+  role               Role     @default(USER)
+  passwordResetToken   String?  @unique
+  passwordResetExpires DateTime?
+  isEmailVerified        Boolean   @default(false)
+  emailVerificationToken String?   @unique
+}
+
+// Definisikan enum Role di sini (tidak perlu impor)
+enum Role {
+  USER
+  ADMIN
 }

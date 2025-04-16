@@ -120,7 +120,14 @@ exports.Prisma.TransactionIsolationLevel = makeStrictEnum({
 exports.Prisma.UserMysqlScalarFieldEnum = {
   id: 'id',
   email: 'email',
-  name: 'name'
+  name: 'name',
+  password: 'password',
+  hashedRefreshToken: 'hashedRefreshToken',
+  role: 'role',
+  passwordResetToken: 'passwordResetToken',
+  passwordResetExpires: 'passwordResetExpires',
+  isEmailVerified: 'isEmailVerified',
+  emailVerificationToken: 'emailVerificationToken'
 };
 
 exports.Prisma.SortOrder = {
@@ -135,9 +142,16 @@ exports.Prisma.NullsOrder = {
 
 exports.Prisma.UserMysqlOrderByRelevanceFieldEnum = {
   email: 'email',
-  name: 'name'
+  name: 'name',
+  password: 'password',
+  hashedRefreshToken: 'hashedRefreshToken',
+  passwordResetToken: 'passwordResetToken',
+  emailVerificationToken: 'emailVerificationToken'
 };
-
+exports.Role = exports.$Enums.Role = {
+  USER: 'USER',
+  ADMIN: 'ADMIN'
+};
 
 exports.Prisma.ModelName = {
   UserMysql: 'UserMysql'

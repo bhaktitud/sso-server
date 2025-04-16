@@ -20,6 +20,23 @@ export type PrismaPromise<T> = $Public.PrismaPromise<T>
 export type UserMysql = $Result.DefaultSelection<Prisma.$UserMysqlPayload>
 
 /**
+ * Enums
+ */
+export namespace $Enums {
+  export const Role: {
+  USER: 'USER',
+  ADMIN: 'ADMIN'
+};
+
+export type Role = (typeof Role)[keyof typeof Role]
+
+}
+
+export type Role = $Enums.Role
+
+export const Role: typeof $Enums.Role
+
+/**
  * ##  Prisma Client ʲˢ
  *
  * Type-safe database client for TypeScript & Node.js
@@ -885,18 +902,39 @@ export namespace Prisma {
     id: number | null
     email: string | null
     name: string | null
+    password: string | null
+    hashedRefreshToken: string | null
+    role: $Enums.Role | null
+    passwordResetToken: string | null
+    passwordResetExpires: Date | null
+    isEmailVerified: boolean | null
+    emailVerificationToken: string | null
   }
 
   export type UserMysqlMaxAggregateOutputType = {
     id: number | null
     email: string | null
     name: string | null
+    password: string | null
+    hashedRefreshToken: string | null
+    role: $Enums.Role | null
+    passwordResetToken: string | null
+    passwordResetExpires: Date | null
+    isEmailVerified: boolean | null
+    emailVerificationToken: string | null
   }
 
   export type UserMysqlCountAggregateOutputType = {
     id: number
     email: number
     name: number
+    password: number
+    hashedRefreshToken: number
+    role: number
+    passwordResetToken: number
+    passwordResetExpires: number
+    isEmailVerified: number
+    emailVerificationToken: number
     _all: number
   }
 
@@ -913,18 +951,39 @@ export namespace Prisma {
     id?: true
     email?: true
     name?: true
+    password?: true
+    hashedRefreshToken?: true
+    role?: true
+    passwordResetToken?: true
+    passwordResetExpires?: true
+    isEmailVerified?: true
+    emailVerificationToken?: true
   }
 
   export type UserMysqlMaxAggregateInputType = {
     id?: true
     email?: true
     name?: true
+    password?: true
+    hashedRefreshToken?: true
+    role?: true
+    passwordResetToken?: true
+    passwordResetExpires?: true
+    isEmailVerified?: true
+    emailVerificationToken?: true
   }
 
   export type UserMysqlCountAggregateInputType = {
     id?: true
     email?: true
     name?: true
+    password?: true
+    hashedRefreshToken?: true
+    role?: true
+    passwordResetToken?: true
+    passwordResetExpires?: true
+    isEmailVerified?: true
+    emailVerificationToken?: true
     _all?: true
   }
 
@@ -1018,6 +1077,13 @@ export namespace Prisma {
     id: number
     email: string
     name: string | null
+    password: string
+    hashedRefreshToken: string | null
+    role: $Enums.Role
+    passwordResetToken: string | null
+    passwordResetExpires: Date | null
+    isEmailVerified: boolean
+    emailVerificationToken: string | null
     _count: UserMysqlCountAggregateOutputType | null
     _avg: UserMysqlAvgAggregateOutputType | null
     _sum: UserMysqlSumAggregateOutputType | null
@@ -1043,6 +1109,13 @@ export namespace Prisma {
     id?: boolean
     email?: boolean
     name?: boolean
+    password?: boolean
+    hashedRefreshToken?: boolean
+    role?: boolean
+    passwordResetToken?: boolean
+    passwordResetExpires?: boolean
+    isEmailVerified?: boolean
+    emailVerificationToken?: boolean
   }, ExtArgs["result"]["userMysql"]>
 
 
@@ -1051,9 +1124,16 @@ export namespace Prisma {
     id?: boolean
     email?: boolean
     name?: boolean
+    password?: boolean
+    hashedRefreshToken?: boolean
+    role?: boolean
+    passwordResetToken?: boolean
+    passwordResetExpires?: boolean
+    isEmailVerified?: boolean
+    emailVerificationToken?: boolean
   }
 
-  export type UserMysqlOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "email" | "name", ExtArgs["result"]["userMysql"]>
+  export type UserMysqlOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "email" | "name" | "password" | "hashedRefreshToken" | "role" | "passwordResetToken" | "passwordResetExpires" | "isEmailVerified" | "emailVerificationToken", ExtArgs["result"]["userMysql"]>
 
   export type $UserMysqlPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "UserMysql"
@@ -1062,6 +1142,13 @@ export namespace Prisma {
       id: number
       email: string
       name: string | null
+      password: string
+      hashedRefreshToken: string | null
+      role: $Enums.Role
+      passwordResetToken: string | null
+      passwordResetExpires: Date | null
+      isEmailVerified: boolean
+      emailVerificationToken: string | null
     }, ExtArgs["result"]["userMysql"]>
     composites: {}
   }
@@ -1434,6 +1521,13 @@ export namespace Prisma {
     readonly id: FieldRef<"UserMysql", 'Int'>
     readonly email: FieldRef<"UserMysql", 'String'>
     readonly name: FieldRef<"UserMysql", 'String'>
+    readonly password: FieldRef<"UserMysql", 'String'>
+    readonly hashedRefreshToken: FieldRef<"UserMysql", 'String'>
+    readonly role: FieldRef<"UserMysql", 'Role'>
+    readonly passwordResetToken: FieldRef<"UserMysql", 'String'>
+    readonly passwordResetExpires: FieldRef<"UserMysql", 'DateTime'>
+    readonly isEmailVerified: FieldRef<"UserMysql", 'Boolean'>
+    readonly emailVerificationToken: FieldRef<"UserMysql", 'String'>
   }
     
 
@@ -1772,7 +1866,14 @@ export namespace Prisma {
   export const UserMysqlScalarFieldEnum: {
     id: 'id',
     email: 'email',
-    name: 'name'
+    name: 'name',
+    password: 'password',
+    hashedRefreshToken: 'hashedRefreshToken',
+    role: 'role',
+    passwordResetToken: 'passwordResetToken',
+    passwordResetExpires: 'passwordResetExpires',
+    isEmailVerified: 'isEmailVerified',
+    emailVerificationToken: 'emailVerificationToken'
   };
 
   export type UserMysqlScalarFieldEnum = (typeof UserMysqlScalarFieldEnum)[keyof typeof UserMysqlScalarFieldEnum]
@@ -1796,7 +1897,11 @@ export namespace Prisma {
 
   export const UserMysqlOrderByRelevanceFieldEnum: {
     email: 'email',
-    name: 'name'
+    name: 'name',
+    password: 'password',
+    hashedRefreshToken: 'hashedRefreshToken',
+    passwordResetToken: 'passwordResetToken',
+    emailVerificationToken: 'emailVerificationToken'
   };
 
   export type UserMysqlOrderByRelevanceFieldEnum = (typeof UserMysqlOrderByRelevanceFieldEnum)[keyof typeof UserMysqlOrderByRelevanceFieldEnum]
@@ -1822,6 +1927,27 @@ export namespace Prisma {
 
 
   /**
+   * Reference to a field of type 'Role'
+   */
+  export type EnumRoleFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Role'>
+    
+
+
+  /**
+   * Reference to a field of type 'DateTime'
+   */
+  export type DateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DateTime'>
+    
+
+
+  /**
+   * Reference to a field of type 'Boolean'
+   */
+  export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
+    
+
+
+  /**
    * Reference to a field of type 'Float'
    */
   export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float'>
@@ -1838,28 +1964,56 @@ export namespace Prisma {
     id?: IntFilter<"UserMysql"> | number
     email?: StringFilter<"UserMysql"> | string
     name?: StringNullableFilter<"UserMysql"> | string | null
+    password?: StringFilter<"UserMysql"> | string
+    hashedRefreshToken?: StringNullableFilter<"UserMysql"> | string | null
+    role?: EnumRoleFilter<"UserMysql"> | $Enums.Role
+    passwordResetToken?: StringNullableFilter<"UserMysql"> | string | null
+    passwordResetExpires?: DateTimeNullableFilter<"UserMysql"> | Date | string | null
+    isEmailVerified?: BoolFilter<"UserMysql"> | boolean
+    emailVerificationToken?: StringNullableFilter<"UserMysql"> | string | null
   }
 
   export type UserMysqlOrderByWithRelationInput = {
     id?: SortOrder
     email?: SortOrder
     name?: SortOrderInput | SortOrder
+    password?: SortOrder
+    hashedRefreshToken?: SortOrderInput | SortOrder
+    role?: SortOrder
+    passwordResetToken?: SortOrderInput | SortOrder
+    passwordResetExpires?: SortOrderInput | SortOrder
+    isEmailVerified?: SortOrder
+    emailVerificationToken?: SortOrderInput | SortOrder
     _relevance?: UserMysqlOrderByRelevanceInput
   }
 
   export type UserMysqlWhereUniqueInput = Prisma.AtLeast<{
     id?: number
     email?: string
+    passwordResetToken?: string
+    emailVerificationToken?: string
     AND?: UserMysqlWhereInput | UserMysqlWhereInput[]
     OR?: UserMysqlWhereInput[]
     NOT?: UserMysqlWhereInput | UserMysqlWhereInput[]
     name?: StringNullableFilter<"UserMysql"> | string | null
-  }, "id" | "email">
+    password?: StringFilter<"UserMysql"> | string
+    hashedRefreshToken?: StringNullableFilter<"UserMysql"> | string | null
+    role?: EnumRoleFilter<"UserMysql"> | $Enums.Role
+    passwordResetExpires?: DateTimeNullableFilter<"UserMysql"> | Date | string | null
+    isEmailVerified?: BoolFilter<"UserMysql"> | boolean
+  }, "id" | "email" | "passwordResetToken" | "emailVerificationToken">
 
   export type UserMysqlOrderByWithAggregationInput = {
     id?: SortOrder
     email?: SortOrder
     name?: SortOrderInput | SortOrder
+    password?: SortOrder
+    hashedRefreshToken?: SortOrderInput | SortOrder
+    role?: SortOrder
+    passwordResetToken?: SortOrderInput | SortOrder
+    passwordResetExpires?: SortOrderInput | SortOrder
+    isEmailVerified?: SortOrder
+    emailVerificationToken?: SortOrderInput | SortOrder
     _count?: UserMysqlCountOrderByAggregateInput
     _avg?: UserMysqlAvgOrderByAggregateInput
     _max?: UserMysqlMaxOrderByAggregateInput
@@ -1874,45 +2028,101 @@ export namespace Prisma {
     id?: IntWithAggregatesFilter<"UserMysql"> | number
     email?: StringWithAggregatesFilter<"UserMysql"> | string
     name?: StringNullableWithAggregatesFilter<"UserMysql"> | string | null
+    password?: StringWithAggregatesFilter<"UserMysql"> | string
+    hashedRefreshToken?: StringNullableWithAggregatesFilter<"UserMysql"> | string | null
+    role?: EnumRoleWithAggregatesFilter<"UserMysql"> | $Enums.Role
+    passwordResetToken?: StringNullableWithAggregatesFilter<"UserMysql"> | string | null
+    passwordResetExpires?: DateTimeNullableWithAggregatesFilter<"UserMysql"> | Date | string | null
+    isEmailVerified?: BoolWithAggregatesFilter<"UserMysql"> | boolean
+    emailVerificationToken?: StringNullableWithAggregatesFilter<"UserMysql"> | string | null
   }
 
   export type UserMysqlCreateInput = {
     email: string
     name?: string | null
+    password: string
+    hashedRefreshToken?: string | null
+    role?: $Enums.Role
+    passwordResetToken?: string | null
+    passwordResetExpires?: Date | string | null
+    isEmailVerified?: boolean
+    emailVerificationToken?: string | null
   }
 
   export type UserMysqlUncheckedCreateInput = {
     id?: number
     email: string
     name?: string | null
+    password: string
+    hashedRefreshToken?: string | null
+    role?: $Enums.Role
+    passwordResetToken?: string | null
+    passwordResetExpires?: Date | string | null
+    isEmailVerified?: boolean
+    emailVerificationToken?: string | null
   }
 
   export type UserMysqlUpdateInput = {
     email?: StringFieldUpdateOperationsInput | string
     name?: NullableStringFieldUpdateOperationsInput | string | null
+    password?: StringFieldUpdateOperationsInput | string
+    hashedRefreshToken?: NullableStringFieldUpdateOperationsInput | string | null
+    role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
+    passwordResetToken?: NullableStringFieldUpdateOperationsInput | string | null
+    passwordResetExpires?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    isEmailVerified?: BoolFieldUpdateOperationsInput | boolean
+    emailVerificationToken?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type UserMysqlUncheckedUpdateInput = {
     id?: IntFieldUpdateOperationsInput | number
     email?: StringFieldUpdateOperationsInput | string
     name?: NullableStringFieldUpdateOperationsInput | string | null
+    password?: StringFieldUpdateOperationsInput | string
+    hashedRefreshToken?: NullableStringFieldUpdateOperationsInput | string | null
+    role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
+    passwordResetToken?: NullableStringFieldUpdateOperationsInput | string | null
+    passwordResetExpires?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    isEmailVerified?: BoolFieldUpdateOperationsInput | boolean
+    emailVerificationToken?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type UserMysqlCreateManyInput = {
     id?: number
     email: string
     name?: string | null
+    password: string
+    hashedRefreshToken?: string | null
+    role?: $Enums.Role
+    passwordResetToken?: string | null
+    passwordResetExpires?: Date | string | null
+    isEmailVerified?: boolean
+    emailVerificationToken?: string | null
   }
 
   export type UserMysqlUpdateManyMutationInput = {
     email?: StringFieldUpdateOperationsInput | string
     name?: NullableStringFieldUpdateOperationsInput | string | null
+    password?: StringFieldUpdateOperationsInput | string
+    hashedRefreshToken?: NullableStringFieldUpdateOperationsInput | string | null
+    role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
+    passwordResetToken?: NullableStringFieldUpdateOperationsInput | string | null
+    passwordResetExpires?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    isEmailVerified?: BoolFieldUpdateOperationsInput | boolean
+    emailVerificationToken?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type UserMysqlUncheckedUpdateManyInput = {
     id?: IntFieldUpdateOperationsInput | number
     email?: StringFieldUpdateOperationsInput | string
     name?: NullableStringFieldUpdateOperationsInput | string | null
+    password?: StringFieldUpdateOperationsInput | string
+    hashedRefreshToken?: NullableStringFieldUpdateOperationsInput | string | null
+    role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
+    passwordResetToken?: NullableStringFieldUpdateOperationsInput | string | null
+    passwordResetExpires?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    isEmailVerified?: BoolFieldUpdateOperationsInput | boolean
+    emailVerificationToken?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type IntFilter<$PrismaModel = never> = {
@@ -1956,6 +2166,29 @@ export namespace Prisma {
     not?: NestedStringNullableFilter<$PrismaModel> | string | null
   }
 
+  export type EnumRoleFilter<$PrismaModel = never> = {
+    equals?: $Enums.Role | EnumRoleFieldRefInput<$PrismaModel>
+    in?: $Enums.Role[]
+    notIn?: $Enums.Role[]
+    not?: NestedEnumRoleFilter<$PrismaModel> | $Enums.Role
+  }
+
+  export type DateTimeNullableFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
+    in?: Date[] | string[] | null
+    notIn?: Date[] | string[] | null
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeNullableFilter<$PrismaModel> | Date | string | null
+  }
+
+  export type BoolFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
+    not?: NestedBoolFilter<$PrismaModel> | boolean
+  }
+
   export type SortOrderInput = {
     sort: SortOrder
     nulls?: NullsOrder
@@ -1971,6 +2204,13 @@ export namespace Prisma {
     id?: SortOrder
     email?: SortOrder
     name?: SortOrder
+    password?: SortOrder
+    hashedRefreshToken?: SortOrder
+    role?: SortOrder
+    passwordResetToken?: SortOrder
+    passwordResetExpires?: SortOrder
+    isEmailVerified?: SortOrder
+    emailVerificationToken?: SortOrder
   }
 
   export type UserMysqlAvgOrderByAggregateInput = {
@@ -1981,12 +2221,26 @@ export namespace Prisma {
     id?: SortOrder
     email?: SortOrder
     name?: SortOrder
+    password?: SortOrder
+    hashedRefreshToken?: SortOrder
+    role?: SortOrder
+    passwordResetToken?: SortOrder
+    passwordResetExpires?: SortOrder
+    isEmailVerified?: SortOrder
+    emailVerificationToken?: SortOrder
   }
 
   export type UserMysqlMinOrderByAggregateInput = {
     id?: SortOrder
     email?: SortOrder
     name?: SortOrder
+    password?: SortOrder
+    hashedRefreshToken?: SortOrder
+    role?: SortOrder
+    passwordResetToken?: SortOrder
+    passwordResetExpires?: SortOrder
+    isEmailVerified?: SortOrder
+    emailVerificationToken?: SortOrder
   }
 
   export type UserMysqlSumOrderByAggregateInput = {
@@ -2045,12 +2299,56 @@ export namespace Prisma {
     _max?: NestedStringNullableFilter<$PrismaModel>
   }
 
+  export type EnumRoleWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.Role | EnumRoleFieldRefInput<$PrismaModel>
+    in?: $Enums.Role[]
+    notIn?: $Enums.Role[]
+    not?: NestedEnumRoleWithAggregatesFilter<$PrismaModel> | $Enums.Role
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumRoleFilter<$PrismaModel>
+    _max?: NestedEnumRoleFilter<$PrismaModel>
+  }
+
+  export type DateTimeNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
+    in?: Date[] | string[] | null
+    notIn?: Date[] | string[] | null
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeNullableWithAggregatesFilter<$PrismaModel> | Date | string | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedDateTimeNullableFilter<$PrismaModel>
+    _max?: NestedDateTimeNullableFilter<$PrismaModel>
+  }
+
+  export type BoolWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
+    not?: NestedBoolWithAggregatesFilter<$PrismaModel> | boolean
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedBoolFilter<$PrismaModel>
+    _max?: NestedBoolFilter<$PrismaModel>
+  }
+
   export type StringFieldUpdateOperationsInput = {
     set?: string
   }
 
   export type NullableStringFieldUpdateOperationsInput = {
     set?: string | null
+  }
+
+  export type EnumRoleFieldUpdateOperationsInput = {
+    set?: $Enums.Role
+  }
+
+  export type NullableDateTimeFieldUpdateOperationsInput = {
+    set?: Date | string | null
+  }
+
+  export type BoolFieldUpdateOperationsInput = {
+    set?: boolean
   }
 
   export type IntFieldUpdateOperationsInput = {
@@ -2100,6 +2398,29 @@ export namespace Prisma {
     endsWith?: string | StringFieldRefInput<$PrismaModel>
     search?: string
     not?: NestedStringNullableFilter<$PrismaModel> | string | null
+  }
+
+  export type NestedEnumRoleFilter<$PrismaModel = never> = {
+    equals?: $Enums.Role | EnumRoleFieldRefInput<$PrismaModel>
+    in?: $Enums.Role[]
+    notIn?: $Enums.Role[]
+    not?: NestedEnumRoleFilter<$PrismaModel> | $Enums.Role
+  }
+
+  export type NestedDateTimeNullableFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
+    in?: Date[] | string[] | null
+    notIn?: Date[] | string[] | null
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeNullableFilter<$PrismaModel> | Date | string | null
+  }
+
+  export type NestedBoolFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
+    not?: NestedBoolFilter<$PrismaModel> | boolean
   }
 
   export type NestedIntWithAggregatesFilter<$PrismaModel = never> = {
@@ -2174,6 +2495,38 @@ export namespace Prisma {
     gt?: number | IntFieldRefInput<$PrismaModel>
     gte?: number | IntFieldRefInput<$PrismaModel>
     not?: NestedIntNullableFilter<$PrismaModel> | number | null
+  }
+
+  export type NestedEnumRoleWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.Role | EnumRoleFieldRefInput<$PrismaModel>
+    in?: $Enums.Role[]
+    notIn?: $Enums.Role[]
+    not?: NestedEnumRoleWithAggregatesFilter<$PrismaModel> | $Enums.Role
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumRoleFilter<$PrismaModel>
+    _max?: NestedEnumRoleFilter<$PrismaModel>
+  }
+
+  export type NestedDateTimeNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
+    in?: Date[] | string[] | null
+    notIn?: Date[] | string[] | null
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeNullableWithAggregatesFilter<$PrismaModel> | Date | string | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedDateTimeNullableFilter<$PrismaModel>
+    _max?: NestedDateTimeNullableFilter<$PrismaModel>
+  }
+
+  export type NestedBoolWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
+    not?: NestedBoolWithAggregatesFilter<$PrismaModel> | boolean
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedBoolFilter<$PrismaModel>
+    _max?: NestedBoolFilter<$PrismaModel>
   }
 
 
