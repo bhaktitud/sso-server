@@ -1,0 +1,21 @@
+// Skema Prisma untuk koneksi MongoDB
+
+generator client {
+  provider = "prisma-client-js"
+  // Menentukan direktori output kustom untuk klien MongoDB
+  output   = "../generated/mongo" 
+}
+
+datasource db {
+  // Menggunakan provider MongoDB
+  provider = "mongodb"
+  // Menggunakan variabel lingkungan untuk URL koneksi MongoDB
+  url      = env("DATABASE_URL_MONGO")
+}
+
+// Model contoh untuk database MongoDB
+model UserMongo {
+  id    String  @id @default(auto()) @map("_id") @db.ObjectId
+  email String  @unique
+  name  String?
+} 
