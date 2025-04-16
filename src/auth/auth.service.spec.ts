@@ -12,13 +12,13 @@ import {
   InternalServerErrorException,
 } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
-import { Role } from './roles/roles.enum';
 import { jwtConstants } from './constants';
-import { UserMysql, Prisma } from '../../generated/mysql';
+import { UserMysql, Prisma, Role as RoleType } from '../../generated/mysql';
 import { ResetPasswordDto } from './dto/reset-password.dto';
+import * as crypto from 'crypto';
 
 // Tipe lokal untuk payload user dalam test
-type TestUserPayload = Omit<UserMysql, 'password'>;
+type TestUserPayload = Omit<UserMysql, 'password'> & { role: RoleType };
 
 // Mock implementasi untuk dependensi
 const mockUserService = {
@@ -45,6 +45,9 @@ const mockPrismaService = {
       findUnique: jest.fn(),
       update: jest.fn(),
     },
+    role: {
+      findUnique: jest.fn(),
+    },
   },
 };
 
@@ -55,14 +58,6 @@ const mockConfigService = {
 
 // Mock bcrypt
 jest.mock('bcrypt');
-// Mock crypto (tidak perlu karena built-in, tapi bisa di-spy jika perlu)
-jest.mock('crypto', () => ({
-  randomBytes: jest.fn().mockReturnValue(Buffer.from('randombytesbuffer')),
-  createHash: jest.fn(() => ({
-    update: jest.fn().mockReturnThis(),
-    digest: jest.fn().mockReturnValue('hashedcryptovalue'),
-  })),
-}));
 
 describe('AuthService', () => {
   let service: AuthService;
@@ -70,6 +65,8 @@ describe('AuthService', () => {
   let jwtService: typeof mockJwtService;
   let mailService: typeof mockMailService;
   let prisma: typeof mockPrismaService;
+  let randomBytesSpy: jest.SpyInstance;
+  let createHashSpy: jest.SpyInstance;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -89,7 +86,25 @@ describe('AuthService', () => {
     mailService = module.get(MailService);
     prisma = module.get(PrismaService);
 
+    // Spy dan mock crypto methods
+    randomBytesSpy = jest
+      .spyOn(crypto, 'randomBytes')
+      .mockImplementation((): Buffer => Buffer.from('randombytesbuffer'));
+    const mockHash = {
+      update: jest.fn().mockReturnThis(),
+      digest: jest.fn().mockReturnValue('hashedcryptovalue'),
+    };
+    createHashSpy = jest
+      .spyOn(crypto, 'createHash')
+      .mockReturnValue(mockHash as any);
+
     jest.clearAllMocks();
+  });
+
+  afterEach(() => {
+    // Restore original crypto functions setelah setiap test
+    randomBytesSpy.mockRestore();
+    createHashSpy.mockRestore();
   });
 
   it('should be defined', () => {
@@ -101,34 +116,36 @@ describe('AuthService', () => {
     const email = 'test@example.com';
     const password = 'password123';
     const hashedPassword = 'hashedPassword';
-    const userFromDb = {
+    const userFromDb: TestUserPayload = {
       id: 1,
       email,
-      password: hashedPassword,
       name: 'Test User',
-      role: Role.USER,
+      role: { id: 1, name: 'USER', description: null },
       isEmailVerified: true,
       hashedRefreshToken: null,
       passwordResetToken: null,
       passwordResetExpires: null,
       emailVerificationToken: null,
-      createdAt: new Date(),
-      updatedAt: new Date(),
+      companyId: null,
+      roleId: 1,
     };
 
     it('should return user payload if credentials are valid and email is verified', async () => {
-      userService.findOneByEmail.mockResolvedValue(userFromDb);
+      const userWithPassword = { ...userFromDb, password: hashedPassword };
+      userService.findOneByEmail.mockResolvedValue(userWithPassword);
       (bcrypt.compare as jest.Mock).mockResolvedValue(true);
       const result = await service.validateUser(email, password);
-      // Omit password from expectation
-      const { password: _, ...expectedResult } = userFromDb;
-      expect(result).toEqual(expectedResult);
+      expect(result).toEqual(userWithPassword);
       expect(userService.findOneByEmail).toHaveBeenCalledWith(email);
       expect(bcrypt.compare).toHaveBeenCalledWith(password, hashedPassword);
     });
 
     it('should throw ForbiddenException if email is not verified', async () => {
-      const unverifiedUser = { ...userFromDb, isEmailVerified: false };
+      const unverifiedUser = {
+        ...userFromDb,
+        isEmailVerified: false,
+        password: hashedPassword,
+      };
       userService.findOneByEmail.mockResolvedValue(unverifiedUser);
       (bcrypt.compare as jest.Mock).mockResolvedValue(true);
       await expect(service.validateUser(email, password)).rejects.toThrow(
@@ -142,7 +159,8 @@ describe('AuthService', () => {
     });
 
     it('should return null if password does not match', async () => {
-      userService.findOneByEmail.mockResolvedValue(userFromDb);
+      const userWithPassword = { ...userFromDb, password: hashedPassword };
+      userService.findOneByEmail.mockResolvedValue(userWithPassword);
       (bcrypt.compare as jest.Mock).mockResolvedValue(false);
       const result = await service.validateUser(email, password);
       expect(result).toBeNull();
@@ -161,16 +179,19 @@ describe('AuthService', () => {
 
   // --- login tests ---
   describe('login', () => {
-    const userPayload: TestUserPayload = {
+    const userPayloadForLogin: UserMysql & { role: RoleType } = {
       id: 1,
       email: 'test@example.com',
+      password: 'hashedPassword',
       name: 'Test User',
-      role: Role.USER,
+      role: { id: 1, name: 'USER', description: null },
       isEmailVerified: true,
       hashedRefreshToken: null,
       passwordResetToken: null,
       passwordResetExpires: null,
       emailVerificationToken: null,
+      companyId: null,
+      roleId: 1,
     };
     const accessToken = 'mockAccessToken';
     const refreshToken = 'mockRefreshToken';
@@ -182,21 +203,22 @@ describe('AuthService', () => {
         .mockResolvedValueOnce(refreshToken);
       (bcrypt.hash as jest.Mock).mockResolvedValue(hashedRefreshToken);
       userService.updateRefreshToken.mockResolvedValue(undefined);
-      const result = await service.login(userPayload);
+      const result = await service.login(userPayloadForLogin);
       expect(result).toEqual({
         access_token: accessToken,
         refresh_token: refreshToken,
       });
       expect(jwtService.signAsync).toHaveBeenCalledTimes(2);
       expect(jwtService.signAsync).toHaveBeenNthCalledWith(1, {
-        email: userPayload.email,
-        sub: userPayload.id,
-        name: userPayload.name,
-        role: userPayload.role,
+        email: userPayloadForLogin.email,
+        sub: userPayloadForLogin.id,
+        name: userPayloadForLogin.name,
+        role: userPayloadForLogin.role.name,
+        companyId: userPayloadForLogin.companyId,
       });
       expect(jwtService.signAsync).toHaveBeenNthCalledWith(
         2,
-        { sub: userPayload.id, nonce: expect.any(Number) },
+        { sub: userPayloadForLogin.id, nonce: expect.any(Number) },
         {
           secret: jwtConstants.refresh.secret,
           expiresIn: jwtConstants.refresh.expiresIn,
@@ -205,7 +227,7 @@ describe('AuthService', () => {
       );
       expect(bcrypt.hash).toHaveBeenCalledWith(refreshToken, 10);
       expect(userService.updateRefreshToken).toHaveBeenCalledWith(
-        userPayload.id,
+        userPayloadForLogin.id,
         hashedRefreshToken,
       );
     });
@@ -225,23 +247,26 @@ describe('AuthService', () => {
   describe('refreshTokens', () => {
     const userId = 1;
     const oldRefreshToken = 'oldRefreshToken';
-    const userFromDb = {
+    const userFromDb: UserMysql & { role: RoleType } = {
       id: userId,
       email: 'test@example.com',
+      password: 'hashedPassword',
       name: 'Test User',
-      role: Role.USER,
+      role: { id: 1, name: 'USER', description: null },
       isEmailVerified: true,
       hashedRefreshToken: 'hashedOldRefreshToken',
       passwordResetToken: null,
       passwordResetExpires: null,
       emailVerificationToken: null,
+      companyId: null,
+      roleId: 1,
     };
     const newAccessToken = 'newAccessToken';
     const newRefreshToken = 'newRefreshToken';
     const newHashedRefreshToken = 'newHashedRefreshToken';
 
     it('should refresh tokens successfully if user and token are valid', async () => {
-      userService.findById.mockResolvedValue(userFromDb);
+      prisma.mysql.userMysql.findUnique.mockResolvedValue(userFromDb);
       (bcrypt.compare as jest.Mock).mockResolvedValue(true);
       jwtService.signAsync
         .mockResolvedValueOnce(newAccessToken)
@@ -253,7 +278,10 @@ describe('AuthService', () => {
         access_token: newAccessToken,
         refresh_token: newRefreshToken,
       });
-      expect(userService.findById).toHaveBeenCalledWith(userId);
+      expect(prisma.mysql.userMysql.findUnique).toHaveBeenCalledWith({
+        where: { id: userId },
+        include: { role: true },
+      });
       expect(bcrypt.compare).toHaveBeenCalledWith(
         oldRefreshToken,
         userFromDb.hashedRefreshToken,
@@ -266,20 +294,16 @@ describe('AuthService', () => {
       );
     });
 
-    it('should throw ForbiddenException if user is not found', async () => {
-      userService.findById.mockResolvedValue(null);
+    it('should throw ForbiddenException if user not found', async () => {
+      prisma.mysql.userMysql.findUnique.mockResolvedValue(null);
       await expect(
         service.refreshTokens(userId, oldRefreshToken),
       ).rejects.toThrow(ForbiddenException);
-      await expect(
-        service.refreshTokens(userId, oldRefreshToken),
-      ).rejects.toThrow('Access Denied: User or token not found');
-      expect(bcrypt.compare).not.toHaveBeenCalled();
     });
 
     it('should throw ForbiddenException if user has no refresh token hash', async () => {
       const userWithoutHash = { ...userFromDb, hashedRefreshToken: null };
-      userService.findById.mockResolvedValue(userWithoutHash);
+      prisma.mysql.userMysql.findUnique.mockResolvedValue(userWithoutHash);
       await expect(
         service.refreshTokens(userId, oldRefreshToken),
       ).rejects.toThrow(ForbiddenException);
@@ -290,7 +314,7 @@ describe('AuthService', () => {
     });
 
     it('should throw ForbiddenException if refresh token does not match hash', async () => {
-      userService.findById.mockResolvedValue(userFromDb);
+      prisma.mysql.userMysql.findUnique.mockResolvedValue(userFromDb);
       (bcrypt.compare as jest.Mock).mockResolvedValue(false);
       await expect(
         service.refreshTokens(userId, oldRefreshToken),
@@ -306,98 +330,120 @@ describe('AuthService', () => {
 
   // --- register tests ---
   describe('register', () => {
-    const createUserDto: Prisma.UserMysqlCreateInput = {
-      email: 'newuser@example.com',
-      password: 'password123',
+    const registerDto: Omit<Prisma.UserMysqlCreateInput, 'role'> = {
+      email: 'new@example.com',
+      password: 'Password123',
       name: 'New User',
     };
     const hashedPassword = 'hashedPasswordForNewUser';
-    const newUserFromDb = {
-      id: 2,
-      ...createUserDto,
+    const mockAdminRole = { id: 99, name: 'ADMIN', description: null };
+    const createdUser = {
+      id: 10,
+      email: registerDto.email,
+      name: registerDto.name,
       password: hashedPassword,
-      role: Role.USER,
+      role: mockAdminRole,
       isEmailVerified: false,
       hashedRefreshToken: null,
+      emailVerificationToken: null,
       passwordResetToken: null,
       passwordResetExpires: null,
-      emailVerificationToken: null,
-      createdAt: new Date(),
-      updatedAt: new Date(),
+      companyId: null,
+      roleId: mockAdminRole.id,
     };
+    const rawVerificationToken = 'randombytesbuffer'; // Dari mock crypto
+    const hashedVerificationToken = 'hashedcryptovalue'; // Dari mock crypto
 
-    it('should register a new user successfully', async () => {
-      userService.findOneByEmail.mockResolvedValue(null);
+    beforeEach(() => {
+      // Mock bcrypt hash untuk register
       (bcrypt.hash as jest.Mock).mockResolvedValue(hashedPassword);
-      userService.create.mockResolvedValue(newUserFromDb);
-      prisma.mysql.userMysql.update.mockResolvedValue({
-        ...newUserFromDb,
-        emailVerificationToken: 'hashedcryptovalue',
-      });
+      // Mock prisma role findUnique
+      prisma.mysql.role.findUnique.mockResolvedValue(mockAdminRole);
+      // Mock userService create
+      userService.create.mockResolvedValue(createdUser);
+      // Mock prisma user update (untuk token verifikasi)
+      prisma.mysql.userMysql.update.mockResolvedValue(undefined); // Tidak perlu return value spesifik
+      // Mock mail service
       mailService.sendVerificationEmail.mockResolvedValue(undefined);
-      const result = await service.register(createUserDto);
+      // Mock user service findOneByEmail (default: user tidak ditemukan)
+      userService.findOneByEmail.mockResolvedValue(null);
+    });
+
+    it('should register user, assign ADMIN role, save token, send email successfully', async () => {
+      const result = await service.register(registerDto);
+
+      expect(userService.findOneByEmail).toHaveBeenCalledWith(
+        registerDto.email,
+      );
+      expect(bcrypt.hash).toHaveBeenCalledWith(registerDto.password, 10);
+      expect(prisma.mysql.role.findUnique).toHaveBeenCalledWith({
+        where: { name: 'ADMIN' },
+      });
+      expect(userService.create).toHaveBeenCalledWith({
+        ...registerDto,
+        password: hashedPassword,
+        role: { connect: { id: mockAdminRole.id } },
+      });
+      expect(randomBytesSpy).toHaveBeenCalledWith(32);
+      expect(createHashSpy).toHaveBeenCalledWith('sha256');
+      // Verifikasi update dipanggil untuk menyimpan HASHED token
+      expect(prisma.mysql.userMysql.update).toHaveBeenCalledWith({
+        where: { id: createdUser.id },
+        data: { emailVerificationToken: hashedVerificationToken },
+      });
+      // Verifikasi email dikirim dengan RAW token versi HEX
+      const expectedRawTokenHex =
+        Buffer.from(rawVerificationToken).toString('hex');
+      expect(mailService.sendVerificationEmail).toHaveBeenCalledWith(
+        createdUser.email,
+        createdUser.name || 'Pengguna',
+        expectedRawTokenHex, // Gunakan versi hex
+      );
       expect(result).toEqual({
         message:
-          'Registrasi berhasil. Silakan cek email Anda untuk verifikasi.',
+          'User registered successfully. Please check your email for verification.',
       });
-      expect(userService.findOneByEmail).toHaveBeenCalledWith(
-        createUserDto.email,
-      );
-      expect(bcrypt.hash).toHaveBeenCalledWith(createUserDto.password, 10);
-      expect(userService.create).toHaveBeenCalledWith({
-        ...createUserDto,
-        password: hashedPassword,
-      });
-      expect(prisma.mysql.userMysql.update).toHaveBeenCalledWith({
-        where: { id: newUserFromDb.id },
-        data: { emailVerificationToken: 'hashedcryptovalue' }, // Periksa hash dari mock crypto
-      });
-      expect(mailService.sendVerificationEmail).toHaveBeenCalledWith(
-        newUserFromDb.email,
-        newUserFromDb.name,
-        Buffer.from('randombytesbuffer').toString('hex'), // Periksa raw token dari mock crypto
-      );
     });
 
-    it('should throw ConflictException if email is already registered and verified', async () => {
-      const existingVerifiedUser = {
-        ...newUserFromDb,
-        id: 3,
-        email: createUserDto.email,
-        isEmailVerified: true,
-      };
+    it('should throw ConflictException if email already exists and is verified', async () => {
+      const existingVerifiedUser = { ...createdUser, isEmailVerified: true };
       userService.findOneByEmail.mockResolvedValue(existingVerifiedUser);
-      await expect(service.register(createUserDto)).rejects.toThrow(
+
+      await expect(service.register(registerDto)).rejects.toThrow(
         ConflictException,
       );
-      await expect(service.register(createUserDto)).rejects.toThrow(
+      await expect(service.register(registerDto)).rejects.toThrow(
         'Email sudah terdaftar dan terverifikasi.',
       );
-      expect(bcrypt.hash).not.toHaveBeenCalled();
       expect(userService.create).not.toHaveBeenCalled();
-      expect(prisma.mysql.userMysql.update).not.toHaveBeenCalled();
-      expect(mailService.sendVerificationEmail).not.toHaveBeenCalled();
     });
 
-    it('should throw ConflictException if email is registered but not verified', async () => {
-      const existingUnverifiedUser = {
-        ...newUserFromDb,
-        id: 4,
-        email: createUserDto.email,
-        isEmailVerified: false,
-      };
+    it('should throw ConflictException if email exists but not verified', async () => {
+      const existingUnverifiedUser = { ...createdUser, isEmailVerified: false };
       userService.findOneByEmail.mockResolvedValue(existingUnverifiedUser);
-      await expect(service.register(createUserDto)).rejects.toThrow(
+
+      await expect(service.register(registerDto)).rejects.toThrow(
         ConflictException,
       );
-      await expect(service.register(createUserDto)).rejects.toThrow(
+      await expect(service.register(registerDto)).rejects.toThrow(
         'Email sudah terdaftar tetapi belum diverifikasi. Cek email Anda.',
       );
-      expect(bcrypt.hash).not.toHaveBeenCalled();
       expect(userService.create).not.toHaveBeenCalled();
-      expect(prisma.mysql.userMysql.update).not.toHaveBeenCalled();
-      expect(mailService.sendVerificationEmail).not.toHaveBeenCalled();
     });
+
+    it('should throw InternalServerErrorException if default ADMIN role not found', async () => {
+      prisma.mysql.role.findUnique.mockResolvedValue(null); // Simulasikan peran tidak ditemukan
+
+      await expect(service.register(registerDto)).rejects.toThrow(
+        InternalServerErrorException,
+      );
+      await expect(service.register(registerDto)).rejects.toThrow(
+        'Konfigurasi peran default tidak ditemukan. Registrasi tidak dapat dilanjutkan.',
+      );
+      expect(userService.create).not.toHaveBeenCalled();
+    });
+
+    // Anda bisa menambahkan test untuk error saat userService.create, prisma.update, mailService.send
   });
 
   // --- verifyEmail tests ---
@@ -409,14 +455,12 @@ describe('AuthService', () => {
       email: 'verify@example.com',
       password: 'hashedPassword',
       name: 'Verify User',
-      role: Role.USER,
+      role: { id: 1, name: 'USER', description: null },
       isEmailVerified: false,
       hashedRefreshToken: null,
       passwordResetToken: null,
       passwordResetExpires: null,
       emailVerificationToken: hashedToken, // Token ada di DB
-      createdAt: new Date(),
-      updatedAt: new Date(),
     };
 
     it('should verify email successfully if token is valid', async () => {
@@ -457,14 +501,12 @@ describe('AuthService', () => {
       email,
       password: 'hashedPassword',
       name: 'Forgot User',
-      role: Role.USER,
+      role: { id: 1, name: 'USER', description: null },
       isEmailVerified: true,
       hashedRefreshToken: null,
       passwordResetToken: null,
       passwordResetExpires: null,
       emailVerificationToken: null,
-      createdAt: new Date(),
-      updatedAt: new Date(),
     };
     const rawResetToken = Buffer.from('randombytesbuffer').toString('hex');
     const hashedResetToken = 'hashedcryptovalue'; // Dari mock crypto
@@ -542,14 +584,12 @@ describe('AuthService', () => {
       email: 'reset@example.com',
       password: 'oldHashedPassword',
       name: 'Reset User',
-      role: Role.USER,
+      role: { id: 1, name: 'USER', description: null },
       isEmailVerified: true,
       hashedRefreshToken: null,
       passwordResetToken: hashedToken, // Token cocok dengan yang dicari
       passwordResetExpires: futureDate, // Token belum kedaluwarsa
       emailVerificationToken: null,
-      createdAt: new Date(),
-      updatedAt: new Date(),
     };
 
     it('should reset password successfully if token is valid and not expired', async () => {

@@ -121,7 +121,7 @@ describe('AppController & AuthController (e2e)', () => {
         email: dbUser.email,
         name: dbUser.name,
         role: dbUser.role,
-      } as RegisterResponse;
+      } as unknown as RegisterResponse;
     });
 
     it('POST /register - should fail if email already exists', () => {

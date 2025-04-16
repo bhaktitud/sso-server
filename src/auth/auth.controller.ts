@@ -8,6 +8,7 @@ import {
   HttpCode,
   HttpStatus,
   Param,
+  UnauthorizedException,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -22,16 +23,16 @@ import { LocalAuthGuard } from './guards/local-auth.guard';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { RefreshTokenGuard } from './guards/refresh-token.guard';
 import { UserMysql } from '../../generated/mysql';
-import { Roles } from './roles/roles.decorator';
-import { Role } from './roles/roles.enum';
-import { RolesGuard } from './roles/roles.guard';
 import { RegisterDto } from './dto/register.dto';
+import { LoginDto } from './dto/login.dto';
 import { ApiProperty } from '@nestjs/swagger';
 import { ProfileResponseDto } from './dto/profile-response.dto';
 import { LoginResponseDto } from './dto/login-response.dto';
 import { SuccessMessageResponseDto } from '@src/common/dto/success-message-response.dto';
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
+import { Public } from '@src/common/decorators/public.decorator';
+import { RequirePermission } from './permissions/require-permission.decorator';
 
 // Tipe untuk req.user setelah LocalAuthGuard
 type AuthenticatedUser = Omit<UserMysql, 'password'>;
@@ -41,7 +42,8 @@ interface AuthenticatedJwtPayload {
   userId: number;
   email: string;
   name?: string | null;
-  role: Role;
+  role: string;
+  companyId?: number | null;
 }
 
 // Tipe untuk payload yang divalidasi oleh RefreshTokenStrategy
@@ -86,10 +88,11 @@ export class AuthController {
    * Endpoint login
    * POST /auth/login
    */
-  @UseGuards(LocalAuthGuard)
+  @Public()
   @Post('login')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Log in a user' })
+  @ApiBody({ type: LoginDto })
   @ApiResponse({
     status: 200,
     description: 'Login successful, returns tokens.',
@@ -100,8 +103,15 @@ export class AuthController {
     description: 'Unauthorized (Invalid credentials)',
   })
   @ApiResponse({ status: 403, description: 'Forbidden (Account not verified)' })
-  login(@Request() req: { user: AuthenticatedUser }) {
-    return this.authService.login(req.user);
+  async login(@Body() loginDto: LoginDto) {
+    const user = await this.authService.validateUser(
+      loginDto.email,
+      loginDto.password,
+    );
+    if (!user) {
+      throw new UnauthorizedException('Invalid credentials');
+    }
+    return this.authService.login(user);
   }
 
   /**
@@ -200,13 +210,15 @@ export class AuthController {
   }
 
   @Get('admin-only')
-  @Roles(Role.ADMIN)
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @RequirePermission('admin:access')
   @ApiBearerAuth('jwt')
   @ApiOperation({ summary: 'Admin-only endpoint example' })
   @ApiResponse({ status: 200, description: 'Success (for admins).' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
-  @ApiResponse({ status: 403, description: 'Forbidden (User is not Admin)' })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden (User lacks permission)',
+  })
   adminOnlyEndpoint(@Request() req: { user: AuthenticatedJwtPayload }) {
     return {
       message: 'Welcome, Admin!',

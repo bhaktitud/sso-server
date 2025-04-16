@@ -10,13 +10,11 @@ import { MailService } from '@src/mail/mail.service';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import * as crypto from 'crypto';
-import { Prisma, UserMysql } from '../../generated/mysql';
+import { Prisma, UserMysql, Role } from '../../generated/mysql';
 import { jwtConstants } from './constants';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { PrismaService } from '@src/prisma/prisma.service';
 
-// Tipe untuk pengguna tanpa password
-type UserPayload = Omit<UserMysql, 'password'>;
 // Definisikan tipe untuk hasil token
 type Tokens = { access_token: string; refresh_token: string };
 
@@ -31,40 +29,46 @@ export class AuthService {
 
   /**
    * Memvalidasi pengguna berdasarkan email dan password.
-   * Digunakan oleh LocalStrategy.
+   * Mengembalikan user DENGAN password dan relasi role.
    */
-  async validateUser(email: string, pass: string): Promise<UserPayload | null> {
-    const user = await this.userService.findOneByEmail(email);
+  async validateUser(
+    email: string,
+    pass: string,
+  ): Promise<(UserMysql & { role: Role }) | null> {
+    const userWithRole = await this.userService.findOneByEmail(email);
 
-    // Cek password DAN status verifikasi email
-    if (user && (await bcrypt.compare(pass, user.password))) {
-      // Jika password cocok, cek verifikasi
-      if (!user.isEmailVerified) {
-        // Lempar error spesifik jika belum verifikasi
+    if (userWithRole && (await bcrypt.compare(pass, userWithRole.password))) {
+      if (!userWithRole.isEmailVerified) {
         throw new ForbiddenException(
           'Akun belum diverifikasi. Silakan cek email Anda.',
         );
       }
-      // Jika sudah diverifikasi, hapus password dan kembalikan user
-      const { password, ...result } = user;
-      return result;
+      // Kembalikan objek asli (dengan password)
+      return userWithRole;
     }
-    // Jika password tidak cocok atau user tidak ditemukan
     return null;
   }
 
   /**
    * Generate Access dan Refresh Token
    */
-  private async _generateTokens(user: UserPayload): Promise<Tokens> {
+  private async _generateTokens(payload: {
+    id: number;
+    email: string;
+    name: string | null;
+    role: string; // Hanya nama role
+    companyId: number | null;
+  }): Promise<Tokens> {
+    // Payload sudah sesuai untuk accessToken
     const accessTokenPayload = {
-      email: user.email,
-      sub: user.id,
-      name: user.name,
-      role: user.role,
+      sub: payload.id,
+      email: payload.email,
+      name: payload.name,
+      role: payload.role,
+      companyId: payload.companyId,
     };
     const refreshTokenPayload = {
-      sub: user.id,
+      sub: payload.id,
       nonce: Date.now(),
     };
 
@@ -98,9 +102,23 @@ export class AuthService {
   /**
    * Login: Validasi, generate token, simpan hash refresh token
    */
-  async login(user: UserPayload): Promise<Tokens> {
-    const tokens = await this._generateTokens(user);
-    await this._updateRefreshTokenHash(user.id, tokens.refresh_token);
+  async login(
+    userWithPasswordAndRole: UserMysql & { role: Role },
+  ): Promise<Tokens> {
+    // Buat payload baru secara manual untuk _generateTokens
+    const tokenGenerationPayload = {
+      id: userWithPasswordAndRole.id,
+      email: userWithPasswordAndRole.email,
+      name: userWithPasswordAndRole.name,
+      role: userWithPasswordAndRole.role.name,
+      companyId: userWithPasswordAndRole.companyId,
+    };
+    const tokens = await this._generateTokens(tokenGenerationPayload);
+    // Gunakan ID user asli untuk update refresh token hash
+    await this._updateRefreshTokenHash(
+      userWithPasswordAndRole.id,
+      tokens.refresh_token,
+    );
     return tokens;
   }
 
@@ -116,28 +134,38 @@ export class AuthService {
    * Refresh Tokens: Validasi refresh token, bandingkan hash, terbitkan token baru
    */
   async refreshTokens(userId: number, refreshToken: string): Promise<Tokens> {
-    const user = await this.userService.findById(userId);
-    // Periksa apakah user ada dan punya hash refresh token
-    if (!user || !user.hashedRefreshToken) {
+    // Cari user DENGAN relasi role (dan company jika perlu)
+    // Kita perlu memodifikasi userService.findById atau menggunakan prisma langsung
+    // Mari gunakan prisma langsung di sini untuk menyertakan relasi
+    const userWithRole = await this.prisma.mysql.userMysql.findUnique({
+      where: { id: userId },
+      include: { role: true /*, company: true*/ },
+    });
+
+    if (!userWithRole || !userWithRole.hashedRefreshToken) {
       throw new ForbiddenException('Access Denied: User or token not found');
     }
 
-    // Bandingkan refresh token yang diberikan dengan hash di DB
     const refreshTokenMatches = await bcrypt.compare(
       refreshToken,
-      user.hashedRefreshToken,
+      userWithRole.hashedRefreshToken,
     );
 
     if (!refreshTokenMatches) {
-      // Jika tidak cocok, ini mencurigakan, mungkin hapus semua token user?
-      // Atau setidaknya lempar error.
       throw new ForbiddenException('Access Denied: Invalid refresh token');
     }
 
-    // Generate token baru (Access & Refresh) - Rotasi Refresh Token
-    const tokens = await this._generateTokens(user);
-    // Update hash refresh token yang baru
-    await this._updateRefreshTokenHash(user.id, tokens.refresh_token);
+    // Buat payload eksplisit untuk _generateTokens
+    const tokenGenerationPayload = {
+      id: userWithRole.id,
+      email: userWithRole.email,
+      name: userWithRole.name,
+      role: userWithRole.role.name,
+      companyId: userWithRole.companyId,
+    };
+
+    const tokens = await this._generateTokens(tokenGenerationPayload);
+    await this._updateRefreshTokenHash(userWithRole.id, tokens.refresh_token);
 
     return tokens;
   }
@@ -251,18 +279,13 @@ export class AuthService {
    * Tidak langsung login.
    */
   async register(
-    createUserDto: Prisma.UserMysqlCreateInput,
+    registerDto: Omit<Prisma.UserMysqlCreateInput, 'role'>,
   ): Promise<{ message: string }> {
     const existingUser = await this.userService.findOneByEmail(
-      createUserDto.email,
+      registerDto.email,
     );
     if (existingUser) {
-      // Jika user sudah ada TAPI belum verifikasi, kirim ulang email verifikasi?
-      // Atau cukup lempar error.
       if (!existingUser.isEmailVerified) {
-        // TODO: Opsi: Kirim ulang email verifikasi daripada error
-        // await this.sendVerificationEmailForUser(existingUser);
-        // return { message: 'Email sudah terdaftar. Email verifikasi baru telah dikirim.' };
         throw new ConflictException(
           'Email sudah terdaftar tetapi belum diverifikasi. Cek email Anda.',
         );
@@ -271,19 +294,32 @@ export class AuthService {
     }
 
     const saltRounds = 10;
-    const hashedPassword = await bcrypt.hash(
-      createUserDto.password,
-      saltRounds,
-    );
+    const hashedPassword = await bcrypt.hash(registerDto.password, saltRounds);
 
-    // 1. Buat user baru (dengan isEmailVerified = false by default)
+    // --- Penambahan Logika Peran Default ---
+    const defaultRoleName = 'ADMIN';
+    const adminRole = await this.prisma.mysql.role.findUnique({
+      where: { name: defaultRoleName },
+    });
+
+    if (!adminRole) {
+      console.error(`Default role '${defaultRoleName}' not found in database.`);
+      throw new InternalServerErrorException(
+        `Konfigurasi peran default tidak ditemukan. Registrasi tidak dapat dilanjutkan.`,
+      );
+    }
+    // ----------------------------------------
+
     let newUser: UserMysql;
     try {
-      newUser = await this.userService.create({
-        ...createUserDto,
+      const createData: Prisma.UserMysqlCreateInput = {
+        ...registerDto,
         password: hashedPassword,
-        // isEmailVerified default false dari skema
-      });
+        role: {
+          connect: { id: adminRole.id },
+        },
+      };
+      newUser = await this.userService.create(createData);
     } catch (error: unknown) {
       console.error('Error during user creation in registration:', error);
       const message = error instanceof Error ? error.message : String(error);
@@ -292,48 +328,30 @@ export class AuthService {
       );
     }
 
-    // 2. Generate token verifikasi (raw & hashed SHA256)
-    const rawToken = crypto.randomBytes(32).toString('hex');
-    const hashedToken = crypto
+    // Logika untuk email verifikasi (ASUMSI NAMA FIELD: emailVerificationToken)
+    const rawVerificationToken = crypto.randomBytes(32).toString('hex');
+    const hashedVerificationToken = crypto
       .createHash('sha256')
-      .update(rawToken)
+      .update(rawVerificationToken)
       .digest('hex');
 
-    // 3. Simpan hash token verifikasi ke DB
-    console.log(
-      `---> Attempting to save verification token for user ID: ${newUser.id}`,
-    );
     try {
       await this.prisma.mysql.userMysql.update({
         where: { id: newUser.id },
-        data: { emailVerificationToken: hashedToken },
+        data: { emailVerificationToken: hashedVerificationToken },
       });
-    } catch (error) {
-      console.error('Error saving email verification token:', error);
-      // Mungkin hapus user yang baru dibuat? Tergantung logika bisnis.
-      throw new InternalServerErrorException(
-        'Gagal menyimpan token verifikasi.',
-      );
-    }
-
-    // 4. Kirim email verifikasi (dengan token RAW)
-    console.log(
-      `---> Attempting to call sendVerificationEmail for user ID: ${newUser.id} with rawToken: ${rawToken}`,
-    );
-    try {
       await this.mailService.sendVerificationEmail(
         newUser.email,
         newUser.name || 'Pengguna',
-        rawToken,
+        rawVerificationToken,
       );
     } catch (error) {
-      console.error('Error sending verification email:', error);
-      // Rollback? Log? Tergantung kebutuhan.
+      console.error('Error saving/sending verification email:', error);
     }
 
-    // 5. Kembalikan pesan sukses
     return {
-      message: 'Registrasi berhasil. Silakan cek email Anda untuk verifikasi.',
+      message:
+        'User registered successfully. Please check your email for verification.',
     };
   }
 
@@ -374,5 +392,47 @@ export class AuthService {
     }
 
     return { message: 'Email berhasil diverifikasi.' };
+  }
+
+  /**
+   * Mengirim ulang email verifikasi.
+   */
+  async resendVerificationEmail(email: string): Promise<{ message: string }> {
+    const user = await this.userService.findOneByEmail(email);
+    if (!user) {
+      return {
+        message:
+          'Jika email terdaftar dan belum diverifikasi, email verifikasi akan dikirim.',
+      };
+    }
+
+    if (user.isEmailVerified) {
+      throw new BadRequestException('Email sudah diverifikasi.');
+    }
+
+    // Logika sama seperti di register untuk generate & save token, lalu kirim email
+    const rawToken = crypto.randomBytes(32).toString('hex');
+    const hashedToken = crypto
+      .createHash('sha256')
+      .update(rawToken)
+      .digest('hex');
+
+    try {
+      await this.prisma.mysql.userMysql.update({
+        where: { id: user.id },
+        data: { emailVerificationToken: hashedToken },
+      });
+      await this.mailService.sendVerificationEmail(
+        user.email,
+        user.name || 'Pengguna',
+        rawToken,
+      );
+      return { message: 'Email verifikasi baru telah dikirim.' };
+    } catch (error) {
+      console.error('Error resending verification email:', error);
+      throw new InternalServerErrorException(
+        'Gagal mengirim ulang email verifikasi.',
+      );
+    }
   }
 }

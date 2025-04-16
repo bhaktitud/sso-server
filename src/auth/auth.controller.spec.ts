@@ -1,15 +1,18 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
-import { LocalAuthGuard } from './guards/local-auth.guard';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { RefreshTokenGuard } from './guards/refresh-token.guard';
-import { RolesGuard } from './roles/roles.guard';
 import { CanActivate } from '@nestjs/common';
 import { RegisterDto } from './dto/register.dto';
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
-import { Role } from './roles/roles.enum'; // Import Role
+import { LoginDto } from './dto/login.dto';
+import {
+  ForbiddenException,
+  UnauthorizedException,
+  ConflictException,
+} from '@nestjs/common';
 
 // Mock AuthService
 const mockAuthService = {
@@ -20,6 +23,7 @@ const mockAuthService = {
   verifyEmail: jest.fn(),
   forgotPassword: jest.fn(),
   resetPassword: jest.fn(),
+  validateUser: jest.fn(),
   // Tambahkan metode lain jika ada
 };
 
@@ -42,14 +46,9 @@ describe('AuthController', () => {
         },
       ],
     })
-      // Override semua guard yang digunakan di controller ini
-      .overrideGuard(LocalAuthGuard)
-      .useValue(mockGuard)
       .overrideGuard(JwtAuthGuard)
       .useValue(mockGuard)
       .overrideGuard(RefreshTokenGuard)
-      .useValue(mockGuard)
-      .overrideGuard(RolesGuard)
       .useValue(mockGuard)
       .compile();
 
@@ -64,18 +63,128 @@ describe('AuthController', () => {
     expect(controller).toBeDefined();
   });
 
-  // --- Test cases untuk endpoint controller akan ditambahkan di sini ---
+  // --- Test cases untuk endpoint POST /register ---
+  describe('register', () => {
+    const registerDto: RegisterDto = {
+      email: 'newuser@example.com',
+      password: 'NewPassword123',
+      name: 'New User', // Nama bersifat opsional di DTO kita
+    };
+    const expectedResult = {
+      message:
+        'User registered successfully. Please check your email for verification.',
+    };
+
+    it('should call AuthService.register with the correct DTO', async () => {
+      // Mock service method
+      service.register.mockResolvedValue(expectedResult);
+
+      await controller.register(registerDto);
+
+      // Verifikasi service.register dipanggil dengan DTO yang benar
+      expect(service.register).toHaveBeenCalledWith(registerDto);
+    });
+
+    it('should return the result from AuthService.register', async () => {
+      service.register.mockResolvedValue(expectedResult);
+
+      const result = await controller.register(registerDto);
+
+      // Verifikasi hasilnya sama dengan yang dikembalikan service
+      expect(result).toEqual(expectedResult);
+    });
+
+    // Anda bisa menambahkan test case lain untuk error, misalnya ConflictException
+    it('should let ConflictException from AuthService bubble up', async () => {
+      const conflictError = new ConflictException('Email already exists');
+      service.register.mockRejectedValue(conflictError);
+
+      await expect(controller.register(registerDto)).rejects.toThrow(
+        ConflictException,
+      );
+      await expect(controller.register(registerDto)).rejects.toThrow(
+        'Email already exists',
+      );
+    });
+  });
+
+  // --- Test cases untuk endpoint POST /login ---
+  describe('login', () => {
+    const loginDto: LoginDto = {
+      email: 'test@example.com',
+      password: 'password123',
+    };
+    const mockUser = {
+      // Objek user lengkap seperti yang dikembalikan validateUser
+      id: 1,
+      email: 'test@example.com',
+      password: 'hashedPassword',
+      name: 'Test User',
+      role: { id: 1, name: 'USER' }, // Sesuaikan dengan struktur Role Anda
+      companyId: null,
+      isEmailVerified: true,
+      hashedRefreshToken: null,
+      emailVerificationToken: null,
+      passwordResetToken: null,
+      passwordResetExpires: null,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+    const expectedTokens = {
+      access_token: 'accessToken',
+      refresh_token: 'refreshToken',
+    };
+
+    it('should call validateUser and login on success', async () => {
+      // Mock service methods
+      service.validateUser.mockResolvedValue(mockUser);
+      service.login.mockResolvedValue(expectedTokens);
+
+      const result = await controller.login(loginDto);
+
+      expect(service.validateUser).toHaveBeenCalledWith(
+        loginDto.email,
+        loginDto.password,
+      );
+      expect(service.login).toHaveBeenCalledWith(mockUser);
+      expect(result).toEqual(expectedTokens);
+    });
+
+    it('should throw UnauthorizedException if validateUser returns null', async () => {
+      // Mock validateUser untuk gagal
+      service.validateUser.mockResolvedValue(null);
+
+      // Harapkan controller melempar error
+      await expect(controller.login(loginDto)).rejects.toThrow(
+        'Invalid credentials',
+      );
+      // Pastikan service.login tidak dipanggil
+      expect(service.login).not.toHaveBeenCalled();
+    });
+
+    it('should let ForbiddenException from validateUser bubble up', async () => {
+      const forbiddenError = new ForbiddenException('Account not verified');
+      service.validateUser.mockRejectedValue(forbiddenError);
+
+      await expect(controller.login(loginDto)).rejects.toThrow(
+        ForbiddenException,
+      );
+      await expect(controller.login(loginDto)).rejects.toThrow(
+        'Account not verified',
+      );
+      expect(service.login).not.toHaveBeenCalled();
+    });
+  });
 
   // --- Test cases untuk endpoint POST /logout ---
   describe('logout', () => {
-    // Mock payload user dari JWT
     const mockJwtPayload = {
       userId: 1,
       email: 'test@example.com',
       name: 'Test User',
-      role: Role.USER,
+      role: 'USER',
+      companyId: null,
     };
-    // Mock request object
     const mockRequest = { user: mockJwtPayload };
     const expectedResult = { message: 'Logged out successfully' };
 
@@ -101,12 +210,10 @@ describe('AuthController', () => {
 
   // --- Test cases untuk endpoint POST /refresh ---
   describe('refreshTokens', () => {
-    // Mock payload dari RefreshTokenStrategy
     const mockRefreshTokenPayload = {
       sub: 1,
       refreshToken: 'validRefreshToken',
     };
-    // Mock request object
     const mockRequest = { user: mockRefreshTokenPayload };
     const expectedResult = {
       access_token: 'newAccess',
@@ -138,21 +245,19 @@ describe('AuthController', () => {
 
   // --- Test cases untuk endpoint GET /profile ---
   describe('getProfile', () => {
-    // Mock payload user dari JWT
     const mockJwtPayload = {
       userId: 1,
       email: 'test@example.com',
       name: 'Test User',
-      role: Role.USER,
+      role: 'USER',
+      companyId: null,
     };
-    // Mock request object
     const mockRequest = { user: mockJwtPayload };
-    // Hasil yang diharapkan (sesuai implementasi controller)
     const expectedResult = {
       userId: 1,
       email: 'test@example.com',
       name: 'Test User',
-      role: Role.USER,
+      role: 'USER',
     };
 
     it('should return the user profile data from the request payload', () => {
@@ -248,5 +353,30 @@ describe('AuthController', () => {
     });
   });
 
-  // --- Test cases untuk endpoint controller lainnya akan ditambahkan di sini ---
+  // --- Test cases untuk endpoint GET /admin-only ---
+  describe('adminOnlyEndpoint', () => {
+    const mockAdminPayload = {
+      userId: 2,
+      email: 'admin@example.com',
+      name: 'Admin User',
+      role: 'ADMIN', // Gunakan string 'ADMIN'
+      companyId: null,
+    };
+    const mockRequest = { user: mockAdminPayload };
+    const expectedResult = {
+      message: 'Welcome, Admin!',
+      user: mockAdminPayload,
+    };
+
+    it('should return the admin message and user payload', () => {
+      // Karena guard di-mock, kita hanya perlu memanggil method
+      const result = controller.adminOnlyEndpoint(mockRequest as any);
+
+      // Verifikasi hasilnya sesuai ekspektasi
+      expect(result).toEqual(expectedResult);
+    });
+
+    // Note: Test ini tidak menguji PermissionsGuard karena guard di-mock.
+    // Untuk menguji guard, perlu setup test yang berbeda.
+  });
 });

@@ -4,15 +4,14 @@ import { Injectable } from '@nestjs/common';
 import * as fs from 'fs';
 import { ConfigService } from '@nestjs/config';
 import { Algorithm } from 'jsonwebtoken';
-import { Role } from '@src/auth/roles/roles.enum';
 
-// Definisikan tipe untuk payload JWT
+// Definisikan tipe untuk payload JWT (sesuai dengan yang dibuat AuthService)
 interface JwtPayload {
-  sub: number; // ID Pengguna (dari UserMysql.id)
+  sub: number;
   email: string;
-  name?: string | null; // Nama bisa null
-  role: Role;
-  // Tambahkan klaim lain jika perlu (misalnya, roles)
+  name?: string | null;
+  role: string; // <<< Nama peran dari database (string)
+  companyId: number | null; // <<< ID Perusahaan (bisa null)
 }
 
 @Injectable()
@@ -61,11 +60,13 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
    * Nilai yang dikembalikan akan ditambahkan ke objek Request sebagai `req.user`.
    */
   validate(payload: JwtPayload) {
+    // Kembalikan semua data dari payload yang relevan untuk req.user
     return {
       userId: payload.sub,
       email: payload.email,
       name: payload.name,
-      role: payload.role,
+      role: payload.role, // Sertakan nama peran
+      companyId: payload.companyId, // Sertakan companyId
     };
   }
 }

@@ -1,7 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { JwtStrategy } from './jwt.strategy';
 import { ConfigService } from '@nestjs/config';
-import { Role } from '../roles/roles.enum';
 import * as fs from 'fs';
 
 // Mock ConfigService
@@ -13,17 +12,19 @@ const mockConfigService = {
 const mockReadFileSync = jest.spyOn(fs, 'readFileSync');
 
 // Definisikan nilai-nilai mock
-const mockPublicKeyString =
-  '-----BEGIN PUBLIC KEY-----\nmockPublicKeyContent\n-----END PUBLIC KEY-----';
+const mockPublicKeyString = `-----BEGIN PUBLIC KEY-----
+mockPublicKeyContent
+-----END PUBLIC KEY-----`;
 const mockPathFromConfig = 'mock/path/public.pem';
 const mockAlgorithmFromConfig = 'RS256';
 
-// Definisikan ulang tipe payload untuk test
+// Definisikan tipe payload langsung di sini
 interface TestJwtPayload {
   sub: number;
   email: string;
   name?: string | null;
-  role: Role;
+  role: string; // Gunakan string
+  companyId: number | null; // Harus ada, tidak opsional
 }
 
 describe('JwtStrategy', () => {
@@ -31,10 +32,10 @@ describe('JwtStrategy', () => {
   let configService: ConfigService;
 
   beforeEach(async () => {
-    // Reset mocks sebelum setiap tes
+    // Reset mocks
     jest.resetAllMocks();
 
-    // Setup mock ConfigService.get
+    // Setup mock ConfigService.get (perbaiki formatting lagi)
     mockConfigService.get.mockImplementation(
       (key: string, defaultValue?: any) => {
         if (key === 'JWT_PUBLIC_KEY_PATH') {
@@ -47,7 +48,7 @@ describe('JwtStrategy', () => {
       },
     );
 
-    // Setup mock fs.readFileSync
+    // Setup mock fs.readFileSync (perbaiki formatting)
     mockReadFileSync.mockImplementation((path, encoding) => {
       if (path === mockPathFromConfig && encoding === 'utf8') {
         return mockPublicKeyString;
@@ -91,7 +92,8 @@ describe('JwtStrategy', () => {
         sub: 1,
         email: 'test@example.com',
         name: 'Test User',
-        role: Role.USER,
+        role: 'USER',
+        companyId: null,
       };
       const result = strategy.validate(payload);
       expect(result).toEqual({
@@ -99,6 +101,7 @@ describe('JwtStrategy', () => {
         email: payload.email,
         name: payload.name,
         role: payload.role,
+        companyId: payload.companyId,
       });
     });
     it('should handle payload with null name', () => {
@@ -106,7 +109,8 @@ describe('JwtStrategy', () => {
         sub: 2,
         email: 'test2@example.com',
         name: null,
-        role: Role.ADMIN,
+        role: 'ADMIN',
+        companyId: 123,
       };
       const result = strategy.validate(payload);
       expect(result).toEqual({
@@ -114,6 +118,7 @@ describe('JwtStrategy', () => {
         email: payload.email,
         name: null,
         role: payload.role,
+        companyId: payload.companyId,
       });
     });
   });

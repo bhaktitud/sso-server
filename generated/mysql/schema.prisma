@@ -14,22 +14,47 @@ datasource db {
   url      = env("DATABASE_URL_MYSQL")
 }
 
-// Model contoh untuk database MySQL
+// Model UserMysql yang dimodifikasi
 model UserMysql {
   id                     Int       @id @default(autoincrement())
   email                  String    @unique
   name                   String?
   password               String
   hashedRefreshToken     String?   @db.Text
-  role                   Role      @default(USER)
   passwordResetToken     String?   @unique
   passwordResetExpires   DateTime?
   isEmailVerified        Boolean   @default(false)
   emailVerificationToken String?   @unique
+
+  // Tambahkan relasi ke Role (wajib)
+  roleId Int
+  role   Role @relation(fields: [roleId], references: [id])
+
+  // Tambahkan relasi ke Company (opsional, untuk user admin panel)
+  companyId Int?
+  company   Company? @relation(fields: [companyId], references: [id])
 }
 
-// Definisikan enum Role di sini (tidak perlu impor)
-enum Role {
-  USER
-  ADMIN
+// --- Model Baru --- //
+
+model Company {
+  id    Int         @id @default(autoincrement())
+  name  String      @unique
+  // Tambahkan field lain jika perlu (alamat, dll)
+  users UserMysql[] // Relasi ke UserMysql (untuk admin panel)
+}
+
+model Role {
+  id          Int          @id @default(autoincrement())
+  name        String       @unique // Misal: 'CUSTOMER', 'COMPANY_ADMIN', 'MARKETING_STAFF'
+  description String?
+  users       UserMysql[] // Relasi ke UserMysql
+  permissions Permission[] @relation("RolePermissions") // Relasi many-to-many ke Permission
+}
+
+model Permission {
+  id          Int     @id @default(autoincrement())
+  code        String  @unique // Misal: 'VIEW_CUSTOMER_LIST', 'CREATE_CUSTOMER'
+  description String?
+  roles       Role[]  @relation("RolePermissions") // Relasi many-to-many ke Role
 }

@@ -123,11 +123,29 @@ exports.Prisma.UserMysqlScalarFieldEnum = {
   name: 'name',
   password: 'password',
   hashedRefreshToken: 'hashedRefreshToken',
-  role: 'role',
   passwordResetToken: 'passwordResetToken',
   passwordResetExpires: 'passwordResetExpires',
   isEmailVerified: 'isEmailVerified',
-  emailVerificationToken: 'emailVerificationToken'
+  emailVerificationToken: 'emailVerificationToken',
+  roleId: 'roleId',
+  companyId: 'companyId'
+};
+
+exports.Prisma.CompanyScalarFieldEnum = {
+  id: 'id',
+  name: 'name'
+};
+
+exports.Prisma.RoleScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  description: 'description'
+};
+
+exports.Prisma.PermissionScalarFieldEnum = {
+  id: 'id',
+  code: 'code',
+  description: 'description'
 };
 
 exports.Prisma.SortOrder = {
@@ -148,13 +166,27 @@ exports.Prisma.UserMysqlOrderByRelevanceFieldEnum = {
   passwordResetToken: 'passwordResetToken',
   emailVerificationToken: 'emailVerificationToken'
 };
-exports.Role = exports.$Enums.Role = {
-  USER: 'USER',
-  ADMIN: 'ADMIN'
+
+exports.Prisma.CompanyOrderByRelevanceFieldEnum = {
+  name: 'name'
 };
 
+exports.Prisma.RoleOrderByRelevanceFieldEnum = {
+  name: 'name',
+  description: 'description'
+};
+
+exports.Prisma.PermissionOrderByRelevanceFieldEnum = {
+  code: 'code',
+  description: 'description'
+};
+
+
 exports.Prisma.ModelName = {
-  UserMysql: 'UserMysql'
+  UserMysql: 'UserMysql',
+  Company: 'Company',
+  Role: 'Role',
+  Permission: 'Permission'
 };
 
 /**

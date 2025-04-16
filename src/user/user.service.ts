@@ -1,20 +1,28 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '@src/prisma/prisma.service';
-import { UserMysql, Prisma } from '../../generated/mysql';
+import { UserMysql, Prisma, Role /*, Company*/ } from '../../generated/mysql';
+
+// Definisikan tipe baru yang menyertakan relasi role
+type UserWithRole = UserMysql & { role: Role };
 
 @Injectable()
 export class UserService {
   constructor(private prisma: PrismaService) {}
 
-  async findOneByEmail(email: string): Promise<UserMysql | null> {
+  async findOneByEmail(email: string): Promise<UserWithRole | null> {
     return await this.prisma.mysql.userMysql.findUnique({
       where: { email },
+      include: {
+        role: true,
+        // company: true, // Hapus include company sementara
+      },
     });
   }
 
-  async findById(id: number): Promise<UserMysql | null> {
+  async findById(id: number): Promise<UserWithRole | null> {
     return await this.prisma.mysql.userMysql.findUnique({
       where: { id },
+      include: { role: true },
     });
   }
 
@@ -48,33 +56,45 @@ export class UserService {
 
   async updateUser(
     userId: number,
-    data: Partial<UserMysql>, // Gunakan tipe UserMysql langsung
-  ): Promise<UserMysql> {
-    // Hapus properti yang tidak boleh diubah langsung (misal: email, role)
-    // Ini adalah contoh, sesuaikan dengan field yang ada di UserMysql
+    data: Partial<UserMysql>,
+  ): Promise<UserWithRole | null> {
+    // Hapus properti yang tidak boleh diubah langsung
     delete data.email;
-    delete data.role;
+    // delete data.role; // Hapus baris ini
     delete data.id;
-    delete data.password; // Password diubah via endpoint/metode terpisah
-    delete data.hashedRefreshToken; // Diubah via logout/refresh
-    delete data.isEmailVerified; // Hanya diubah via verifikasi
+    delete data.password;
+    delete data.hashedRefreshToken;
+    delete data.isEmailVerified;
     delete data.emailVerificationToken;
     delete data.passwordResetToken;
     delete data.passwordResetExpires;
+    // Juga hapus roleId dan companyId karena tidak boleh diubah di sini
+    delete data.roleId;
+    delete data.companyId;
 
-    // Pastikan hanya data yang valid yang tersisa
     if (Object.keys(data).length === 0) {
-      // Jika tidak ada data valid untuk diupdate, kembalikan user asli
-      // atau lempar error jika lebih sesuai
+      // findById sudah kita modifikasi untuk include role
       const currentUser = await this.findById(userId);
-      if (!currentUser) throw new Error('User not found during update.'); // Safety check
+      if (!currentUser) {
+        // Sebaiknya throw NotFoundException dari NestJS
+        console.error(`Update failed: User with ID ${userId} not found.`);
+        return null; // Atau throw error
+      }
       return currentUser;
     }
 
-    return await this.prisma.mysql.userMysql.update({
-      where: { id: userId },
-      data,
-    });
+    try {
+      return await this.prisma.mysql.userMysql.update({
+        where: { id: userId },
+        data,
+        include: { role: true }, // Tambahkan include: { role: true }
+      });
+    } catch (error) {
+      // Handle potential error (misal PrismaClientKnownRequestError jika user tidak ditemukan P2025)
+      // Atau biarkan error propagate
+      console.error(`Error updating user ${userId}:`, error);
+      return null; // Atau throw error
+    }
   }
 
   // Tambahkan metode lain sesuai kebutuhan (findById, dll.)

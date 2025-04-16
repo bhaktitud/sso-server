@@ -18,7 +18,6 @@ import {
 import { ViewProfileDto } from './dto/view-profile.dto';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 import { UserMysql as User } from '../../generated/mysql';
-import { Role as AppRole } from '@src/auth/roles/roles.enum';
 
 @ApiTags('User') // Group endpoints under 'User' tag in Swagger
 @ApiBearerAuth() // Indicate that endpoints require Bearer token
@@ -44,13 +43,11 @@ export class UserController {
       throw new NotFoundException('User not found');
     }
 
-    // Buat DTO secara eksplisit dengan field yang dibutuhkan
     const result: ViewProfileDto = {
       id: user.id,
       email: user.email,
       name: user.name,
-      // Pastikan tipe user.role bisa di-cast ke AppRole
-      role: user.role as AppRole,
+      role: user.role.name,
       isEmailVerified: user.isEmailVerified,
     };
 
@@ -87,13 +84,11 @@ export class UserController {
       throw new NotFoundException('User not found');
     }
 
-    // Buat DTO secara eksplisit dengan field yang dibutuhkan
     const result: ViewProfileDto = {
       id: updatedUser.id,
       email: updatedUser.email,
       name: updatedUser.name,
-      // Pastikan tipe updatedUser.role bisa di-cast ke AppRole
-      role: updatedUser.role as AppRole,
+      role: updatedUser.role.name,
       isEmailVerified: updatedUser.isEmailVerified,
     };
 
