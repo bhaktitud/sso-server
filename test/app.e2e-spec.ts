@@ -19,16 +19,22 @@ interface ProfileResponse {
   role: Role;
 }
 
-// --- Mock Mail Service --- 
+// --- Mock Mail Service ---
 // Objek untuk menyimpan token yang "dikirim"
-const mailTestData: { verificationToken: string | null } = { verificationToken: null };
+const mailTestData: { verificationToken: string | null } = {
+  verificationToken: null,
+};
 const mockMailService = {
   // Implementasi mock untuk metode yang dipanggil oleh AuthService
-  sendVerificationEmail: jest.fn().mockImplementation(async (to, name, token) => {
-    console.log(`---> MOCK sending verification email to ${to} with token ${token}`);
-    mailTestData.verificationToken = token; // Simpan token untuk tes
-    return Promise.resolve();
-  }),
+  sendVerificationEmail: jest
+    .fn()
+    .mockImplementation(async (to, name, token) => {
+      console.log(
+        `---> MOCK sending verification email to ${to} with token ${token}`,
+      );
+      mailTestData.verificationToken = token; // Simpan token untuk tes
+      return Promise.resolve();
+    }),
   // Tambahkan mock untuk metode lain jika dipanggil dalam alur lain yg diuji
   sendPasswordResetEmail: jest.fn().mockResolvedValue(undefined),
 };
@@ -49,23 +55,33 @@ describe('AppController & AuthController (e2e)', () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
     })
-    // Override MailService SEBELUM compile
-    .overrideProvider(MailService)
-    .useValue(mockMailService)
-    .compile();
+      // Override MailService SEBELUM compile
+      .overrideProvider(MailService)
+      .useValue(mockMailService)
+      .compile();
 
     app = moduleFixture.createNestApplication();
     // Terapkan ValidationPipe secara global (penting untuk tes validasi DTO)
-    app.useGlobalPipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true, transform: true }));
+    app.useGlobalPipes(
+      new ValidationPipe({
+        whitelist: true,
+        forbidNonWhitelisted: true,
+        transform: true,
+      }),
+    );
     await app.init();
 
     prisma = moduleFixture.get<PrismaService>(PrismaService);
     await prisma.onModuleInit();
-    await prisma.mysql.userMysql.deleteMany({ where: { email: testUser.email } });
+    await prisma.mysql.userMysql.deleteMany({
+      where: { email: testUser.email },
+    });
   });
 
   afterAll(async () => {
-    await prisma.mysql.userMysql.deleteMany({ where: { email: testUser.email } });
+    await prisma.mysql.userMysql.deleteMany({
+      where: { email: testUser.email },
+    });
     await prisma.mysql.$disconnect();
     await prisma.mongo.$disconnect();
     await app.close();
@@ -86,7 +102,7 @@ describe('AppController & AuthController (e2e)', () => {
         .expect(201);
 
       expect(response.body.message).toEqual(
-        'Registrasi berhasil. Silakan cek email Anda untuk verifikasi.'
+        'Registrasi berhasil. Silakan cek email Anda untuk verifikasi.',
       );
       // Verifikasi bahwa mock mail service dipanggil
       expect(mockMailService.sendVerificationEmail).toHaveBeenCalled();
@@ -94,11 +110,18 @@ describe('AppController & AuthController (e2e)', () => {
       expect(mailTestData.verificationToken).not.toBeNull(); // Lebih eksplisit
 
       // Simpan detail user yg dibuat (opsional, bisa query manual)
-      const dbUser = await prisma.mysql.userMysql.findUnique({where: {email: testUser.email}});
+      const dbUser = await prisma.mysql.userMysql.findUnique({
+        where: { email: testUser.email },
+      });
       expect(dbUser).toBeDefined();
       if (!dbUser) throw new Error('User not found after registration'); // Guard
       expect(dbUser.isEmailVerified).toBe(false);
-      createdUser = { id: dbUser.id, email: dbUser.email, name: dbUser.name, role: dbUser.role } as RegisterResponse;
+      createdUser = {
+        id: dbUser.id,
+        email: dbUser.email,
+        name: dbUser.name,
+        role: dbUser.role,
+      } as RegisterResponse;
     });
 
     it('POST /register - should fail if email already exists', () => {
@@ -157,7 +180,9 @@ describe('AppController & AuthController (e2e)', () => {
         .get(`/auth/verify-email/${tokenToVerify}`)
         .expect(400)
         .expect((res) => {
-          expect(res.body.message).toContain('Token verifikasi tidak valid atau sudah digunakan');
+          expect(res.body.message).toContain(
+            'Token verifikasi tidak valid atau sudah digunakan',
+          );
         });
     });
 

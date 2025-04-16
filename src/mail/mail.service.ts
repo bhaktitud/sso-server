@@ -37,7 +37,10 @@ export class MailService {
     token: string,
   ): Promise<void> {
     // Dapatkan base URL frontend dari .env via ConfigService
-    const frontendBaseUrl = this.configService.get<string>('FRONTEND_BASE_URL', 'http://localhost:3001'); // Default jika tidak ada
+    const frontendBaseUrl = this.configService.get<string>(
+      'FRONTEND_BASE_URL',
+      'http://localhost:3001',
+    ); // Default jika tidak ada
     const resetUrl = `${frontendBaseUrl}/reset-password?token=${token}`;
     const mailFrom = this.configService.get<string>(
       'MAIL_FROM',
@@ -75,7 +78,10 @@ export class MailService {
     token: string,
   ): Promise<void> {
     // Dapatkan base URL frontend dari .env via ConfigService
-    const frontendBaseUrl = this.configService.get<string>('FRONTEND_BASE_URL', 'http://localhost:3001'); // Default jika tidak ada
+    const frontendBaseUrl = this.configService.get<string>(
+      'FRONTEND_BASE_URL',
+      'http://localhost:3001',
+    ); // Default jika tidak ada
     const verificationUrl = `${frontendBaseUrl}/verify-email?token=${token}`;
     const mailFrom = this.configService.get<string>(
       'MAIL_FROM',

@@ -35,4 +35,4 @@ export class RegisterDto implements Prisma.UserMysqlCreateInput {
       'Password harus mengandung setidaknya satu huruf besar, satu huruf kecil, dan satu angka',
   })
   password: string;
-} 
+}

@@ -3,7 +3,6 @@ import {
   ConflictException,
   InternalServerErrorException,
   ForbiddenException,
-  NotFoundException,
   BadRequestException,
 } from '@nestjs/common';
 import { UserService } from '../user/user.service';
@@ -13,7 +12,6 @@ import * as bcrypt from 'bcrypt';
 import * as crypto from 'crypto';
 import { Prisma, UserMysql } from '../../generated/mysql';
 import { jwtConstants } from './constants';
-import { Role } from '../auth/roles/roles.enum';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { PrismaService } from '../prisma/prisma.service';
 
