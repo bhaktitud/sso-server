@@ -27,6 +27,11 @@ import { Role } from './roles/roles.enum';
 import { RolesGuard } from './roles/roles.guard';
 import { RegisterDto } from './dto/register.dto';
 import { ApiProperty } from '@nestjs/swagger';
+import { ProfileResponseDto } from './dto/profile-response.dto';
+import { LoginResponseDto } from './dto/login-response.dto';
+import { SuccessMessageResponseDto } from '@src/common/dto/success-message-response.dto';
+import { ForgotPasswordDto } from './dto/forgot-password.dto';
+import { ResetPasswordDto } from './dto/reset-password.dto';
 
 // Tipe untuk req.user setelah LocalAuthGuard
 type AuthenticatedUser = Omit<UserMysql, 'password'>;
@@ -43,14 +48,6 @@ interface AuthenticatedJwtPayload {
 interface ValidatedRefreshTokenPayload {
   sub: number;
   refreshToken: string;
-}
-
-// Tipe untuk response login (bisa dipindah ke DTO jika perlu)
-class LoginResponse {
-  @ApiProperty({ description: 'JWT Access Token' })
-  access_token: string;
-  @ApiProperty({ description: 'JWT Refresh Token' })
-  refresh_token: string;
 }
 
 // Tipe untuk response message generik
@@ -96,14 +93,13 @@ export class AuthController {
   @ApiResponse({
     status: 200,
     description: 'Login successful, returns tokens.',
-    type: LoginResponse,
+    type: LoginResponseDto,
   })
   @ApiResponse({
     status: 401,
     description: 'Unauthorized (Invalid credentials)',
   })
   @ApiResponse({ status: 403, description: 'Forbidden (Account not verified)' })
-  // Jadikan sinkron, tipe user dari LocalStrategy.validate
   login(@Request() req: { user: AuthenticatedUser }) {
     return this.authService.login(req.user);
   }
@@ -143,7 +139,7 @@ export class AuthController {
   @ApiResponse({
     status: 200,
     description: 'Tokens refreshed successfully.',
-    type: LoginResponse,
+    type: LoginResponseDto,
   })
   @ApiResponse({
     status: 401,
@@ -169,13 +165,22 @@ export class AuthController {
   @ApiOperation({ summary: 'Get current user profile' })
   @ApiResponse({
     status: 200,
-    description:
-      'Returns user profile.' /* , type: ProfileResponseDto (jika dibuat) */,
+    description: 'Returns current user profile data.',
+    type: ProfileResponseDto,
   })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   // Tipe user dari JwtStrategy.validate
-  getProfile(@Request() req: { user: AuthenticatedJwtPayload }) {
-    return req.user;
+  getProfile(
+    @Request() req: { user: AuthenticatedJwtPayload },
+  ): ProfileResponseDto {
+    // Buat objek baru yang sesuai dengan DTO untuk memastikan tipe
+    const userProfile: ProfileResponseDto = {
+      userId: req.user.userId,
+      email: req.user.email,
+      name: req.user.name ?? null, // Pastikan null jika undefined/null
+      role: req.user.role,
+    };
+    return userProfile;
   }
 
   @Get('verify-email/:token')
@@ -207,5 +212,25 @@ export class AuthController {
       message: 'Welcome, Admin!',
       user: req.user,
     };
+  }
+
+  @Post('forgot-password')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Request a password reset email' })
+  @ApiBody({ type: ForgotPasswordDto })
+  @ApiResponse({ status: 200, description: 'Password reset instructions sent (if email exists).', type: SuccessMessageResponseDto })
+  @ApiResponse({ status: 400, description: 'Validation failed' })
+  async forgotPassword(@Body() forgotPasswordDto: ForgotPasswordDto): Promise<SuccessMessageResponseDto> {
+    return this.authService.forgotPassword(forgotPasswordDto.email);
+  }
+
+  @Post('reset-password')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Reset password using token' })
+  @ApiBody({ type: ResetPasswordDto })
+  @ApiResponse({ status: 200, description: 'Password reset successfully.', type: SuccessMessageResponseDto })
+  @ApiResponse({ status: 400, description: 'Invalid/expired token or validation failed' })
+  async resetPassword(@Body() resetPasswordDto: ResetPasswordDto): Promise<SuccessMessageResponseDto> {
+    return this.authService.resetPassword(resetPasswordDto);
   }
 }
