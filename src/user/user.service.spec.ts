@@ -214,5 +214,108 @@ describe('UserService', () => {
     // it('should handle prisma update error', async () => { ... });
   });
 
+  // --- Test cases untuk metode updateUser ---
+  describe('updateUser', () => {
+    const userId = 1;
+    const currentUser: UserMysql = {
+      id: userId,
+      email: 'current@example.com',
+      password: 'hashedPassword',
+      name: 'Current Name',
+      role: Role.USER,
+      isEmailVerified: true,
+      hashedRefreshToken: null,
+      passwordResetToken: null,
+      passwordResetExpires: null,
+      emailVerificationToken: null,
+    };
+
+    it('should call prisma.update with filtered data (only name)', async () => {
+      const updateData: Partial<UserMysql> = {
+        name: 'Updated Name',
+        email: 'new@example.com', // Field ilegal
+        role: Role.ADMIN, // Field ilegal
+      };
+      const expectedUpdatePayload = { name: 'Updated Name' }; // Hanya name
+      const updatedUser = { ...currentUser, name: 'Updated Name' };
+
+      mockPrismaService.mysql.userMysql.update.mockResolvedValue(updatedUser);
+
+      await service.updateUser(userId, updateData);
+
+      expect(mockPrismaService.mysql.userMysql.update).toHaveBeenCalledWith({
+        where: { id: userId },
+        data: expectedUpdatePayload,
+      });
+    });
+
+    it('should return the updated user from prisma', async () => {
+      const updateData: Partial<UserMysql> = { name: 'Updated Name Again' };
+      const updatedUser = { ...currentUser, name: 'Updated Name Again' };
+      mockPrismaService.mysql.userMysql.update.mockResolvedValue(updatedUser);
+
+      const result = await service.updateUser(userId, updateData);
+
+      expect(result).toEqual(updatedUser);
+    });
+
+    it('should not call prisma.update and return current user if data is empty after filtering', async () => {
+      const updateData: Partial<UserMysql> = {
+        email: 'new@example.com', // Hanya field ilegal
+        role: Role.ADMIN,
+        password: 'newPassword',
+      };
+
+      // Mock findById yang akan dipanggil jika data kosong
+      mockPrismaService.mysql.userMysql.findUnique.mockResolvedValue(
+        currentUser,
+      );
+
+      const result = await service.updateUser(userId, updateData);
+
+      expect(mockPrismaService.mysql.userMysql.update).not.toHaveBeenCalled();
+      // Verifikasi findById dipanggil
+      expect(mockPrismaService.mysql.userMysql.findUnique).toHaveBeenCalledWith(
+        {
+          where: { id: userId },
+        },
+      );
+      expect(result).toEqual(currentUser);
+    });
+
+    it('should not call prisma.update and return current user if input data is empty', async () => {
+      const updateData: Partial<UserMysql> = {};
+
+      // Mock findById
+      mockPrismaService.mysql.userMysql.findUnique.mockResolvedValue(
+        currentUser,
+      );
+
+      const result = await service.updateUser(userId, updateData);
+
+      expect(mockPrismaService.mysql.userMysql.update).not.toHaveBeenCalled();
+      expect(mockPrismaService.mysql.userMysql.findUnique).toHaveBeenCalledWith(
+        {
+          where: { id: userId },
+        },
+      );
+      expect(result).toEqual(currentUser);
+    });
+
+    it('should throw error from findById if user not found when data is empty', async () => {
+      const updateData: Partial<UserMysql> = {};
+      // Mock findById mengembalikan null
+      mockPrismaService.mysql.userMysql.findUnique.mockResolvedValue(null);
+
+      await expect(service.updateUser(userId, updateData)).rejects.toThrow(
+        'User not found during update.',
+      );
+      expect(mockPrismaService.mysql.userMysql.update).not.toHaveBeenCalled();
+    });
+
+    // Opsional: Tes jika prisma.update gagal
+    // it('should handle prisma update error', async () => { ... });
+  });
+
   // --- Test cases untuk metode-metode UserService lainnya akan ditambahkan di sini ---
 });

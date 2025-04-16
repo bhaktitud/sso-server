@@ -57,6 +57,36 @@ $ npm run test:e2e
 $ npm run test:cov
 ```
 
+## API Endpoints
+
+### Authentication (`/auth`)
+
+- **POST `/auth/register`**: Register a new user.
+  - Body: `RegisterDto` (`email`, `password`, `name?`)
+- **POST `/auth/login`**: Login with email and password.
+  - Body: `LoginDto` (`email`, `password`)
+  - Returns: `LoginResponseDto` (`access_token`, `refresh_token`)
+- **POST `/auth/refresh`**: Refresh access token using refresh token.
+  - Requires Bearer Token (Refresh Token).
+  - Returns: `LoginResponseDto` (`access_token`, `refresh_token`)
+- **POST `/auth/logout`**: Logout user (invalidates refresh token).
+  - Requires Bearer Token (Access Token).
+- **POST `/auth/forgot-password`**: Request a password reset link.
+  - Body: `ForgotPasswordDto` (`email`)
+- **POST `/auth/reset-password`**: Reset password using token from email.
+  - Body: `ResetPasswordDto` (`token`, `password`)
+- **GET `/auth/verify-email/:token`**: Verify user's email address using token.
+
+### User Profile (`/users`)
+
+_Requires Bearer Token (Access Token) for all endpoints._
+
+- **GET `/users/me`**: Get the profile information of the currently logged-in user.
+  - Returns: `ViewProfileDto` (`id`, `email`, `name`, `role`, `isEmailVerified`)
+- **PATCH `/users/me`**: Update the profile information of the currently logged-in user.
+  - Body: `UpdateProfileDto` (`name?` - use empty string `""` to set name to null)
+  - Returns: `ViewProfileDto` (updated profile)
+
 ## Deployment
 
 When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.

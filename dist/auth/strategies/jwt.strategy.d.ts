@@ -1,6 +1,6 @@
 import { Strategy } from 'passport-jwt';
 import { ConfigService } from '@nestjs/config';
-import { Role } from '../roles/roles.enum';
+import { Role } from '@src/auth/roles/roles.enum';
 interface JwtPayload {
     sub: number;
     email: string;
@@ -11,7 +11,6 @@ declare const JwtStrategy_base: new (...args: [opt: import("passport-jwt").Strat
     validate(...args: any[]): unknown;
 };
 export declare class JwtStrategy extends JwtStrategy_base {
-    private configService;
     constructor(configService: ConfigService);
     validate(payload: JwtPayload): {
         userId: number;

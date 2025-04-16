@@ -13,15 +13,24 @@ exports.JwtStrategy = void 0;
 const passport_jwt_1 = require("passport-jwt");
 const passport_1 = require("@nestjs/passport");
 const common_1 = require("@nestjs/common");
-const constants_1 = require("../constants");
 const fs = require("fs");
 const config_1 = require("@nestjs/config");
 let JwtStrategy = class JwtStrategy extends (0, passport_1.PassportStrategy)(passport_jwt_1.Strategy) {
-    configService;
     constructor(configService) {
+        const publicKeyPath = configService.get('JWT_PUBLIC_KEY_PATH');
+        const algorithm = configService.get('JWT_ACCESS_ALGORITHM', 'RS256');
+        if (![
+            'RS256',
+            'HS256',
+            'ES256',
+        ].includes(algorithm)) {
+            throw new Error(`Unsupported JWT algorithm specified: ${algorithm}`);
+        }
         let publicKey;
         try {
-            const publicKeyPath = constants_1.jwtConstants.access.publicKeyPath;
+            if (!publicKeyPath) {
+                throw new Error('JWT_PUBLIC_KEY_PATH not found in configuration.');
+            }
             publicKey = fs.readFileSync(publicKeyPath, 'utf8');
         }
         catch (error) {
@@ -32,9 +41,8 @@ let JwtStrategy = class JwtStrategy extends (0, passport_1.PassportStrategy)(pas
             jwtFromRequest: passport_jwt_1.ExtractJwt.fromAuthHeaderAsBearerToken(),
             ignoreExpiration: false,
             secretOrKey: publicKey,
-            algorithms: [constants_1.jwtConstants.access.algorithm],
+            algorithms: [algorithm],
         });
-        this.configService = configService;
     }
     validate(payload) {
         return {

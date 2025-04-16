@@ -18,17 +18,17 @@ let UserService = class UserService {
         this.prisma = prisma;
     }
     async findOneByEmail(email) {
-        return this.prisma.mysql.userMysql.findUnique({
+        return await this.prisma.mysql.userMysql.findUnique({
             where: { email },
         });
     }
     async findById(id) {
-        return this.prisma.mysql.userMysql.findUnique({
+        return await this.prisma.mysql.userMysql.findUnique({
             where: { id },
         });
     }
     async create(data) {
-        return this.prisma.mysql.userMysql.create({
+        return await this.prisma.mysql.userMysql.create({
             data,
         });
     }
@@ -42,6 +42,27 @@ let UserService = class UserService {
         await this.prisma.mysql.userMysql.update({
             where: { id: userId },
             data: { password: newHashedPassword },
+        });
+    }
+    async updateUser(userId, data) {
+        delete data.email;
+        delete data.role;
+        delete data.id;
+        delete data.password;
+        delete data.hashedRefreshToken;
+        delete data.isEmailVerified;
+        delete data.emailVerificationToken;
+        delete data.passwordResetToken;
+        delete data.passwordResetExpires;
+        if (Object.keys(data).length === 0) {
+            const currentUser = await this.findById(userId);
+            if (!currentUser)
+                throw new Error('User not found during update.');
+            return currentUser;
+        }
+        return await this.prisma.mysql.userMysql.update({
+            where: { id: userId },
+            data,
         });
     }
 };
