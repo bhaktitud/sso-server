@@ -336,20 +336,20 @@ describe('AuthService', () => {
       name: 'New User',
     };
     const hashedPassword = 'hashedPasswordForNewUser';
-    const mockAdminRole = { id: 99, name: 'ADMIN', description: null };
+    const mockCustomerRole = { id: 1, name: 'CUSTOMER', description: null };
     const createdUser = {
       id: 10,
       email: registerDto.email,
       name: registerDto.name,
       password: hashedPassword,
-      role: mockAdminRole,
+      role: mockCustomerRole,
       isEmailVerified: false,
       hashedRefreshToken: null,
       emailVerificationToken: null,
       passwordResetToken: null,
       passwordResetExpires: null,
       companyId: null,
-      roleId: mockAdminRole.id,
+      roleId: mockCustomerRole.id,
     };
     const rawVerificationToken = 'randombytesbuffer'; // Dari mock crypto
     const hashedVerificationToken = 'hashedcryptovalue'; // Dari mock crypto
@@ -358,7 +358,7 @@ describe('AuthService', () => {
       // Mock bcrypt hash untuk register
       (bcrypt.hash as jest.Mock).mockResolvedValue(hashedPassword);
       // Mock prisma role findUnique
-      prisma.mysql.role.findUnique.mockResolvedValue(mockAdminRole);
+      prisma.mysql.role.findUnique.mockResolvedValue(mockCustomerRole);
       // Mock userService create
       userService.create.mockResolvedValue(createdUser);
       // Mock prisma user update (untuk token verifikasi)
@@ -369,7 +369,7 @@ describe('AuthService', () => {
       userService.findOneByEmail.mockResolvedValue(null);
     });
 
-    it('should register user, assign ADMIN role, save token, send email successfully', async () => {
+    it('should register user, assign CUSTOMER role, save token, send email successfully', async () => {
       const result = await service.register(registerDto);
 
       expect(userService.findOneByEmail).toHaveBeenCalledWith(
@@ -377,12 +377,12 @@ describe('AuthService', () => {
       );
       expect(bcrypt.hash).toHaveBeenCalledWith(registerDto.password, 10);
       expect(prisma.mysql.role.findUnique).toHaveBeenCalledWith({
-        where: { name: 'ADMIN' },
+        where: { name: 'CUSTOMER' },
       });
       expect(userService.create).toHaveBeenCalledWith({
         ...registerDto,
         password: hashedPassword,
-        role: { connect: { id: mockAdminRole.id } },
+        role: { connect: { id: mockCustomerRole.id } },
       });
       expect(randomBytesSpy).toHaveBeenCalledWith(32);
       expect(createHashSpy).toHaveBeenCalledWith('sha256');
@@ -431,8 +431,8 @@ describe('AuthService', () => {
       expect(userService.create).not.toHaveBeenCalled();
     });
 
-    it('should throw InternalServerErrorException if default ADMIN role not found', async () => {
-      prisma.mysql.role.findUnique.mockResolvedValue(null); // Simulasikan peran tidak ditemukan
+    it('should throw InternalServerErrorException if default CUSTOMER role not found', async () => {
+      prisma.mysql.role.findUnique.mockResolvedValue(null); // Simulasikan CUSTOMER tidak ditemukan
 
       await expect(service.register(registerDto)).rejects.toThrow(
         InternalServerErrorException,

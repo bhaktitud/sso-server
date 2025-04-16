@@ -59,17 +59,18 @@ export class AuthService {
     role: string; // Hanya nama role
     companyId: number | null;
   }): Promise<Tokens> {
-    // Payload sudah sesuai untuk accessToken
     const accessTokenPayload = {
+      jti: crypto.randomUUID(),
       sub: payload.id,
       email: payload.email,
       name: payload.name,
       role: payload.role,
       companyId: payload.companyId,
+      iat: Math.floor(Date.now() / 1000),
     };
     const refreshTokenPayload = {
+      jti: crypto.randomUUID(),
       sub: payload.id,
-      nonce: Date.now(),
     };
 
     const [accessToken, refreshToken] = await Promise.all([
@@ -297,12 +298,12 @@ export class AuthService {
     const hashedPassword = await bcrypt.hash(registerDto.password, saltRounds);
 
     // --- Penambahan Logika Peran Default ---
-    const defaultRoleName = 'ADMIN';
-    const adminRole = await this.prisma.mysql.role.findUnique({
+    const defaultRoleName = 'CUSTOMER';
+    const customerRole = await this.prisma.mysql.role.findUnique({
       where: { name: defaultRoleName },
     });
 
-    if (!adminRole) {
+    if (!customerRole) {
       console.error(`Default role '${defaultRoleName}' not found in database.`);
       throw new InternalServerErrorException(
         `Konfigurasi peran default tidak ditemukan. Registrasi tidak dapat dilanjutkan.`,
@@ -316,7 +317,7 @@ export class AuthService {
         ...registerDto,
         password: hashedPassword,
         role: {
-          connect: { id: adminRole.id },
+          connect: { id: customerRole.id },
         },
       };
       newUser = await this.userService.create(createData);

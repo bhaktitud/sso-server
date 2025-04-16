@@ -33,6 +33,7 @@ import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { Public } from '@src/common/decorators/public.decorator';
 import { RequirePermission } from './permissions/require-permission.decorator';
+import { PermissionsGuard } from './permissions/permissions.guard';
 
 // Tipe untuk req.user setelah LocalAuthGuard
 type AuthenticatedUser = Omit<UserMysql, 'password'>;
@@ -210,7 +211,8 @@ export class AuthController {
   }
 
   @Get('admin-only')
-  @RequirePermission('admin:access')
+  @UseGuards(JwtAuthGuard, PermissionsGuard)
+  @RequirePermission('ACCESS_ADMIN_FEATURES')
   @ApiBearerAuth('jwt')
   @ApiOperation({ summary: 'Admin-only endpoint example' })
   @ApiResponse({ status: 200, description: 'Success (for admins).' })

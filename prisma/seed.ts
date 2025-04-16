@@ -30,6 +30,10 @@ const permissionsToSeed: Prisma.PermissionCreateInput[] = [
     code: 'MANAGE_COMPANY_ROLES',
     description: 'Manage admin panel roles within own company',
   },
+  {
+    code: 'ACCESS_ADMIN_FEATURES',
+    description: 'Allow access to general admin features',
+  },
 ];
 
 // Peran yang tersedia dan izin defaultnya
@@ -54,6 +58,7 @@ const rolesToSeed = [
       'EDIT_ORDER_STATUS',
       'MANAGE_COMPANY_USERS', // Bisa kelola user di perusahaannya
       'MANAGE_COMPANY_ROLES', // Bisa kelola peran di perusahaannya
+      'ACCESS_ADMIN_FEATURES',
     ],
   },
   {

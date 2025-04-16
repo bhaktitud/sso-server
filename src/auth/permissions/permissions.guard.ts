@@ -26,59 +26,46 @@ export class PermissionsGuard implements CanActivate {
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    // 1. Dapatkan izin yang dibutuhkan dari decorator @RequirePermission
     const requiredPermissions = this.reflector.getAllAndOverride<string[]>(
       PERMISSIONS_KEY,
       [context.getHandler(), context.getClass()],
     );
 
-    // Jika tidak ada decorator @RequirePermission, izinkan akses
     if (!requiredPermissions || requiredPermissions.length === 0) {
       return true;
     }
 
-    // 2. Dapatkan objek user dari request (setelah JwtAuthGuard)
     const request = context.switchToHttp().getRequest();
     const user: RequestUser | undefined = request.user;
 
-    // Jika tidak ada user (misalnya JwtAuthGuard gagal atau tidak dipakai), tolak akses
     if (!user) {
-      // Sebaiknya lempar UnauthorizedException jika user tidak ada,
-      // tapi karena ini biasanya dijalankan SETELAH JwtAuthGuard,
-      // Forbidden lebih masuk akal (user ada tapi tidak punya izin).
-      // throw new UnauthorizedException();
-      return false; // Atau throw ForbiddenException
+      return false;
     }
 
-    // 3. Dapatkan nama peran user
     const userRoleName = user.role;
     if (!userRoleName) {
       console.error(
-        `User with ID ${user.userId} has no role name in JWT payload.`,
+        `User with ID ${user.userId} has no role name in JWT payload, denying access.`,
       );
       return false;
     }
 
-    // 4. Cari peran di DB dan izin yang dimilikinya
     const roleWithPermissions = await this.prisma.mysql.role.findUnique({
       where: { name: userRoleName },
       include: {
-        permissions: {
-          select: { code: true }, // Hanya butuh kode permission
-        },
+        permissions: { select: { code: true } },
       },
     });
 
-    // Jika peran tidak ditemukan di DB, tolak akses
     if (!roleWithPermissions) {
-      console.warn(`Role "${userRoleName}" found in JWT but not in database.`);
+      console.warn(
+        `Role "${userRoleName}" found in JWT but not in DB, denying access.`,
+      );
       return false;
     }
 
-    // 5. Ekstrak daftar kode izin yang dimiliki user
     const userPermissions = roleWithPermissions.permissions.map((p) => p.code);
 
-    // 6. Periksa apakah user memiliki SEMUA izin yang dibutuhkan
     const hasAllPermissions = requiredPermissions.every((requiredPermission) =>
       userPermissions.includes(requiredPermission),
     );
@@ -89,6 +76,6 @@ export class PermissionsGuard implements CanActivate {
       );
     }
 
-    return true; // Izinkan akses jika semua izin terpenuhi
+    return true;
   }
 }
