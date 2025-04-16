@@ -3,6 +3,7 @@ import { PassportStrategy } from '@nestjs/passport';
 import { Injectable } from '@nestjs/common';
 import { jwtConstants } from '../constants';
 import * as fs from 'fs';
+import { ConfigService } from '@nestjs/config';
 import { Role } from '../roles/roles.enum';
 
 // Definisikan tipe untuk payload JWT
@@ -16,11 +17,14 @@ interface JwtPayload {
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
-  constructor() {
+  constructor(private configService: ConfigService) {
     let publicKey: string;
     try {
-      // Baca kunci publik dari jwtConstants.access
-      publicKey = fs.readFileSync(jwtConstants.access.publicKeyPath, 'utf8');
+      // Baca path dari konstanta (atau bisa dari configService)
+      const publicKeyPath = jwtConstants.access.publicKeyPath;
+      // const publicKeyPath = configService.get<string>('JWT_PUBLIC_KEY_PATH');
+
+      publicKey = fs.readFileSync(publicKeyPath, 'utf8');
     } catch (error) {
       console.error(
         'FATAL: Could not read JWT public key for verification.',
@@ -33,7 +37,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
       secretOrKey: publicKey,
-      // Gunakan algoritma dari jwtConstants.access
+      // Algoritma dari konstanta
       algorithms: [jwtConstants.access.algorithm],
     });
   }

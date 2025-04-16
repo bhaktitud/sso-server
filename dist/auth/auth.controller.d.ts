@@ -1,13 +1,7 @@
 import { AuthService } from './auth.service';
-import { Prisma, UserMysql } from '../../generated/mysql';
+import { UserMysql } from '../../generated/mysql';
 import { Role } from './roles/roles.enum';
-import { ForgotPasswordDto } from './dto/forgot-password.dto';
-import { ResetPasswordDto } from './dto/reset-password.dto';
-declare class RegisterDto implements Prisma.UserMysqlCreateInput {
-    email: string;
-    password: string;
-    name?: string;
-}
+import { RegisterDto } from './dto/register.dto';
 type AuthenticatedUser = Omit<UserMysql, 'password'>;
 interface AuthenticatedJwtPayload {
     userId: number;
@@ -46,12 +40,6 @@ export declare class AuthController {
         user: AuthenticatedJwtPayload;
     }): AuthenticatedJwtPayload;
     verifyEmail(token: string): Promise<{
-        message: string;
-    }>;
-    forgotPassword(forgotPasswordDto: ForgotPasswordDto): Promise<{
-        message: string;
-    }>;
-    resetPassword(resetPasswordDto: ResetPasswordDto): Promise<{
         message: string;
     }>;
     adminOnlyEndpoint(req: {

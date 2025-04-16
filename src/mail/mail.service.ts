@@ -36,8 +36,9 @@ export class MailService {
     name: string,
     token: string,
   ): Promise<void> {
-    // Ganti YOUR_FRONTEND_PORT dan pastikan URL ini benar
-    const resetUrl = `http://localhost:YOUR_FRONTEND_PORT/reset-password?token=${token}`;
+    // Dapatkan base URL frontend dari .env via ConfigService
+    const frontendBaseUrl = this.configService.get<string>('FRONTEND_BASE_URL', 'http://localhost:3001'); // Default jika tidak ada
+    const resetUrl = `${frontendBaseUrl}/reset-password?token=${token}`;
     const mailFrom = this.configService.get<string>(
       'MAIL_FROM',
       '"No Reply" <noreply@example.com>',
@@ -73,9 +74,9 @@ export class MailService {
     name: string,
     token: string,
   ): Promise<void> {
-    // Ganti YOUR_FRONTEND_PORT dan pastikan URL ini benar
-    // Endpoint verifikasi biasanya GET
-    const verificationUrl = `http://localhost:YOUR_FRONTEND_PORT/verify-email?token=${token}`;
+    // Dapatkan base URL frontend dari .env via ConfigService
+    const frontendBaseUrl = this.configService.get<string>('FRONTEND_BASE_URL', 'http://localhost:3001'); // Default jika tidak ada
+    const verificationUrl = `${frontendBaseUrl}/verify-email?token=${token}`;
     const mailFrom = this.configService.get<string>(
       'MAIL_FROM',
       '"No Reply" <noreply@example.com>',

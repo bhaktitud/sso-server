@@ -15,11 +15,14 @@ const passport_1 = require("@nestjs/passport");
 const common_1 = require("@nestjs/common");
 const constants_1 = require("../constants");
 const fs = require("fs");
+const config_1 = require("@nestjs/config");
 let JwtStrategy = class JwtStrategy extends (0, passport_1.PassportStrategy)(passport_jwt_1.Strategy) {
-    constructor() {
+    configService;
+    constructor(configService) {
         let publicKey;
         try {
-            publicKey = fs.readFileSync(constants_1.jwtConstants.access.publicKeyPath, 'utf8');
+            const publicKeyPath = constants_1.jwtConstants.access.publicKeyPath;
+            publicKey = fs.readFileSync(publicKeyPath, 'utf8');
         }
         catch (error) {
             console.error('FATAL: Could not read JWT public key for verification.', error);
@@ -31,6 +34,7 @@ let JwtStrategy = class JwtStrategy extends (0, passport_1.PassportStrategy)(pas
             secretOrKey: publicKey,
             algorithms: [constants_1.jwtConstants.access.algorithm],
         });
+        this.configService = configService;
     }
     validate(payload) {
         return {
@@ -44,6 +48,6 @@ let JwtStrategy = class JwtStrategy extends (0, passport_1.PassportStrategy)(pas
 exports.JwtStrategy = JwtStrategy;
 exports.JwtStrategy = JwtStrategy = __decorate([
     (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [])
+    __metadata("design:paramtypes", [config_1.ConfigService])
 ], JwtStrategy);
 //# sourceMappingURL=jwt.strategy.js.map

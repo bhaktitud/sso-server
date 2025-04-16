@@ -11,23 +11,27 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ResetPasswordDto = void 0;
 const class_validator_1 = require("class-validator");
+const swagger_1 = require("@nestjs/swagger");
 class ResetPasswordDto {
     token;
     password;
 }
 exports.ResetPasswordDto = ResetPasswordDto;
 __decorate([
-    (0, class_validator_1.IsString)(),
+    (0, swagger_1.ApiProperty)({
+        example: 'abcdef123456',
+        description: 'Reset token received via email',
+    }),
     (0, class_validator_1.IsNotEmpty)({ message: 'Token tidak boleh kosong' }),
     __metadata("design:type", String)
 ], ResetPasswordDto.prototype, "token", void 0);
 __decorate([
-    (0, class_validator_1.IsString)(),
-    (0, class_validator_1.IsNotEmpty)({ message: 'Password baru tidak boleh kosong' }),
-    (0, class_validator_1.MinLength)(8, { message: 'Password minimal harus 8 karakter' }),
-    (0, class_validator_1.Matches)(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{8,}$/, {
-        message: 'Password baru harus mengandung setidaknya satu huruf besar, satu huruf kecil, dan satu angka',
+    (0, swagger_1.ApiProperty)({
+        example: 'NewSecureP@ssw0rd',
+        description: 'New password for the user account (min. 8 characters)',
     }),
+    (0, class_validator_1.MinLength)(8, { message: 'Password minimal 8 karakter' }),
+    (0, class_validator_1.IsNotEmpty)({ message: 'Password tidak boleh kosong' }),
     __metadata("design:type", String)
 ], ResetPasswordDto.prototype, "password", void 0);
 //# sourceMappingURL=reset-password.dto.js.map

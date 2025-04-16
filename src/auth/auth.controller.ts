@@ -9,45 +9,24 @@ import {
   HttpStatus,
   Param,
 } from '@nestjs/common';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBody,
+  ApiBearerAuth,
+  ApiParam,
+} from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 import { LocalAuthGuard } from './guards/local-auth.guard';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { RefreshTokenGuard } from './guards/refresh-token.guard';
-import { Prisma, UserMysql } from '../../generated/mysql';
+import { UserMysql } from '../../generated/mysql';
 import { Roles } from './roles/roles.decorator';
 import { Role } from './roles/roles.enum';
 import { RolesGuard } from './roles/roles.guard';
-import {
-  IsEmail,
-  IsNotEmpty,
-  IsString,
-  MinLength,
-  Matches,
-} from 'class-validator';
-import { ForgotPasswordDto } from './dto/forgot-password.dto';
-import { ResetPasswordDto } from './dto/reset-password.dto';
-
-// DTO untuk register dengan validasi
-class RegisterDto implements Prisma.UserMysqlCreateInput {
-  @IsEmail({}, { message: 'Format email tidak valid' })
-  @IsNotEmpty({ message: 'Email tidak boleh kosong' })
-  email: string;
-
-  @IsString()
-  @IsNotEmpty({ message: 'Password tidak boleh kosong' })
-  @MinLength(8, { message: 'Password minimal harus 8 karakter' })
-  // Contoh Regex: minimal 1 huruf kecil, 1 huruf besar, 1 angka
-  @Matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{8,}$/, {
-    message:
-      'Password harus mengandung setidaknya satu huruf besar, satu huruf kecil, dan satu angka',
-  })
-  password: string;
-
-  // Nama opsional, tapi jika ada harus string
-  @IsString()
-  @IsNotEmpty({ message: 'Password tidak boleh kosong' })
-  name?: string;
-}
+import { RegisterDto } from './dto/register.dto';
+import { ApiProperty } from '@nestjs/swagger';
 
 // Tipe untuk req.user setelah LocalAuthGuard
 type AuthenticatedUser = Omit<UserMysql, 'password'>;
@@ -66,6 +45,21 @@ interface ValidatedRefreshTokenPayload {
   refreshToken: string;
 }
 
+// Tipe untuk response login (bisa dipindah ke DTO jika perlu)
+class LoginResponse {
+  @ApiProperty({ description: 'JWT Access Token' })
+  access_token: string;
+  @ApiProperty({ description: 'JWT Refresh Token' })
+  refresh_token: string;
+}
+
+// Tipe untuk response message generik
+class SuccessMessageResponse {
+  @ApiProperty()
+  message: string;
+}
+
+@ApiTags('auth') // Tag untuk mengelompokkan di Swagger UI
 @Controller('auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
@@ -75,7 +69,16 @@ export class AuthController {
    * Mengembalikan pesan sukses, email verifikasi dikirim
    */
   @Post('register')
-  @HttpCode(HttpStatus.CREATED) // Tetap gunakan 201 Created
+  @HttpCode(HttpStatus.CREATED)
+  @ApiOperation({ summary: 'Register a new user' })
+  @ApiBody({ type: RegisterDto })
+  @ApiResponse({
+    status: 201,
+    description: 'User registered, verification email sent.',
+    type: SuccessMessageResponse,
+  })
+  @ApiResponse({ status: 400, description: 'Validation failed' })
+  @ApiResponse({ status: 409, description: 'Email already exists' })
   async register(
     @Body() registerDto: RegisterDto,
   ): Promise<{ message: string }> {
@@ -89,6 +92,17 @@ export class AuthController {
   @UseGuards(LocalAuthGuard)
   @Post('login')
   @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Log in a user' })
+  @ApiResponse({
+    status: 200,
+    description: 'Login successful, returns tokens.',
+    type: LoginResponse,
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'Unauthorized (Invalid credentials)',
+  })
+  @ApiResponse({ status: 403, description: 'Forbidden (Account not verified)' })
   // Jadikan sinkron, tipe user dari LocalStrategy.validate
   login(@Request() req: { user: AuthenticatedUser }) {
     return this.authService.login(req.user);
@@ -101,7 +115,15 @@ export class AuthController {
    */
   @UseGuards(JwtAuthGuard)
   @Post('logout')
+  @ApiBearerAuth('jwt') // Menandakan perlu Bearer token (cocokkan nama 'jwt')
   @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Log out the current user' })
+  @ApiResponse({
+    status: 200,
+    description: 'Logout successful.',
+    type: SuccessMessageResponse,
+  })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
   async logout(@Request() req: { user: AuthenticatedJwtPayload }) {
     await this.authService.logout(req.user.userId);
     // Tidak perlu mengembalikan apa pun atau kembalikan pesan sukses
@@ -115,7 +137,22 @@ export class AuthController {
    */
   @UseGuards(RefreshTokenGuard)
   @Post('refresh')
+  @ApiBearerAuth('jwt') // Refresh token dikirim sebagai Bearer token
   @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Refresh access and refresh tokens' })
+  @ApiResponse({
+    status: 200,
+    description: 'Tokens refreshed successfully.',
+    type: LoginResponse,
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'Unauthorized (Invalid/Expired Refresh Token)',
+  })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden (Refresh token revoked/not found)',
+  })
   async refreshTokens(@Request() req: { user: ValidatedRefreshTokenPayload }) {
     const userId = req.user.sub;
     const refreshToken = req.user.refreshToken;
@@ -128,6 +165,14 @@ export class AuthController {
    */
   @UseGuards(JwtAuthGuard)
   @Get('profile')
+  @ApiBearerAuth('jwt')
+  @ApiOperation({ summary: 'Get current user profile' })
+  @ApiResponse({
+    status: 200,
+    description:
+      'Returns user profile.' /* , type: ProfileResponseDto (jika dibuat) */,
+  })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
   // Tipe user dari JwtStrategy.validate
   getProfile(@Request() req: { user: AuthenticatedJwtPayload }) {
     return req.user;
@@ -135,27 +180,28 @@ export class AuthController {
 
   @Get('verify-email/:token')
   @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Verify user email address' })
+  @ApiParam({ name: 'token', description: 'Verification token from email' })
+  @ApiResponse({
+    status: 200,
+    description: 'Email verified successfully.',
+    type: SuccessMessageResponse,
+  })
+  @ApiResponse({ status: 400, description: 'Invalid or expired token' })
   async verifyEmail(
     @Param('token') token: string,
   ): Promise<{ message: string }> {
     return this.authService.verifyEmail(token);
   }
 
-  @Post('forgot-password')
-  @HttpCode(HttpStatus.OK)
-  async forgotPassword(@Body() forgotPasswordDto: ForgotPasswordDto) {
-    return this.authService.forgotPassword(forgotPasswordDto.email);
-  }
-
-  @Post('reset-password')
-  @HttpCode(HttpStatus.OK)
-  async resetPassword(@Body() resetPasswordDto: ResetPasswordDto) {
-    return this.authService.resetPassword(resetPasswordDto);
-  }
-
   @Get('admin-only')
   @Roles(Role.ADMIN)
   @UseGuards(JwtAuthGuard, RolesGuard)
+  @ApiBearerAuth('jwt')
+  @ApiOperation({ summary: 'Admin-only endpoint example' })
+  @ApiResponse({ status: 200, description: 'Success (for admins).' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({ status: 403, description: 'Forbidden (User is not Admin)' })
   adminOnlyEndpoint(@Request() req: { user: AuthenticatedJwtPayload }) {
     return {
       message: 'Welcome, Admin!',

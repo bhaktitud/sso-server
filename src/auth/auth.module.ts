@@ -10,6 +10,7 @@ import { JwtStrategy } from './strategies/jwt.strategy';
 import { RefreshTokenStrategy } from './strategies/refresh-token.strategy';
 import { MailModule } from '../mail/mail.module';
 import { PrismaModule } from '../prisma/prisma.module';
+import { ConfigService } from '@nestjs/config';
 import * as fs from 'fs';
 
 @Module({
@@ -19,24 +20,21 @@ import * as fs from 'fs';
     MailModule,
     PrismaModule,
     JwtModule.registerAsync({
+      inject: [ConfigService],
       useFactory: () => {
         let privateKey: string;
         let publicKey: string;
         try {
-          privateKey = fs.readFileSync(
-            jwtConstants.access.privateKeyPath,
-            'utf8',
-          );
-          publicKey = fs.readFileSync(
-            jwtConstants.access.publicKeyPath,
-            'utf8',
-          );
+          const privateKeyPath = jwtConstants.access.privateKeyPath;
+          const publicKeyPath = jwtConstants.access.publicKeyPath;
+          privateKey = fs.readFileSync(privateKeyPath, 'utf8');
+          publicKey = fs.readFileSync(publicKeyPath, 'utf8');
         } catch (error: unknown) {
           console.error('Error reading JWT keys:', error);
           const message =
             error instanceof Error ? error.message : String(error);
           throw new Error(
-            `Could not read JWT keys. Ensure 'keys/private.pem' and 'keys/public.pem' exist. Original error: ${message}`,
+            `Could not read JWT keys. Ensure keys exist at specified paths. Original error: ${message}`,
           );
         }
 

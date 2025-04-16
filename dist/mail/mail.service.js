@@ -36,7 +36,8 @@ let MailService = class MailService {
         }
     }
     async sendPasswordResetEmail(to, name, token) {
-        const resetUrl = `http://localhost:YOUR_FRONTEND_PORT/reset-password?token=${token}`;
+        const frontendBaseUrl = this.configService.get('FRONTEND_BASE_URL', 'http://localhost:3001');
+        const resetUrl = `${frontendBaseUrl}/reset-password?token=${token}`;
         const mailFrom = this.configService.get('MAIL_FROM', '"No Reply" <noreply@example.com>');
         console.log(`Attempting to send password reset email to ${to} from ${mailFrom}`);
         console.log(`Reset URL: ${resetUrl}`);
@@ -55,7 +56,8 @@ let MailService = class MailService {
         }
     }
     async sendVerificationEmail(to, name, token) {
-        const verificationUrl = `http://localhost:YOUR_FRONTEND_PORT/verify-email?token=${token}`;
+        const frontendBaseUrl = this.configService.get('FRONTEND_BASE_URL', 'http://localhost:3001');
+        const verificationUrl = `${frontendBaseUrl}/verify-email?token=${token}`;
         const mailFrom = this.configService.get('MAIL_FROM', '"No Reply" <noreply@example.com>');
         console.log(`Attempting to send verification email to ${to} from ${mailFrom}`);
         console.log(`Verification URL: ${verificationUrl}`);

@@ -1,16 +1,19 @@
-import { IsNotEmpty, IsString, MinLength, Matches } from 'class-validator';
+import { IsNotEmpty, MinLength } from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
 
 export class ResetPasswordDto {
-  @IsString()
+  @ApiProperty({
+    example: 'abcdef123456',
+    description: 'Reset token received via email',
+  })
   @IsNotEmpty({ message: 'Token tidak boleh kosong' })
   token: string;
 
-  @IsString()
-  @IsNotEmpty({ message: 'Password baru tidak boleh kosong' })
-  @MinLength(8, { message: 'Password minimal harus 8 karakter' })
-  @Matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{8,}$/, {
-    message:
-      'Password baru harus mengandung setidaknya satu huruf besar, satu huruf kecil, dan satu angka',
+  @ApiProperty({
+    example: 'NewSecureP@ssw0rd',
+    description: 'New password for the user account (min. 8 characters)',
   })
+  @MinLength(8, { message: 'Password minimal 8 karakter' })
+  @IsNotEmpty({ message: 'Password tidak boleh kosong' })
   password: string;
 }
