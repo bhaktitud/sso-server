@@ -12,4 +12,4 @@ export class LoginResponseDto {
     example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
   })
   refresh_token: string;
-} 
+}

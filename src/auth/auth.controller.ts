@@ -218,9 +218,15 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Request a password reset email' })
   @ApiBody({ type: ForgotPasswordDto })
-  @ApiResponse({ status: 200, description: 'Password reset instructions sent (if email exists).', type: SuccessMessageResponseDto })
+  @ApiResponse({
+    status: 200,
+    description: 'Password reset instructions sent (if email exists).',
+    type: SuccessMessageResponseDto,
+  })
   @ApiResponse({ status: 400, description: 'Validation failed' })
-  async forgotPassword(@Body() forgotPasswordDto: ForgotPasswordDto): Promise<SuccessMessageResponseDto> {
+  async forgotPassword(
+    @Body() forgotPasswordDto: ForgotPasswordDto,
+  ): Promise<SuccessMessageResponseDto> {
     return this.authService.forgotPassword(forgotPasswordDto.email);
   }
 
@@ -228,9 +234,18 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Reset password using token' })
   @ApiBody({ type: ResetPasswordDto })
-  @ApiResponse({ status: 200, description: 'Password reset successfully.', type: SuccessMessageResponseDto })
-  @ApiResponse({ status: 400, description: 'Invalid/expired token or validation failed' })
-  async resetPassword(@Body() resetPasswordDto: ResetPasswordDto): Promise<SuccessMessageResponseDto> {
+  @ApiResponse({
+    status: 200,
+    description: 'Password reset successfully.',
+    type: SuccessMessageResponseDto,
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Invalid/expired token or validation failed',
+  })
+  async resetPassword(
+    @Body() resetPasswordDto: ResetPasswordDto,
+  ): Promise<SuccessMessageResponseDto> {
     return this.authService.resetPassword(resetPasswordDto);
   }
 }
