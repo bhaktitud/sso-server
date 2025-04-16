@@ -2,7 +2,7 @@ import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { Request } from 'express';
 import { Injectable } from '@nestjs/common';
-import { jwtConstants } from '../constants';
+import { jwtConstants } from '@src/auth/constants';
 
 // Definisikan tipe untuk payload refresh token
 interface RefreshTokenPayload {

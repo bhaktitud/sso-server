@@ -1,10 +1,10 @@
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { PassportStrategy } from '@nestjs/passport';
 import { Injectable } from '@nestjs/common';
-import { jwtConstants } from '../constants';
+import { jwtConstants } from '@src/auth/constants';
 import * as fs from 'fs';
 import { ConfigService } from '@nestjs/config';
-import { Role } from '../roles/roles.enum';
+import { Role } from '@src/auth/roles/roles.enum';
 
 // Definisikan tipe untuk payload JWT
 interface JwtPayload {

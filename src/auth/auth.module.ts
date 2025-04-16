@@ -1,15 +1,15 @@
 import { Module } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
-import { UserModule } from '../user/user.module';
+import { UserModule } from '@src/user/user.module';
 import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 import { jwtConstants } from './constants';
 import { LocalStrategy } from './strategies/local.strategy';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { RefreshTokenStrategy } from './strategies/refresh-token.strategy';
-import { MailModule } from '../mail/mail.module';
-import { PrismaModule } from '../prisma/prisma.module';
+import { MailModule } from '@src/mail/mail.module';
+import { PrismaModule } from '@src/prisma/prisma.module';
 import { ConfigService } from '@nestjs/config';
 import * as fs from 'fs';
 

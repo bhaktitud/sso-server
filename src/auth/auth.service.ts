@@ -5,15 +5,15 @@ import {
   ForbiddenException,
   BadRequestException,
 } from '@nestjs/common';
-import { UserService } from '../user/user.service';
-import { MailService } from '../mail/mail.service';
+import { UserService } from '@src/user/user.service';
+import { MailService } from '@src/mail/mail.service';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import * as crypto from 'crypto';
 import { Prisma, UserMysql } from '../../generated/mysql';
 import { jwtConstants } from './constants';
 import { ResetPasswordDto } from './dto/reset-password.dto';
-import { PrismaService } from '../prisma/prisma.service';
+import { PrismaService } from '@src/prisma/prisma.service';
 
 // Tipe untuk pengguna tanpa password
 type UserPayload = Omit<UserMysql, 'password'>;

@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
+import { PrismaService } from '@src/prisma/prisma.service';
 import { UserMysql, Prisma } from '../../generated/mysql';
 
 @Injectable()
@@ -7,20 +7,20 @@ export class UserService {
   constructor(private prisma: PrismaService) {}
 
   async findOneByEmail(email: string): Promise<UserMysql | null> {
-    return this.prisma.mysql.userMysql.findUnique({
+    return await this.prisma.mysql.userMysql.findUnique({
       where: { email },
     });
   }
 
   async findById(id: number): Promise<UserMysql | null> {
-    return this.prisma.mysql.userMysql.findUnique({
+    return await this.prisma.mysql.userMysql.findUnique({
       where: { id },
     });
   }
 
   async create(data: Prisma.UserMysqlCreateInput): Promise<UserMysql> {
     // Pastikan untuk melakukan hash pada password sebelum memanggil ini
-    return this.prisma.mysql.userMysql.create({
+    return await this.prisma.mysql.userMysql.create({
       data,
     });
   }
