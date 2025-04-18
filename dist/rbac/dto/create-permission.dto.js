@@ -11,18 +11,31 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CreatePermissionDto = void 0;
 const class_validator_1 = require("class-validator");
+const swagger_1 = require("@nestjs/swagger");
 class CreatePermissionDto {
     action;
     subject;
 }
 exports.CreatePermissionDto = CreatePermissionDto;
 __decorate([
+    (0, swagger_1.ApiProperty)({
+        example: 'create',
+        description: 'Action that can be performed (e.g., create, read, update, delete, manage)',
+        maxLength: 100,
+        required: true,
+    }),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsNotEmpty)(),
     (0, class_validator_1.MaxLength)(100),
     __metadata("design:type", String)
 ], CreatePermissionDto.prototype, "action", void 0);
 __decorate([
+    (0, swagger_1.ApiProperty)({
+        example: 'article',
+        description: 'Resource or subject on which the action is performed (e.g., user, article, product)',
+        maxLength: 100,
+        required: true,
+    }),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsNotEmpty)(),
     (0, class_validator_1.MaxLength)(100),

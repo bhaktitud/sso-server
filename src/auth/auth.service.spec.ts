@@ -50,7 +50,7 @@ const mockPrismaService = {
     user: {
       findUnique: jest.fn(),
       update: jest.fn(),
-    }
+    },
   },
 };
 
@@ -342,12 +342,14 @@ describe('AuthService', () => {
 
     it('should register a new user successfully', async () => {
       userService.findOneByEmail.mockResolvedValue(null);
-      mockedBcrypt.hash.mockImplementation(() => Promise.resolve(hashedPassword));
+      mockedBcrypt.hash.mockImplementation(() =>
+        Promise.resolve(hashedPassword),
+      );
       userService.create.mockResolvedValue(createdUser);
 
       const result = await service.register(registerDto);
-      expect(result).toEqual({ 
-        message: expect.any(String) 
+      expect(result).toEqual({
+        message: expect.any(String),
       });
       expect(userService.findOneByEmail).toHaveBeenCalledWith(
         registerDto.email,
@@ -485,7 +487,9 @@ describe('AuthService', () => {
       expect(result).toEqual({
         message: 'Jika email terdaftar, instruksi reset password akan dikirim.',
       });
-      expect(userService.findOneByEmail).toHaveBeenCalledWith('exists@example.com');
+      expect(userService.findOneByEmail).toHaveBeenCalledWith(
+        'exists@example.com',
+      );
       expect(prisma.mysql.user.update).not.toHaveBeenCalled();
       expect(mailService.sendPasswordResetEmail).not.toHaveBeenCalled();
     });
@@ -513,7 +517,9 @@ describe('AuthService', () => {
 
     it('should reset password successfully if token is valid and not expired', async () => {
       prisma.mysql.user.findUnique.mockResolvedValue(userFromDb as any);
-      mockedBcrypt.hash.mockImplementation(() => Promise.resolve(hashedNewPassword));
+      mockedBcrypt.hash.mockImplementation(() =>
+        Promise.resolve(hashedNewPassword),
+      );
       prisma.mysql.user.update.mockResolvedValue({
         ...userFromDb,
         password: hashedNewPassword,
@@ -618,12 +624,14 @@ describe('AuthService', () => {
       };
 
       userService.findOneByEmail.mockResolvedValue(null);
-      mockedBcrypt.hash.mockImplementation(() => Promise.resolve(hashedPassword));
+      mockedBcrypt.hash.mockImplementation(() =>
+        Promise.resolve(hashedPassword),
+      );
       userService.create.mockResolvedValue(createdUser);
 
       const result = await service.register(createUserDto);
-      expect(result).toEqual({ 
-        message: expect.any(String) 
+      expect(result).toEqual({
+        message: expect.any(String),
       });
       expect(userService.findOneByEmail).toHaveBeenCalledWith(
         createUserDto.email,

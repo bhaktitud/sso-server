@@ -11,18 +11,31 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CreateCompanyDto = void 0;
 const class_validator_1 = require("class-validator");
+const swagger_1 = require("@nestjs/swagger");
 class CreateCompanyDto {
     name;
     description;
 }
 exports.CreateCompanyDto = CreateCompanyDto;
 __decorate([
+    (0, swagger_1.ApiProperty)({
+        example: 'Acme Corporation',
+        description: 'Name of the company',
+        maxLength: 150,
+        required: true,
+    }),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsNotEmpty)(),
     (0, class_validator_1.MaxLength)(150),
     __metadata("design:type", String)
 ], CreateCompanyDto.prototype, "name", void 0);
 __decorate([
+    (0, swagger_1.ApiProperty)({
+        example: 'A leading provider of services and products',
+        description: 'Brief description about the company',
+        maxLength: 500,
+        required: false,
+    }),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.MaxLength)(500),

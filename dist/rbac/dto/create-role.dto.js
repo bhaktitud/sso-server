@@ -11,18 +11,31 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CreateRoleDto = void 0;
 const class_validator_1 = require("class-validator");
+const swagger_1 = require("@nestjs/swagger");
 class CreateRoleDto {
     name;
     description;
 }
 exports.CreateRoleDto = CreateRoleDto;
 __decorate([
+    (0, swagger_1.ApiProperty)({
+        example: 'Content Manager',
+        description: 'Name of the role (unique)',
+        maxLength: 100,
+        required: true,
+    }),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsNotEmpty)(),
     (0, class_validator_1.MaxLength)(100),
     __metadata("design:type", String)
 ], CreateRoleDto.prototype, "name", void 0);
 __decorate([
+    (0, swagger_1.ApiProperty)({
+        example: 'Role for managing content and articles',
+        description: 'Brief description of role responsibilities',
+        maxLength: 255,
+        required: false,
+    }),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.MaxLength)(255),

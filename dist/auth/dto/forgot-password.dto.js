@@ -19,7 +19,8 @@ exports.ForgotPasswordDto = ForgotPasswordDto;
 __decorate([
     (0, swagger_1.ApiProperty)({
         example: 'user@example.com',
-        description: 'Email address to send password reset link',
+        description: 'Email address registered in the system to send password reset link',
+        required: true,
     }),
     (0, class_validator_1.IsEmail)({}, { message: 'Format email tidak valid' }),
     (0, class_validator_1.IsNotEmpty)({ message: 'Email tidak boleh kosong' }),

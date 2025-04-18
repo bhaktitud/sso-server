@@ -4,16 +4,18 @@ import { ApiProperty } from '@nestjs/swagger';
 export class LoginDto {
   @ApiProperty({
     example: 'john.doe@example.com',
-    description: 'User email address',
+    description: 'The email address used during registration',
+    required: true,
   })
   @IsEmail({}, { message: 'Format email tidak valid' })
   @IsNotEmpty({ message: 'Email tidak boleh kosong' })
   email: string;
 
   @ApiProperty({
-    example: 'Str0ngP@ssw0rd!', // Contoh bisa disesuaikan
-    description: 'User password',
-    minLength: 8, // Masih relevan meskipun validasi utama di guard
+    example: 'Password123',
+    description: 'Your account password',
+    minLength: 8,
+    required: true,
   })
   @IsString()
   @IsNotEmpty({ message: 'Password tidak boleh kosong' })

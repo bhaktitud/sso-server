@@ -19,7 +19,11 @@ class RegisterDto {
 }
 exports.RegisterDto = RegisterDto;
 __decorate([
-    (0, swagger_1.ApiProperty)({ example: 'John Doe', description: 'Full name of the user' }),
+    (0, swagger_1.ApiProperty)({
+        example: 'John Doe',
+        description: 'Full name of the user',
+        required: false,
+    }),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsNotEmpty)({ message: 'Nama tidak boleh kosong' }),
     __metadata("design:type", String)
@@ -28,6 +32,7 @@ __decorate([
     (0, swagger_1.ApiProperty)({
         example: 'john.doe@example.com',
         description: 'Unique email address for the user',
+        required: true,
     }),
     (0, class_validator_1.IsEmail)({}, { message: 'Format email tidak valid' }),
     (0, class_validator_1.IsNotEmpty)({ message: 'Email tidak boleh kosong' }),
@@ -35,9 +40,10 @@ __decorate([
 ], RegisterDto.prototype, "email", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({
-        example: 'Str0ngP@ssw0rd!',
-        description: 'User password, minimum 8 characters',
+        example: 'Password123',
+        description: 'User password. Must contain at least one uppercase letter, one lowercase letter, and one number with minimum 8 characters',
         minLength: 8,
+        required: true,
     }),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsNotEmpty)({ message: 'Password tidak boleh kosong' }),

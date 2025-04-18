@@ -19,16 +19,19 @@ class ResetPasswordDto {
 exports.ResetPasswordDto = ResetPasswordDto;
 __decorate([
     (0, swagger_1.ApiProperty)({
-        example: 'abcdef123456',
-        description: 'Reset token received via email',
+        example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9',
+        description: 'Reset token received in the password reset email link',
+        required: true,
     }),
     (0, class_validator_1.IsNotEmpty)({ message: 'Token tidak boleh kosong' }),
     __metadata("design:type", String)
 ], ResetPasswordDto.prototype, "token", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({
-        example: 'NewSecureP@ssw0rd',
-        description: 'New password for the user account (min. 8 characters)',
+        example: 'NewPassword123',
+        description: 'New password that meets the requirements: at least one uppercase letter, one lowercase letter, and one number',
+        minLength: 8,
+        required: true,
     }),
     (0, class_validator_1.MinLength)(8, { message: 'Password minimal 8 karakter' }),
     (0, class_validator_1.IsNotEmpty)({ message: 'Password tidak boleh kosong' }),

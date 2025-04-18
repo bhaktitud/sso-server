@@ -9,7 +9,11 @@ import {
 import { ApiProperty } from '@nestjs/swagger';
 
 export class RegisterDto {
-  @ApiProperty({ example: 'John Doe', description: 'Full name of the user' })
+  @ApiProperty({
+    example: 'John Doe',
+    description: 'Full name of the user',
+    required: false,
+  })
   @IsString()
   @IsNotEmpty({ message: 'Nama tidak boleh kosong' })
   name?: string;
@@ -17,15 +21,18 @@ export class RegisterDto {
   @ApiProperty({
     example: 'john.doe@example.com',
     description: 'Unique email address for the user',
+    required: true,
   })
   @IsEmail({}, { message: 'Format email tidak valid' })
   @IsNotEmpty({ message: 'Email tidak boleh kosong' })
   email: string;
 
   @ApiProperty({
-    example: 'Str0ngP@ssw0rd!',
-    description: 'User password, minimum 8 characters',
+    example: 'Password123',
+    description:
+      'User password. Must contain at least one uppercase letter, one lowercase letter, and one number with minimum 8 characters',
     minLength: 8,
+    required: true,
   })
   @IsString()
   @IsNotEmpty({ message: 'Password tidak boleh kosong' })

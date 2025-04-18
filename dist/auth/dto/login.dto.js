@@ -20,7 +20,8 @@ exports.LoginDto = LoginDto;
 __decorate([
     (0, swagger_1.ApiProperty)({
         example: 'john.doe@example.com',
-        description: 'User email address',
+        description: 'The email address used during registration',
+        required: true,
     }),
     (0, class_validator_1.IsEmail)({}, { message: 'Format email tidak valid' }),
     (0, class_validator_1.IsNotEmpty)({ message: 'Email tidak boleh kosong' }),
@@ -28,9 +29,10 @@ __decorate([
 ], LoginDto.prototype, "email", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({
-        example: 'Str0ngP@ssw0rd!',
-        description: 'User password',
+        example: 'Password123',
+        description: 'Your account password',
         minLength: 8,
+        required: true,
     }),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsNotEmpty)({ message: 'Password tidak boleh kosong' }),
