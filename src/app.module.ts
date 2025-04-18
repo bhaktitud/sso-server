@@ -7,6 +7,9 @@ import { UserModule } from './user/user.module';
 import { ConfigModule } from '@nestjs/config';
 import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
+import { RBACModule } from './rbac/rbac.module';
+import { CompanyModule } from './company/company.module';
+import { AdminModule } from './admin/admin.module';
 
 @Module({
   imports: [
@@ -22,6 +25,9 @@ import { APP_GUARD } from '@nestjs/core';
     PrismaModule,
     AuthModule,
     UserModule,
+    RBACModule,
+    CompanyModule,
+    AdminModule,
   ],
   controllers: [AppController],
   providers: [

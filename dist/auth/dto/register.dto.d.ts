@@ -1,5 +1,4 @@
-import { Prisma } from '../../../generated/mysql';
-export declare class RegisterDto implements Prisma.UserMysqlCreateInput {
+export declare class RegisterDto {
     name?: string;
     email: string;
     password: string;

@@ -9,4 +9,4 @@ export class SuccessMessageResponseDto {
     description: 'Success message',
   })
   message: string;
-} 
+}

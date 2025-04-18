@@ -14,22 +14,73 @@ datasource db {
   url      = env("DATABASE_URL_MYSQL")
 }
 
-// Model contoh untuk database MySQL
-model UserMysql {
-  id                 Int      @id @default(autoincrement())
-  email              String   @unique
-  name               String?
-  password           String
+// Enum untuk membedakan tipe pengguna
+enum UserType {
+  APP_USER
+  ADMIN_USER
+}
+
+// Model dasar untuk semua pengguna (menggantikan UserMysql)
+model User {
+  id           Int           @id @default(autoincrement()) // Menggunakan Int ID untuk MySQL
+  email        String        @unique
+  password     String
+  userType     UserType
+  // Field dari UserMysql yang mungkin masih relevan:
+  name         String?
   hashedRefreshToken String?  @db.Text
-  role               Role     @default(USER)
   passwordResetToken   String?  @unique
   passwordResetExpires DateTime?
   isEmailVerified        Boolean   @default(false)
   emailVerificationToken String?   @unique
+  // Akhir field dari UserMysql
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  adminProfile AdminProfile? // Relasi one-to-one opsional ke AdminProfile
 }
 
-// Definisikan enum Role di sini (tidak perlu impor)
-enum Role {
-  USER
-  ADMIN
+// Model untuk detail spesifik pengguna admin panel
+model AdminProfile {
+  id        Int      @id @default(autoincrement()) // Menggunakan Int ID
+  userId    Int      @unique // Kunci asing ke User (Int)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name      String
+  companyId Int?     // Kunci asing ke Company (Int) - Opsional
+  company   Company? @relation(fields: [companyId], references: [id])
+  roles     Role[]   @relation("AdminRoles") // Relasi Many-to-Many ke Role
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// Model untuk Perusahaan
+model Company {
+  id          Int            @id @default(autoincrement()) // Menggunakan Int ID
+  name        String
+  description String?
+  admins      AdminProfile[] // Relasi One-to-Many ke AdminProfile
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+}
+
+// Model untuk Peran (Role) - Menggantikan enum Role sebelumnya
+model Role {
+  id          Int            @id @default(autoincrement()) // Menggunakan Int ID
+  name        String         @unique // Nama peran harus unik (mis. 'Manager', 'OrderViewer')
+  description String?
+  admins      AdminProfile[] @relation("AdminRoles") // Relasi Many-to-Many ke AdminProfile
+  permissions Permission[]   @relation("RolePermissions") // Relasi Many-to-Many ke Permission
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+}
+
+// Model untuk Izin (Permission)
+model Permission {
+  id        Int      @id @default(autoincrement()) // Menggunakan Int ID
+  action    String // e.g., 'create', 'read', 'update', 'delete', 'manage'
+  subject   String // e.g., 'Order', 'User', 'Product', 'Company'
+  roles     Role[]   @relation("RolePermissions") // Relasi Many-to-Many ke Role
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([action, subject]) // Kombinasi action & subject harus unik
 }

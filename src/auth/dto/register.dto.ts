@@ -8,7 +8,7 @@ import {
 } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
-export class RegisterDto implements Prisma.UserMysqlCreateInput {
+export class RegisterDto {
   @ApiProperty({ example: 'John Doe', description: 'Full name of the user' })
   @IsString()
   @IsNotEmpty({ message: 'Nama tidak boleh kosong' })

@@ -117,17 +117,52 @@ exports.Prisma.TransactionIsolationLevel = makeStrictEnum({
   Serializable: 'Serializable'
 });
 
-exports.Prisma.UserMysqlScalarFieldEnum = {
+exports.Prisma.UserScalarFieldEnum = {
   id: 'id',
   email: 'email',
-  name: 'name',
   password: 'password',
+  userType: 'userType',
+  name: 'name',
   hashedRefreshToken: 'hashedRefreshToken',
-  role: 'role',
   passwordResetToken: 'passwordResetToken',
   passwordResetExpires: 'passwordResetExpires',
   isEmailVerified: 'isEmailVerified',
-  emailVerificationToken: 'emailVerificationToken'
+  emailVerificationToken: 'emailVerificationToken',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.AdminProfileScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  name: 'name',
+  companyId: 'companyId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.CompanyScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  description: 'description',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.RoleScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  description: 'description',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.PermissionScalarFieldEnum = {
+  id: 'id',
+  action: 'action',
+  subject: 'subject',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
 };
 
 exports.Prisma.SortOrder = {
@@ -140,21 +175,44 @@ exports.Prisma.NullsOrder = {
   last: 'last'
 };
 
-exports.Prisma.UserMysqlOrderByRelevanceFieldEnum = {
+exports.Prisma.UserOrderByRelevanceFieldEnum = {
   email: 'email',
-  name: 'name',
   password: 'password',
+  name: 'name',
   hashedRefreshToken: 'hashedRefreshToken',
   passwordResetToken: 'passwordResetToken',
   emailVerificationToken: 'emailVerificationToken'
 };
-exports.Role = exports.$Enums.Role = {
-  USER: 'USER',
-  ADMIN: 'ADMIN'
+
+exports.Prisma.AdminProfileOrderByRelevanceFieldEnum = {
+  name: 'name'
+};
+
+exports.Prisma.CompanyOrderByRelevanceFieldEnum = {
+  name: 'name',
+  description: 'description'
+};
+
+exports.Prisma.RoleOrderByRelevanceFieldEnum = {
+  name: 'name',
+  description: 'description'
+};
+
+exports.Prisma.PermissionOrderByRelevanceFieldEnum = {
+  action: 'action',
+  subject: 'subject'
+};
+exports.UserType = exports.$Enums.UserType = {
+  APP_USER: 'APP_USER',
+  ADMIN_USER: 'ADMIN_USER'
 };
 
 exports.Prisma.ModelName = {
-  UserMysql: 'UserMysql'
+  User: 'User',
+  AdminProfile: 'AdminProfile',
+  Company: 'Company',
+  Role: 'Role',
+  Permission: 'Permission'
 };
 
 /**

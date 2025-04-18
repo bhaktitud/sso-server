@@ -24,4 +24,4 @@ export class ProfileResponseDto {
     enum: Role, // Menunjukkan bahwa ini adalah enum
   })
   role: Role;
-} 
+}

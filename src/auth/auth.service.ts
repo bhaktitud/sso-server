@@ -10,13 +10,14 @@ import { MailService } from '@src/mail/mail.service';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import * as crypto from 'crypto';
-import { Prisma, UserMysql } from '../../generated/mysql';
+import { Prisma, User, UserType } from '../../generated/mysql';
 import { jwtConstants } from './constants';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { PrismaService } from '@src/prisma/prisma.service';
+import { RegisterDto } from './dto/register.dto';
 
 // Tipe untuk pengguna tanpa password
-type UserPayload = Omit<UserMysql, 'password'>;
+type UserPayload = Omit<User, 'password'>;
 // Definisikan tipe untuk hasil token
 type Tokens = { access_token: string; refresh_token: string };
 
@@ -61,7 +62,6 @@ export class AuthService {
       email: user.email,
       sub: user.id,
       name: user.name,
-      role: user.role,
     };
     const refreshTokenPayload = {
       sub: user.id,
@@ -166,7 +166,7 @@ export class AuthService {
 
     try {
       // Gunakan PrismaService langsung untuk update token reset
-      await this.prisma.mysql.userMysql.update({
+      await this.prisma.mysql.user.update({
         where: { id: user.id },
         data: {
           passwordResetToken: hashedToken,
@@ -210,7 +210,7 @@ export class AuthService {
       .digest('hex');
 
     // Cari user berdasarkan HASH SHA256
-    const user = await this.prisma.mysql.userMysql.findUnique({
+    const user = await this.prisma.mysql.user.findUnique({
       where: { passwordResetToken: hashedToken },
     });
 
@@ -219,7 +219,7 @@ export class AuthService {
     }
     if (!user.passwordResetExpires || user.passwordResetExpires < new Date()) {
       // Hapus token jika expired
-      await this.prisma.mysql.userMysql.update({
+      await this.prisma.mysql.user.update({
         where: { id: user.id },
         data: { passwordResetToken: null, passwordResetExpires: null },
       });
@@ -234,7 +234,7 @@ export class AuthService {
       // Panggil UserService untuk update password
       await this.userService.updatePassword(user.id, newHashedPassword);
       // Hapus token reset langsung via Prisma
-      await this.prisma.mysql.userMysql.update({
+      await this.prisma.mysql.user.update({
         where: { id: user.id },
         data: { passwordResetToken: null, passwordResetExpires: null },
       });
@@ -250,88 +250,53 @@ export class AuthService {
    * Registrasi: Buat user, simpan token verifikasi, kirim email.
    * Tidak langsung login.
    */
-  async register(
-    createUserDto: Prisma.UserMysqlCreateInput,
-  ): Promise<{ message: string }> {
-    const existingUser = await this.userService.findOneByEmail(
-      createUserDto.email,
-    );
+  async register(registerDto: RegisterDto): Promise<{ message: string }> {
+    const { email, password, name } = registerDto;
+
+    // 1. Cek apakah email sudah ada
+    const existingUser = await this.userService.findOneByEmail(email);
     if (existingUser) {
-      // Jika user sudah ada TAPI belum verifikasi, kirim ulang email verifikasi?
-      // Atau cukup lempar error.
-      if (!existingUser.isEmailVerified) {
-        // TODO: Opsi: Kirim ulang email verifikasi daripada error
-        // await this.sendVerificationEmailForUser(existingUser);
-        // return { message: 'Email sudah terdaftar. Email verifikasi baru telah dikirim.' };
-        throw new ConflictException(
-          'Email sudah terdaftar tetapi belum diverifikasi. Cek email Anda.',
-        );
-      }
-      throw new ConflictException('Email sudah terdaftar dan terverifikasi.');
+      throw new ConflictException('Email sudah terdaftar.');
     }
 
+    // 2. Hash password
     const saltRounds = 10;
-    const hashedPassword = await bcrypt.hash(
-      createUserDto.password,
-      saltRounds,
-    );
+    const hashedPassword = await bcrypt.hash(password, saltRounds);
 
-    // 1. Buat user baru (dengan isEmailVerified = false by default)
-    let newUser: UserMysql;
-    try {
-      newUser = await this.userService.create({
-        ...createUserDto,
-        password: hashedPassword,
-        // isEmailVerified default false dari skema
-      });
-    } catch (error: unknown) {
-      console.error('Error during user creation in registration:', error);
-      const message = error instanceof Error ? error.message : String(error);
-      throw new InternalServerErrorException(
-        `Could not create user: ${message}`,
-      );
-    }
-
-    // 2. Generate token verifikasi (raw & hashed SHA256)
-    const rawToken = crypto.randomBytes(32).toString('hex');
-    const hashedToken = crypto
+    // 3. Generate token verifikasi email
+    const rawVerificationToken = crypto.randomBytes(32).toString('hex');
+    const hashedVerificationToken = crypto
       .createHash('sha256')
-      .update(rawToken)
+      .update(rawVerificationToken)
       .digest('hex');
 
-    // 3. Simpan hash token verifikasi ke DB
-    console.log(
-      `---> Attempting to save verification token for user ID: ${newUser.id}`,
-    );
+    // 4. Buat user baru melalui UserService
     try {
-      await this.prisma.mysql.userMysql.update({
-        where: { id: newUser.id },
-        data: { emailVerificationToken: hashedToken },
+      await this.userService.create({
+        email: email,
+        password: hashedPassword,
+        name: name,
+        emailVerificationToken: hashedVerificationToken,
+        isEmailVerified: false,
+        userType: UserType.APP_USER,
       });
     } catch (error) {
-      console.error('Error saving email verification token:', error);
-      // Mungkin hapus user yang baru dibuat? Tergantung logika bisnis.
-      throw new InternalServerErrorException(
-        'Gagal menyimpan token verifikasi.',
-      );
+      console.error('Error creating user during registration:', error);
+      throw new InternalServerErrorException('Gagal membuat pengguna baru.');
     }
 
-    // 4. Kirim email verifikasi (dengan token RAW)
-    console.log(
-      `---> Attempting to call sendVerificationEmail for user ID: ${newUser.id} with rawToken: ${rawToken}`,
-    );
+    // 5. Kirim email verifikasi (jangan blokir response)
     try {
       await this.mailService.sendVerificationEmail(
-        newUser.email,
-        newUser.name || 'Pengguna',
-        rawToken,
+        email,
+        name || 'Pengguna Baru',
+        rawVerificationToken,
       );
     } catch (error) {
-      console.error('Error sending verification email:', error);
-      // Rollback? Log? Tergantung kebutuhan.
+      // Log error tapi jangan gagalkan registrasi
+      console.error('Failed to send verification email:', error);
     }
 
-    // 5. Kembalikan pesan sukses
     return {
       message: 'Registrasi berhasil. Silakan cek email Anda untuk verifikasi.',
     };
@@ -341,27 +306,29 @@ export class AuthService {
    * Verifikasi email menggunakan token
    */
   async verifyEmail(rawToken: string): Promise<{ message: string }> {
-    // 1. Hash token mentah dari user
     const hashedToken = crypto
       .createHash('sha256')
       .update(rawToken)
       .digest('hex');
 
-    // 2. Cari user berdasarkan HASH token verifikasi
-    const user = await this.prisma.mysql.userMysql.findUnique({
+    // Ganti userMysql menjadi user
+    const user = await this.prisma.mysql.user.findUnique({
       where: { emailVerificationToken: hashedToken },
     });
 
-    // 3. Validasi user dan token
     if (!user) {
       throw new BadRequestException(
         'Token verifikasi tidak valid atau sudah digunakan.',
       );
     }
 
-    // 4. Update user: set isEmailVerified true, hapus token
+    if (user.isEmailVerified) {
+      return { message: 'Email sudah diverifikasi sebelumnya.' };
+    }
+
     try {
-      await this.prisma.mysql.userMysql.update({
+      // Ganti userMysql menjadi user
+      await this.prisma.mysql.user.update({
         where: { id: user.id },
         data: {
           isEmailVerified: true,
@@ -369,7 +336,7 @@ export class AuthService {
         },
       });
     } catch (error) {
-      console.error('Error verifying email:', error);
+      console.error('Error updating user verification status:', error);
       throw new InternalServerErrorException('Gagal memverifikasi email.');
     }
 

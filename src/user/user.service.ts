@@ -1,26 +1,27 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '@src/prisma/prisma.service';
-import { UserMysql, Prisma } from '../../generated/mysql';
+import { User, Prisma } from '../../generated/mysql';
 
 @Injectable()
 export class UserService {
   constructor(private prisma: PrismaService) {}
 
-  async findOneByEmail(email: string): Promise<UserMysql | null> {
-    return await this.prisma.mysql.userMysql.findUnique({
+  async findOneByEmail(email: string): Promise<User | null> {
+    return await this.prisma.mysql.user.findUnique({
       where: { email },
     });
   }
 
-  async findById(id: number): Promise<UserMysql | null> {
-    return await this.prisma.mysql.userMysql.findUnique({
+  async findById(id: number): Promise<User | null> {
+    return await this.prisma.mysql.user.findUnique({
       where: { id },
     });
   }
 
-  async create(data: Prisma.UserMysqlCreateInput): Promise<UserMysql> {
+  async create(data: Prisma.UserCreateInput): Promise<User> {
     // Pastikan untuk melakukan hash pada password sebelum memanggil ini
-    return await this.prisma.mysql.userMysql.create({
+    // dan pastikan data menyertakan userType
+    return await this.prisma.mysql.user.create({
       data,
     });
   }
@@ -29,7 +30,7 @@ export class UserService {
     userId: number,
     hashedRefreshToken: string | null,
   ): Promise<void> {
-    await this.prisma.mysql.userMysql.update({
+    await this.prisma.mysql.user.update({
       where: { id: userId },
       data: { hashedRefreshToken },
     });
@@ -40,7 +41,7 @@ export class UserService {
     userId: number,
     newHashedPassword: string,
   ): Promise<void> {
-    await this.prisma.mysql.userMysql.update({
+    await this.prisma.mysql.user.update({
       where: { id: userId },
       data: { password: newHashedPassword },
     });

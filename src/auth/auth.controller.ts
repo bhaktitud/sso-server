@@ -21,7 +21,7 @@ import { AuthService } from './auth.service';
 import { LocalAuthGuard } from './guards/local-auth.guard';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { RefreshTokenGuard } from './guards/refresh-token.guard';
-import { UserMysql } from '../../generated/mysql';
+import { User } from '../../generated/mysql';
 import { Roles } from './roles/roles.decorator';
 import { Role } from './roles/roles.enum';
 import { RolesGuard } from './roles/roles.guard';
@@ -35,7 +35,7 @@ import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 
 // Tipe untuk req.user setelah LocalAuthGuard
-type AuthenticatedUser = Omit<UserMysql, 'password'>;
+type AuthenticatedUser = Omit<User, 'password'>;
 
 // Tipe untuk req.user setelah JwtAuthGuard (dari JwtPayload)
 interface AuthenticatedJwtPayload {

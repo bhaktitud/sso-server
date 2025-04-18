@@ -1,11 +1,11 @@
 import { PrismaService } from '@src/prisma/prisma.service';
-import { UserMysql, Prisma } from '../../generated/mysql';
+import { User, Prisma } from '../../generated/mysql';
 export declare class UserService {
     private prisma;
     constructor(prisma: PrismaService);
-    findOneByEmail(email: string): Promise<UserMysql | null>;
-    findById(id: number): Promise<UserMysql | null>;
-    create(data: Prisma.UserMysqlCreateInput): Promise<UserMysql>;
+    findOneByEmail(email: string): Promise<User | null>;
+    findById(id: number): Promise<User | null>;
+    create(data: Prisma.UserCreateInput): Promise<User>;
     updateRefreshToken(userId: number, hashedRefreshToken: string | null): Promise<void>;
     updatePassword(userId: number, newHashedPassword: string): Promise<void>;
 }

@@ -18,28 +18,28 @@ let UserService = class UserService {
         this.prisma = prisma;
     }
     async findOneByEmail(email) {
-        return await this.prisma.mysql.userMysql.findUnique({
+        return await this.prisma.mysql.user.findUnique({
             where: { email },
         });
     }
     async findById(id) {
-        return await this.prisma.mysql.userMysql.findUnique({
+        return await this.prisma.mysql.user.findUnique({
             where: { id },
         });
     }
     async create(data) {
-        return await this.prisma.mysql.userMysql.create({
+        return await this.prisma.mysql.user.create({
             data,
         });
     }
     async updateRefreshToken(userId, hashedRefreshToken) {
-        await this.prisma.mysql.userMysql.update({
+        await this.prisma.mysql.user.update({
             where: { id: userId },
             data: { hashedRefreshToken },
         });
     }
     async updatePassword(userId, newHashedPassword) {
-        await this.prisma.mysql.userMysql.update({
+        await this.prisma.mysql.user.update({
             where: { id: userId },
             data: { password: newHashedPassword },
         });

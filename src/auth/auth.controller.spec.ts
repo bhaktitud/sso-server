@@ -43,10 +43,14 @@ describe('AuthController', () => {
       ],
     })
       // Override semua guard yang digunakan di controller ini
-      .overrideGuard(LocalAuthGuard).useValue(mockGuard)
-      .overrideGuard(JwtAuthGuard).useValue(mockGuard)
-      .overrideGuard(RefreshTokenGuard).useValue(mockGuard)
-      .overrideGuard(RolesGuard).useValue(mockGuard)
+      .overrideGuard(LocalAuthGuard)
+      .useValue(mockGuard)
+      .overrideGuard(JwtAuthGuard)
+      .useValue(mockGuard)
+      .overrideGuard(RefreshTokenGuard)
+      .useValue(mockGuard)
+      .overrideGuard(RolesGuard)
+      .useValue(mockGuard)
       .compile();
 
     controller = module.get<AuthController>(AuthController);
@@ -245,4 +249,4 @@ describe('AuthController', () => {
   });
 
   // --- Test cases untuk endpoint controller lainnya akan ditambahkan di sini ---
-}); 
+});

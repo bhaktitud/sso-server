@@ -23,4 +23,4 @@ export class LoginDto {
     message: 'Password minimal harus 8 karakter (sebagai petunjuk)',
   })
   password: string;
-} 
+}
