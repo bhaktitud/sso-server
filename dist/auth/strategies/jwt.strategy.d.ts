@@ -1,11 +1,21 @@
 import { Strategy } from 'passport-jwt';
 import { ConfigService } from '@nestjs/config';
-import { Role } from '@src/auth/roles/roles.enum';
+import { UserType } from '../../../generated/mysql';
 interface JwtPayload {
     sub: number;
     email: string;
+    userType: UserType;
     name?: string | null;
-    role: Role;
+    profileId?: number;
+    roles?: string[];
+}
+interface RequestUser {
+    userId: number;
+    email: string;
+    userType: UserType;
+    name?: string | null;
+    profileId?: number;
+    roles?: string[];
 }
 declare const JwtStrategy_base: new (...args: [opt: import("passport-jwt").StrategyOptionsWithRequest] | [opt: import("passport-jwt").StrategyOptionsWithoutRequest]) => Strategy & {
     validate(...args: any[]): unknown;
@@ -13,11 +23,6 @@ declare const JwtStrategy_base: new (...args: [opt: import("passport-jwt").Strat
 export declare class JwtStrategy extends JwtStrategy_base {
     private configService;
     constructor(configService: ConfigService);
-    validate(payload: JwtPayload): {
-        userId: number;
-        email: string;
-        name: string | null | undefined;
-        role: Role;
-    };
+    validate(payload: JwtPayload): RequestUser;
 }
 export {};

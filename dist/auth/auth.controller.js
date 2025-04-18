@@ -30,6 +30,7 @@ const login_response_dto_1 = require("./dto/login-response.dto");
 const success_message_response_dto_1 = require("../common/dto/success-message-response.dto");
 const forgot_password_dto_1 = require("./dto/forgot-password.dto");
 const reset_password_dto_1 = require("./dto/reset-password.dto");
+const admin_login_dto_1 = require("./dto/admin-login.dto");
 class SuccessMessageResponse {
     message;
 }
@@ -80,6 +81,9 @@ let AuthController = class AuthController {
     }
     async resetPassword(resetPasswordDto) {
         return this.authService.resetPassword(resetPasswordDto);
+    }
+    adminLogin(adminLoginDto) {
+        return this.authService.adminLogin(adminLoginDto);
     }
 };
 exports.AuthController = AuthController;
@@ -243,6 +247,25 @@ __decorate([
     __metadata("design:paramtypes", [reset_password_dto_1.ResetPasswordDto]),
     __metadata("design:returntype", Promise)
 ], AuthController.prototype, "resetPassword", null);
+__decorate([
+    (0, common_1.Post)('admin/login'),
+    (0, common_1.HttpCode)(common_1.HttpStatus.OK),
+    (0, swagger_1.ApiOperation)({ summary: 'Log in an administrator' }),
+    (0, swagger_1.ApiBody)({ type: admin_login_dto_1.AdminLoginDto }),
+    (0, swagger_1.ApiResponse)({
+        status: 200,
+        description: 'Admin login successful, returns tokens.',
+        type: login_response_dto_1.LoginResponseDto,
+    }),
+    (0, swagger_1.ApiResponse)({
+        status: 403,
+        description: 'Forbidden (Invalid credentials or not an admin)',
+    }),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [admin_login_dto_1.AdminLoginDto]),
+    __metadata("design:returntype", void 0)
+], AuthController.prototype, "adminLogin", null);
 exports.AuthController = AuthController = __decorate([
     (0, swagger_1.ApiTags)('auth'),
     (0, common_1.Controller)('auth'),

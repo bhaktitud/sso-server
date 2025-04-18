@@ -12,6 +12,7 @@ import {
   ValidationPipe,
   HttpCode,
   HttpStatus,
+  UseGuards,
 } from '@nestjs/common';
 import { CompanyService } from './company.service';
 import { CreateCompanyDto } from './dto/create-company.dto';
@@ -23,12 +24,18 @@ import {
   ApiResponse,
   ApiParam,
   ApiBody,
+  ApiBearerAuth,
 } from '@nestjs/swagger';
 import { Company } from '../../generated/mysql';
+import { JwtAuthGuard } from '@src/auth/guards/jwt-auth.guard';
+import { PermissionsGuard } from '@src/auth/permissions/permissions.guard';
+import { RequirePermissions } from '@src/auth/permissions/permissions.decorator';
 
 @ApiTags('Companies Management')
 @Controller('companies')
 @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
+@ApiBearerAuth('jwt')
+@UseGuards(JwtAuthGuard, PermissionsGuard)
 export class CompanyController {
   constructor(private readonly companyService: CompanyService) {}
 
@@ -42,7 +49,11 @@ export class CompanyController {
     type: CompanyResponseDto,
   })
   @ApiResponse({ status: 400, description: 'Validation failed.' })
-  // TODO: Tambahkan Guard jika perlu (misal hanya Super Admin boleh buat company)
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden. Missing required permissions.',
+  })
+  @RequirePermissions('create:company')
   create(@Body() createCompanyDto: CreateCompanyDto): Promise<Company> {
     return this.companyService.create(createCompanyDto);
   }
@@ -54,7 +65,11 @@ export class CompanyController {
     description: 'List of companies.',
     type: [CompanyResponseDto],
   })
-  // TODO: Tambahkan Guard jika perlu
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden. Missing required permissions.',
+  })
+  @RequirePermissions('read:company')
   findAll(): Promise<Company[]> {
     return this.companyService.findAll();
   }
@@ -68,7 +83,11 @@ export class CompanyController {
     type: CompanyResponseDto,
   })
   @ApiResponse({ status: 404, description: 'Company not found.' })
-  // TODO: Tambahkan Guard jika perlu
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden. Missing required permissions.',
+  })
+  @RequirePermissions('read:company')
   findOne(@Param('id', ParseIntPipe) id: number): Promise<Company> {
     return this.companyService.findOne(id);
   }
@@ -84,7 +103,11 @@ export class CompanyController {
   })
   @ApiResponse({ status: 400, description: 'Validation failed.' })
   @ApiResponse({ status: 404, description: 'Company not found.' })
-  // TODO: Tambahkan Guard jika perlu
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden. Missing required permissions.',
+  })
+  @RequirePermissions('update:company')
   update(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateCompanyDto: UpdateCompanyDto,
@@ -102,7 +125,11 @@ export class CompanyController {
     status: 409,
     description: 'Conflict (e.g., company still has admins).',
   })
-  // TODO: Tambahkan Guard jika perlu
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden. Missing required permissions.',
+  })
+  @RequirePermissions('delete:company')
   async remove(@Param('id', ParseIntPipe) id: number): Promise<void> {
     await this.companyService.remove(id);
   }

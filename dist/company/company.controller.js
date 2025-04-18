@@ -19,6 +19,9 @@ const create_company_dto_1 = require("./dto/create-company.dto");
 const update_company_dto_1 = require("./dto/update-company.dto");
 const company_response_dto_1 = require("./dto/company-response.dto");
 const swagger_1 = require("@nestjs/swagger");
+const jwt_auth_guard_1 = require("../auth/guards/jwt-auth.guard");
+const permissions_guard_1 = require("../auth/permissions/permissions.guard");
+const permissions_decorator_1 = require("../auth/permissions/permissions.decorator");
 let CompanyController = class CompanyController {
     companyService;
     constructor(companyService) {
@@ -52,6 +55,11 @@ __decorate([
         type: company_response_dto_1.CompanyResponseDto,
     }),
     (0, swagger_1.ApiResponse)({ status: 400, description: 'Validation failed.' }),
+    (0, swagger_1.ApiResponse)({
+        status: 403,
+        description: 'Forbidden. Missing required permissions.',
+    }),
+    (0, permissions_decorator_1.RequirePermissions)('create:company'),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [create_company_dto_1.CreateCompanyDto]),
@@ -65,6 +73,11 @@ __decorate([
         description: 'List of companies.',
         type: [company_response_dto_1.CompanyResponseDto],
     }),
+    (0, swagger_1.ApiResponse)({
+        status: 403,
+        description: 'Forbidden. Missing required permissions.',
+    }),
+    (0, permissions_decorator_1.RequirePermissions)('read:company'),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", Promise)
@@ -79,6 +92,11 @@ __decorate([
         type: company_response_dto_1.CompanyResponseDto,
     }),
     (0, swagger_1.ApiResponse)({ status: 404, description: 'Company not found.' }),
+    (0, swagger_1.ApiResponse)({
+        status: 403,
+        description: 'Forbidden. Missing required permissions.',
+    }),
+    (0, permissions_decorator_1.RequirePermissions)('read:company'),
     __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Number]),
@@ -96,6 +114,11 @@ __decorate([
     }),
     (0, swagger_1.ApiResponse)({ status: 400, description: 'Validation failed.' }),
     (0, swagger_1.ApiResponse)({ status: 404, description: 'Company not found.' }),
+    (0, swagger_1.ApiResponse)({
+        status: 403,
+        description: 'Forbidden. Missing required permissions.',
+    }),
+    (0, permissions_decorator_1.RequirePermissions)('update:company'),
     __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),
     __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
@@ -113,6 +136,11 @@ __decorate([
         status: 409,
         description: 'Conflict (e.g., company still has admins).',
     }),
+    (0, swagger_1.ApiResponse)({
+        status: 403,
+        description: 'Forbidden. Missing required permissions.',
+    }),
+    (0, permissions_decorator_1.RequirePermissions)('delete:company'),
     __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Number]),
@@ -122,6 +150,8 @@ exports.CompanyController = CompanyController = __decorate([
     (0, swagger_1.ApiTags)('Companies Management'),
     (0, common_1.Controller)('companies'),
     (0, common_1.UsePipes)(new common_1.ValidationPipe({ whitelist: true, transform: true })),
+    (0, swagger_1.ApiBearerAuth)('jwt'),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, permissions_guard_1.PermissionsGuard),
     __metadata("design:paramtypes", [company_service_1.CompanyService])
 ], CompanyController);
 //# sourceMappingURL=company.controller.js.map

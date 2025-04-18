@@ -20,15 +20,19 @@ class RoleResponseDto {
 }
 exports.RoleResponseDto = RoleResponseDto;
 __decorate([
-    (0, swagger_1.ApiProperty)(),
+    (0, swagger_1.ApiProperty)({ example: 1 }),
     __metadata("design:type", Number)
 ], RoleResponseDto.prototype, "id", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)(),
+    (0, swagger_1.ApiProperty)({ example: 'admin' }),
     __metadata("design:type", String)
 ], RoleResponseDto.prototype, "name", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ required: false, nullable: true }),
+    (0, swagger_1.ApiProperty)({
+        example: 'Administrator role',
+        required: false,
+        nullable: true,
+    }),
     __metadata("design:type", Object)
 ], RoleResponseDto.prototype, "description", void 0);
 __decorate([

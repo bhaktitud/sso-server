@@ -22,6 +22,9 @@ const update_permission_dto_1 = require("./dto/update-permission.dto");
 const swagger_1 = require("@nestjs/swagger");
 const role_response_dto_1 = require("./dto/role-response.dto");
 const permission_response_dto_1 = require("./dto/permission-response.dto");
+const jwt_auth_guard_1 = require("../auth/guards/jwt-auth.guard");
+const permissions_guard_1 = require("../auth/permissions/permissions.guard");
+const permissions_decorator_1 = require("../auth/permissions/permissions.decorator");
 let RbacController = class RbacController {
     rbacService;
     constructor(rbacService) {
@@ -78,6 +81,11 @@ __decorate([
         description: 'Role created.',
         type: role_response_dto_1.RoleResponseDto,
     }),
+    (0, swagger_1.ApiResponse)({
+        status: 403,
+        description: 'Forbidden. Missing required permissions.',
+    }),
+    (0, permissions_decorator_1.RequirePermissions)('create:role'),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [create_role_dto_1.CreateRoleDto]),
@@ -91,6 +99,11 @@ __decorate([
         description: 'List of roles.',
         type: [role_response_dto_1.RoleResponseDto],
     }),
+    (0, swagger_1.ApiResponse)({
+        status: 403,
+        description: 'Forbidden. Missing required permissions.',
+    }),
+    (0, permissions_decorator_1.RequirePermissions)('read:role'),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", Promise)
@@ -105,6 +118,11 @@ __decorate([
         type: role_response_dto_1.RoleResponseDto,
     }),
     (0, swagger_1.ApiResponse)({ status: 404, description: 'Role not found.' }),
+    (0, swagger_1.ApiResponse)({
+        status: 403,
+        description: 'Forbidden. Missing required permissions.',
+    }),
+    (0, permissions_decorator_1.RequirePermissions)('read:role'),
     __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Number]),
@@ -121,6 +139,11 @@ __decorate([
         type: role_response_dto_1.RoleResponseDto,
     }),
     (0, swagger_1.ApiResponse)({ status: 404, description: 'Role not found.' }),
+    (0, swagger_1.ApiResponse)({
+        status: 403,
+        description: 'Forbidden. Missing required permissions.',
+    }),
+    (0, permissions_decorator_1.RequirePermissions)('update:role'),
     __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),
     __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
@@ -134,6 +157,11 @@ __decorate([
     (0, swagger_1.ApiParam)({ name: 'id', type: Number }),
     (0, swagger_1.ApiResponse)({ status: 204, description: 'Role deleted.' }),
     (0, swagger_1.ApiResponse)({ status: 404, description: 'Role not found.' }),
+    (0, swagger_1.ApiResponse)({
+        status: 403,
+        description: 'Forbidden. Missing required permissions.',
+    }),
+    (0, permissions_decorator_1.RequirePermissions)('delete:role'),
     __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Number]),
@@ -149,6 +177,11 @@ __decorate([
         description: 'Permission created.',
         type: permission_response_dto_1.PermissionResponseDto,
     }),
+    (0, swagger_1.ApiResponse)({
+        status: 403,
+        description: 'Forbidden. Missing required permissions.',
+    }),
+    (0, permissions_decorator_1.RequirePermissions)('create:permission'),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [create_permission_dto_1.CreatePermissionDto]),
@@ -162,6 +195,11 @@ __decorate([
         description: 'List of permissions.',
         type: [permission_response_dto_1.PermissionResponseDto],
     }),
+    (0, swagger_1.ApiResponse)({
+        status: 403,
+        description: 'Forbidden. Missing required permissions.',
+    }),
+    (0, permissions_decorator_1.RequirePermissions)('read:permission'),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", Promise)
@@ -176,6 +214,11 @@ __decorate([
         type: permission_response_dto_1.PermissionResponseDto,
     }),
     (0, swagger_1.ApiResponse)({ status: 404, description: 'Permission not found.' }),
+    (0, swagger_1.ApiResponse)({
+        status: 403,
+        description: 'Forbidden. Missing required permissions.',
+    }),
+    (0, permissions_decorator_1.RequirePermissions)('read:permission'),
     __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Number]),
@@ -192,6 +235,11 @@ __decorate([
         type: permission_response_dto_1.PermissionResponseDto,
     }),
     (0, swagger_1.ApiResponse)({ status: 404, description: 'Permission not found.' }),
+    (0, swagger_1.ApiResponse)({
+        status: 403,
+        description: 'Forbidden. Missing required permissions.',
+    }),
+    (0, permissions_decorator_1.RequirePermissions)('update:permission'),
     __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),
     __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
@@ -205,6 +253,11 @@ __decorate([
     (0, swagger_1.ApiParam)({ name: 'id', type: Number }),
     (0, swagger_1.ApiResponse)({ status: 204, description: 'Permission deleted.' }),
     (0, swagger_1.ApiResponse)({ status: 404, description: 'Permission not found.' }),
+    (0, swagger_1.ApiResponse)({
+        status: 403,
+        description: 'Forbidden. Missing required permissions.',
+    }),
+    (0, permissions_decorator_1.RequirePermissions)('delete:permission'),
     __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Number]),
@@ -222,6 +275,11 @@ __decorate([
         type: role_response_dto_1.RoleResponseDto,
     }),
     (0, swagger_1.ApiResponse)({ status: 404, description: 'Role or Permission not found.' }),
+    (0, swagger_1.ApiResponse)({
+        status: 403,
+        description: 'Forbidden. Missing required permissions.',
+    }),
+    (0, permissions_decorator_1.RequirePermissions)('assign:permission:role'),
     __param(0, (0, common_1.Param)('roleId', common_1.ParseIntPipe)),
     __param(1, (0, common_1.Param)('permissionId', common_1.ParseIntPipe)),
     __metadata("design:type", Function),
@@ -240,6 +298,11 @@ __decorate([
         type: role_response_dto_1.RoleResponseDto,
     }),
     (0, swagger_1.ApiResponse)({ status: 404, description: 'Role or Permission not found.' }),
+    (0, swagger_1.ApiResponse)({
+        status: 403,
+        description: 'Forbidden. Missing required permissions.',
+    }),
+    (0, permissions_decorator_1.RequirePermissions)('remove:permission:role'),
     __param(0, (0, common_1.Param)('roleId', common_1.ParseIntPipe)),
     __param(1, (0, common_1.Param)('permissionId', common_1.ParseIntPipe)),
     __metadata("design:type", Function),
@@ -256,6 +319,11 @@ __decorate([
         type: [permission_response_dto_1.PermissionResponseDto],
     }),
     (0, swagger_1.ApiResponse)({ status: 404, description: 'Role not found.' }),
+    (0, swagger_1.ApiResponse)({
+        status: 403,
+        description: 'Forbidden. Missing required permissions.',
+    }),
+    (0, permissions_decorator_1.RequirePermissions)('read:role', 'read:permission'),
     __param(0, (0, common_1.Param)('roleId', common_1.ParseIntPipe)),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Number]),
@@ -265,6 +333,8 @@ exports.RbacController = RbacController = __decorate([
     (0, swagger_1.ApiTags)('RBAC (Roles & Permissions)'),
     (0, common_1.Controller)('rbac'),
     (0, common_1.UsePipes)(new common_1.ValidationPipe({ whitelist: true, transform: true })),
+    (0, swagger_1.ApiBearerAuth)('jwt'),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, permissions_guard_1.PermissionsGuard),
     __metadata("design:paramtypes", [rbac_service_1.RbacService])
 ], RbacController);
 //# sourceMappingURL=rbac.controller.js.map

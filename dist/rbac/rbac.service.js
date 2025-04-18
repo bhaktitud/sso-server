@@ -45,6 +45,11 @@ let RbacService = class RbacService {
         }
         return role;
     }
+    async findRoleByName(name) {
+        return await this.prisma.mysql.role.findUnique({
+            where: { name },
+        });
+    }
     async updateRole(id, updateRoleDto) {
         await this.findRoleById(id);
         try {

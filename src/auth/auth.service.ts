@@ -10,16 +10,32 @@ import { MailService } from '@src/mail/mail.service';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import * as crypto from 'crypto';
-import { Prisma, User, UserType } from '../../generated/mysql';
+import {
+  Prisma,
+  User,
+  UserType,
+  AdminProfile,
+  Role,
+} from '../../generated/mysql';
 import { jwtConstants } from './constants';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { PrismaService } from '@src/prisma/prisma.service';
 import { RegisterDto } from './dto/register.dto';
+import { AdminLoginDto } from './dto/admin-login.dto';
 
 // Tipe untuk pengguna tanpa password
 type UserPayload = Omit<User, 'password'>;
 // Definisikan tipe untuk hasil token
 type Tokens = { access_token: string; refresh_token: string };
+
+// Tipe baru untuk data admin yang divalidasi (termasuk roles)
+type ValidatedAdminPayload = {
+  userId: number;
+  email: string;
+  adminProfileId: number;
+  name: string; // Bisa dari User atau AdminProfile
+  roles: Pick<Role, 'id' | 'name'>[]; // Sertakan ID dan nama role
+};
 
 @Injectable()
 export class AuthService {
@@ -31,40 +47,124 @@ export class AuthService {
   ) {}
 
   /**
-   * Memvalidasi pengguna berdasarkan email dan password.
+   * Memvalidasi pengguna biasa berdasarkan email dan password.
    * Digunakan oleh LocalStrategy.
    */
   async validateUser(email: string, pass: string): Promise<UserPayload | null> {
     const user = await this.userService.findOneByEmail(email);
 
     // Cek password DAN status verifikasi email
-    if (user && (await bcrypt.compare(pass, user.password))) {
-      // Jika password cocok, cek verifikasi
+    if (
+      user &&
+      user.userType === UserType.APP_USER &&
+      (await bcrypt.compare(pass, user.password))
+    ) {
       if (!user.isEmailVerified) {
-        // Lempar error spesifik jika belum verifikasi
         throw new ForbiddenException(
           'Akun belum diverifikasi. Silakan cek email Anda.',
         );
       }
-      // Jika sudah diverifikasi, hapus password dan kembalikan user
       const { password, ...result } = user;
       return result;
     }
-    // Jika password tidak cocok atau user tidak ditemukan
     return null;
   }
 
   /**
-   * Generate Access dan Refresh Token
+   * Memvalidasi kredensial admin.
+   * Dipanggil oleh adminLogin.
+   */
+  async validateAdminUser(
+    email: string,
+    pass: string,
+  ): Promise<ValidatedAdminPayload | null> {
+    const user = await this.prisma.mysql.user.findUnique({
+      where: { email },
+    });
+
+    // 1. Cek User ada, password cocok, DAN userType adalah ADMIN_USER
+    if (
+      user &&
+      user.userType === UserType.ADMIN_USER &&
+      (await bcrypt.compare(pass, user.password))
+    ) {
+      // 2. Ambil AdminProfile terkait beserta roles-nya
+      const adminProfile = await this.prisma.mysql.adminProfile.findUnique({
+        where: { userId: user.id },
+        include: {
+          roles: {
+            // Sertakan roles
+            select: { id: true, name: true }, // Hanya pilih ID dan nama role
+          },
+        },
+      });
+
+      if (!adminProfile) {
+        console.error(
+          `Admin user ${user.id} (${email}) does not have an associated AdminProfile.`,
+        );
+        return null;
+      }
+
+      // 3. Siapkan payload yang akan digunakan untuk JWT
+      const payload: ValidatedAdminPayload = {
+        userId: user.id,
+        email: user.email,
+        adminProfileId: adminProfile.id,
+        name: adminProfile.name, // Gunakan nama dari AdminProfile
+        roles: adminProfile.roles,
+      };
+      return payload;
+    }
+    return null;
+  }
+
+  /**
+   * Generate Access dan Refresh Token (untuk user biasa)
    */
   private async _generateTokens(user: UserPayload): Promise<Tokens> {
     const accessTokenPayload = {
       email: user.email,
       sub: user.id,
       name: user.name,
+      userType: UserType.APP_USER, // Tambahkan userType
     };
     const refreshTokenPayload = {
       sub: user.id,
+      nonce: Date.now(),
+    };
+
+    const [accessToken, refreshToken] = await Promise.all([
+      this.jwtService.signAsync(accessTokenPayload),
+      this.jwtService.signAsync(refreshTokenPayload, {
+        secret: jwtConstants.refresh.secret,
+        expiresIn: jwtConstants.refresh.expiresIn,
+        algorithm: jwtConstants.refresh.algorithm,
+      }),
+    ]);
+
+    return {
+      access_token: accessToken,
+      refresh_token: refreshToken,
+    };
+  }
+
+  /**
+   * Generate Access dan Refresh Token KHUSUS ADMIN
+   */
+  private async _generateAdminTokens(
+    adminPayload: ValidatedAdminPayload,
+  ): Promise<Tokens> {
+    const accessTokenPayload = {
+      sub: adminPayload.userId,
+      email: adminPayload.email,
+      userType: UserType.ADMIN_USER,
+      profileId: adminPayload.adminProfileId,
+      name: adminPayload.name,
+      roles: adminPayload.roles.map((role) => role.name),
+    };
+    const refreshTokenPayload = {
+      sub: adminPayload.userId,
       nonce: Date.now(),
     };
 
@@ -96,11 +196,35 @@ export class AuthService {
   }
 
   /**
-   * Login: Validasi, generate token, simpan hash refresh token
+   * Login (untuk user biasa): Validasi, generate token, simpan hash refresh token
    */
   async login(user: UserPayload): Promise<Tokens> {
+    // Pastikan ini hanya dipanggil untuk APP_USER setelah validateUser
     const tokens = await this._generateTokens(user);
     await this._updateRefreshTokenHash(user.id, tokens.refresh_token);
+    return tokens;
+  }
+
+  /**
+   * Login khusus Admin: Validasi, generate token, simpan hash refresh token
+   */
+  async adminLogin(adminLoginDto: AdminLoginDto): Promise<Tokens> {
+    const adminPayload = await this.validateAdminUser(
+      adminLoginDto.email,
+      adminLoginDto.password,
+    );
+
+    if (!adminPayload) {
+      throw new ForbiddenException(
+        'Akses ditolak. Kredensial admin tidak valid.',
+      );
+    }
+
+    const tokens = await this._generateAdminTokens(adminPayload);
+    await this._updateRefreshTokenHash(
+      adminPayload.userId,
+      tokens.refresh_token,
+    );
     return tokens;
   }
 

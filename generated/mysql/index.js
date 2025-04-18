@@ -216,7 +216,7 @@ const config = {
     "isCustomOutput": true
   },
   "relativeEnvPaths": {
-    "rootEnvPath": null,
+    "rootEnvPath": "../../.env",
     "schemaEnvPath": "../../.env"
   },
   "relativePath": "../../prisma",
@@ -226,11 +226,12 @@ const config = {
     "db"
   ],
   "activeProvider": "mysql",
+  "postinstall": false,
   "inlineDatasources": {
     "db": {
       "url": {
         "fromEnvVar": "DATABASE_URL_MYSQL",
-        "value": "mysql://root@localhost:3306/database"
+        "value": null
       }
     }
   },

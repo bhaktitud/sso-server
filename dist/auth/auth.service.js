@@ -32,7 +32,9 @@ let AuthService = class AuthService {
     }
     async validateUser(email, pass) {
         const user = await this.userService.findOneByEmail(email);
-        if (user && (await bcrypt.compare(pass, user.password))) {
+        if (user &&
+            user.userType === mysql_1.UserType.APP_USER &&
+            (await bcrypt.compare(pass, user.password))) {
             if (!user.isEmailVerified) {
                 throw new common_1.ForbiddenException('Akun belum diverifikasi. Silakan cek email Anda.');
             }
@@ -41,14 +43,71 @@ let AuthService = class AuthService {
         }
         return null;
     }
+    async validateAdminUser(email, pass) {
+        const user = await this.prisma.mysql.user.findUnique({
+            where: { email },
+        });
+        if (user &&
+            user.userType === mysql_1.UserType.ADMIN_USER &&
+            (await bcrypt.compare(pass, user.password))) {
+            const adminProfile = await this.prisma.mysql.adminProfile.findUnique({
+                where: { userId: user.id },
+                include: {
+                    roles: {
+                        select: { id: true, name: true },
+                    },
+                },
+            });
+            if (!adminProfile) {
+                console.error(`Admin user ${user.id} (${email}) does not have an associated AdminProfile.`);
+                return null;
+            }
+            const payload = {
+                userId: user.id,
+                email: user.email,
+                adminProfileId: adminProfile.id,
+                name: adminProfile.name,
+                roles: adminProfile.roles,
+            };
+            return payload;
+        }
+        return null;
+    }
     async _generateTokens(user) {
         const accessTokenPayload = {
             email: user.email,
             sub: user.id,
             name: user.name,
+            userType: mysql_1.UserType.APP_USER,
         };
         const refreshTokenPayload = {
             sub: user.id,
+            nonce: Date.now(),
+        };
+        const [accessToken, refreshToken] = await Promise.all([
+            this.jwtService.signAsync(accessTokenPayload),
+            this.jwtService.signAsync(refreshTokenPayload, {
+                secret: constants_1.jwtConstants.refresh.secret,
+                expiresIn: constants_1.jwtConstants.refresh.expiresIn,
+                algorithm: constants_1.jwtConstants.refresh.algorithm,
+            }),
+        ]);
+        return {
+            access_token: accessToken,
+            refresh_token: refreshToken,
+        };
+    }
+    async _generateAdminTokens(adminPayload) {
+        const accessTokenPayload = {
+            sub: adminPayload.userId,
+            email: adminPayload.email,
+            userType: mysql_1.UserType.ADMIN_USER,
+            profileId: adminPayload.adminProfileId,
+            name: adminPayload.name,
+            roles: adminPayload.roles.map((role) => role.name),
+        };
+        const refreshTokenPayload = {
+            sub: adminPayload.userId,
             nonce: Date.now(),
         };
         const [accessToken, refreshToken] = await Promise.all([
@@ -72,6 +131,15 @@ let AuthService = class AuthService {
     async login(user) {
         const tokens = await this._generateTokens(user);
         await this._updateRefreshTokenHash(user.id, tokens.refresh_token);
+        return tokens;
+    }
+    async adminLogin(adminLoginDto) {
+        const adminPayload = await this.validateAdminUser(adminLoginDto.email, adminLoginDto.password);
+        if (!adminPayload) {
+            throw new common_1.ForbiddenException('Akses ditolak. Kredensial admin tidak valid.');
+        }
+        const tokens = await this._generateAdminTokens(adminPayload);
+        await this._updateRefreshTokenHash(adminPayload.userId, tokens.refresh_token);
         return tokens;
     }
     async logout(userId) {

@@ -10,6 +10,7 @@ export declare class RbacService {
     createRole(createRoleDto: CreateRoleDto): Promise<Role>;
     findAllRoles(): Promise<Role[]>;
     findRoleById(id: number): Promise<Role>;
+    findRoleByName(name: string): Promise<Role | null>;
     updateRole(id: number, updateRoleDto: UpdateRoleDto): Promise<Role>;
     deleteRole(id: number): Promise<Role>;
     createPermission(createPermissionDto: CreatePermissionDto): Promise<Permission>;

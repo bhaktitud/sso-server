@@ -113,7 +113,7 @@ const config = {
       "value": "prisma-client-js"
     },
     "output": {
-      "value": "/Users/bhakti/Work/research/sso-boilerplate-ts/sso-server/generated/mongo",
+      "value": "/Users/bhakti/sso-server/generated/mongo",
       "fromEnvVar": null
     },
     "config": {
@@ -127,7 +127,7 @@ const config = {
       }
     ],
     "previewFeatures": [],
-    "sourceFilePath": "/Users/bhakti/Work/research/sso-boilerplate-ts/sso-server/prisma/mongo.prisma",
+    "sourceFilePath": "/Users/bhakti/sso-server/prisma/mongo.prisma",
     "isCustomOutput": true
   },
   "relativeEnvPaths": {

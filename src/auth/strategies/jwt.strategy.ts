@@ -4,15 +4,28 @@ import { Injectable } from '@nestjs/common';
 import { jwtConstants } from '@src/auth/constants';
 import * as fs from 'fs';
 import { ConfigService } from '@nestjs/config';
-import { Role } from '@src/auth/roles/roles.enum';
+import { UserType } from '../../../generated/mysql';
 
-// Definisikan tipe untuk payload JWT
+// Definisikan tipe untuk payload JWT (lebih fleksibel)
 interface JwtPayload {
-  sub: number; // ID Pengguna (dari UserMysql.id)
+  sub: number; // User ID
   email: string;
-  name?: string | null; // Nama bisa null
-  role: Role;
-  // Tambahkan klaim lain jika perlu (misalnya, roles)
+  userType: UserType; // Tipe user (APP_USER atau ADMIN_USER)
+  name?: string | null;
+
+  // Admin specific (opsional)
+  profileId?: number; // AdminProfile ID
+  roles?: string[]; // Array nama role
+}
+
+// Tipe untuk objek req.user yang dihasilkan
+interface RequestUser {
+  userId: number; // Ganti nama dari sub
+  email: string;
+  userType: UserType;
+  name?: string | null;
+  profileId?: number;
+  roles?: string[];
 }
 
 @Injectable()
@@ -46,15 +59,17 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
    * Validasi payload token.
    * Nilai yang dikembalikan akan ditambahkan ke objek Request sebagai `req.user`.
    */
-  // Metode ini bisa sinkron jika tidak ada operasi async di dalamnya
-  validate(payload: JwtPayload) {
+  validate(payload: JwtPayload): RequestUser {
     // Payload sudah divalidasi oleh passport-jwt berdasarkan secret dan expiration
-    // Kembalikan data yang ingin Anda ekspos di req.user
+    // Kembalikan semua data yang relevan dari payload
+    // Guard nanti akan memeriksa field spesifik seperti userType atau roles
     return {
       userId: payload.sub,
       email: payload.email,
+      userType: payload.userType,
       name: payload.name,
-      role: payload.role,
+      profileId: payload.profileId,
+      roles: payload.roles,
     };
   }
 }

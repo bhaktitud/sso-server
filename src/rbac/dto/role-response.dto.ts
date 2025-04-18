@@ -4,13 +4,17 @@ import { Role } from '../../../generated/mysql';
 // import { PermissionResponseDto } from './permission-response.dto';
 
 export class RoleResponseDto implements Omit<Role, 'admins' | 'permissions'> {
-  @ApiProperty()
+  @ApiProperty({ example: 1 })
   id: number;
 
-  @ApiProperty()
+  @ApiProperty({ example: 'admin' })
   name: string;
 
-  @ApiProperty({ required: false, nullable: true })
+  @ApiProperty({
+    example: 'Administrator role',
+    required: false,
+    nullable: true,
+  })
   description: string | null;
 
   @ApiProperty()

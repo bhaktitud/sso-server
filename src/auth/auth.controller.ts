@@ -33,6 +33,7 @@ import { LoginResponseDto } from './dto/login-response.dto';
 import { SuccessMessageResponseDto } from '@src/common/dto/success-message-response.dto';
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
+import { AdminLoginDto } from './dto/admin-login.dto';
 
 // Tipe untuk req.user setelah LocalAuthGuard
 type AuthenticatedUser = Omit<User, 'password'>;
@@ -249,5 +250,26 @@ export class AuthController {
     @Body() resetPasswordDto: ResetPasswordDto,
   ): Promise<SuccessMessageResponseDto> {
     return this.authService.resetPassword(resetPasswordDto);
+  }
+
+  /**
+   * Endpoint Login KHUSUS ADMIN
+   * POST /auth/admin/login
+   */
+  @Post('admin/login')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Log in an administrator' })
+  @ApiBody({ type: AdminLoginDto })
+  @ApiResponse({
+    status: 200,
+    description: 'Admin login successful, returns tokens.',
+    type: LoginResponseDto,
+  })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden (Invalid credentials or not an admin)',
+  })
+  adminLogin(@Body() adminLoginDto: AdminLoginDto) {
+    return this.authService.adminLogin(adminLoginDto);
   }
 }
