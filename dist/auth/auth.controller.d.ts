@@ -2,6 +2,10 @@ import { AuthService } from './auth.service';
 import { UserMysql } from '../../generated/mysql';
 import { Role } from './roles/roles.enum';
 import { RegisterDto } from './dto/register.dto';
+import { ProfileResponseDto } from './dto/profile-response.dto';
+import { SuccessMessageResponseDto } from '@src/common/dto/success-message-response.dto';
+import { ForgotPasswordDto } from './dto/forgot-password.dto';
+import { ResetPasswordDto } from './dto/reset-password.dto';
 type AuthenticatedUser = Omit<UserMysql, 'password'>;
 interface AuthenticatedJwtPayload {
     userId: number;
@@ -38,7 +42,7 @@ export declare class AuthController {
     }>;
     getProfile(req: {
         user: AuthenticatedJwtPayload;
-    }): AuthenticatedJwtPayload;
+    }): ProfileResponseDto;
     verifyEmail(token: string): Promise<{
         message: string;
     }>;
@@ -48,5 +52,7 @@ export declare class AuthController {
         message: string;
         user: AuthenticatedJwtPayload;
     };
+    forgotPassword(forgotPasswordDto: ForgotPasswordDto): Promise<SuccessMessageResponseDto>;
+    resetPassword(resetPasswordDto: ResetPasswordDto): Promise<SuccessMessageResponseDto>;
 }
 export {};

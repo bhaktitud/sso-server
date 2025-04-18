@@ -1,9 +1,9 @@
-import { UserService } from '../user/user.service';
-import { MailService } from '../mail/mail.service';
+import { UserService } from '@src/user/user.service';
+import { MailService } from '@src/mail/mail.service';
 import { JwtService } from '@nestjs/jwt';
 import { Prisma, UserMysql } from '../../generated/mysql';
 import { ResetPasswordDto } from './dto/reset-password.dto';
-import { PrismaService } from '../prisma/prisma.service';
+import { PrismaService } from '@src/prisma/prisma.service';
 type UserPayload = Omit<UserMysql, 'password'>;
 type Tokens = {
     access_token: string;

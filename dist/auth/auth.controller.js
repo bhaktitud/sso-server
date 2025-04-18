@@ -23,19 +23,13 @@ const roles_decorator_1 = require("./roles/roles.decorator");
 const roles_enum_1 = require("./roles/roles.enum");
 const roles_guard_1 = require("./roles/roles.guard");
 const register_dto_1 = require("./dto/register.dto");
+const login_dto_1 = require("./dto/login.dto");
 const swagger_2 = require("@nestjs/swagger");
-class LoginResponse {
-    access_token;
-    refresh_token;
-}
-__decorate([
-    (0, swagger_2.ApiProperty)({ description: 'JWT Access Token' }),
-    __metadata("design:type", String)
-], LoginResponse.prototype, "access_token", void 0);
-__decorate([
-    (0, swagger_2.ApiProperty)({ description: 'JWT Refresh Token' }),
-    __metadata("design:type", String)
-], LoginResponse.prototype, "refresh_token", void 0);
+const profile_response_dto_1 = require("./dto/profile-response.dto");
+const login_response_dto_1 = require("./dto/login-response.dto");
+const success_message_response_dto_1 = require("../common/dto/success-message-response.dto");
+const forgot_password_dto_1 = require("./dto/forgot-password.dto");
+const reset_password_dto_1 = require("./dto/reset-password.dto");
 class SuccessMessageResponse {
     message;
 }
@@ -64,7 +58,13 @@ let AuthController = class AuthController {
         return this.authService.refreshTokens(userId, refreshToken);
     }
     getProfile(req) {
-        return req.user;
+        const userProfile = {
+            userId: req.user.userId,
+            email: req.user.email,
+            name: req.user.name ?? null,
+            role: req.user.role,
+        };
+        return userProfile;
     }
     async verifyEmail(token) {
         return this.authService.verifyEmail(token);
@@ -74,6 +74,12 @@ let AuthController = class AuthController {
             message: 'Welcome, Admin!',
             user: req.user,
         };
+    }
+    async forgotPassword(forgotPasswordDto) {
+        return this.authService.forgotPassword(forgotPasswordDto.email);
+    }
+    async resetPassword(resetPasswordDto) {
+        return this.authService.resetPassword(resetPasswordDto);
     }
 };
 exports.AuthController = AuthController;
@@ -99,10 +105,11 @@ __decorate([
     (0, common_1.Post)('login'),
     (0, common_1.HttpCode)(common_1.HttpStatus.OK),
     (0, swagger_1.ApiOperation)({ summary: 'Log in a user' }),
+    (0, swagger_1.ApiBody)({ type: login_dto_1.LoginDto }),
     (0, swagger_1.ApiResponse)({
         status: 200,
         description: 'Login successful, returns tokens.',
-        type: LoginResponse,
+        type: login_response_dto_1.LoginResponseDto,
     }),
     (0, swagger_1.ApiResponse)({
         status: 401,
@@ -140,7 +147,7 @@ __decorate([
     (0, swagger_1.ApiResponse)({
         status: 200,
         description: 'Tokens refreshed successfully.',
-        type: LoginResponse,
+        type: login_response_dto_1.LoginResponseDto,
     }),
     (0, swagger_1.ApiResponse)({
         status: 401,
@@ -162,13 +169,14 @@ __decorate([
     (0, swagger_1.ApiOperation)({ summary: 'Get current user profile' }),
     (0, swagger_1.ApiResponse)({
         status: 200,
-        description: 'Returns user profile.',
+        description: 'Returns current user profile data.',
+        type: profile_response_dto_1.ProfileResponseDto,
     }),
     (0, swagger_1.ApiResponse)({ status: 401, description: 'Unauthorized' }),
     __param(0, (0, common_1.Request)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object]),
-    __metadata("design:returntype", void 0)
+    __metadata("design:returntype", profile_response_dto_1.ProfileResponseDto)
 ], AuthController.prototype, "getProfile", null);
 __decorate([
     (0, common_1.Get)('verify-email/:token'),
@@ -200,6 +208,41 @@ __decorate([
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", void 0)
 ], AuthController.prototype, "adminOnlyEndpoint", null);
+__decorate([
+    (0, common_1.Post)('forgot-password'),
+    (0, common_1.HttpCode)(common_1.HttpStatus.OK),
+    (0, swagger_1.ApiOperation)({ summary: 'Request a password reset email' }),
+    (0, swagger_1.ApiBody)({ type: forgot_password_dto_1.ForgotPasswordDto }),
+    (0, swagger_1.ApiResponse)({
+        status: 200,
+        description: 'Password reset instructions sent (if email exists).',
+        type: success_message_response_dto_1.SuccessMessageResponseDto,
+    }),
+    (0, swagger_1.ApiResponse)({ status: 400, description: 'Validation failed' }),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [forgot_password_dto_1.ForgotPasswordDto]),
+    __metadata("design:returntype", Promise)
+], AuthController.prototype, "forgotPassword", null);
+__decorate([
+    (0, common_1.Post)('reset-password'),
+    (0, common_1.HttpCode)(common_1.HttpStatus.OK),
+    (0, swagger_1.ApiOperation)({ summary: 'Reset password using token' }),
+    (0, swagger_1.ApiBody)({ type: reset_password_dto_1.ResetPasswordDto }),
+    (0, swagger_1.ApiResponse)({
+        status: 200,
+        description: 'Password reset successfully.',
+        type: success_message_response_dto_1.SuccessMessageResponseDto,
+    }),
+    (0, swagger_1.ApiResponse)({
+        status: 400,
+        description: 'Invalid/expired token or validation failed',
+    }),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [reset_password_dto_1.ResetPasswordDto]),
+    __metadata("design:returntype", Promise)
+], AuthController.prototype, "resetPassword", null);
 exports.AuthController = AuthController = __decorate([
     (0, swagger_1.ApiTags)('auth'),
     (0, common_1.Controller)('auth'),

@@ -1,6 +1,6 @@
 import { Strategy } from 'passport-jwt';
 import { ConfigService } from '@nestjs/config';
-import { Role } from '../roles/roles.enum';
+import { Role } from '@src/auth/roles/roles.enum';
 interface JwtPayload {
     sub: number;
     email: string;

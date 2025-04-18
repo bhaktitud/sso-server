@@ -1,4 +1,4 @@
-import { PrismaService } from '../prisma/prisma.service';
+import { PrismaService } from '@src/prisma/prisma.service';
 import { UserMysql, Prisma } from '../../generated/mysql';
 export declare class UserService {
     private prisma;

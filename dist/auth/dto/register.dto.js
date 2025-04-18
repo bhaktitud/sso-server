@@ -42,8 +42,8 @@ __decorate([
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsNotEmpty)({ message: 'Password tidak boleh kosong' }),
     (0, class_validator_1.MinLength)(8, { message: 'Password minimal harus 8 karakter' }),
-    (0, class_validator_1.Matches)(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{8,}$/, {
-        message: 'Password harus mengandung setidaknya satu huruf besar, satu huruf kecil, dan satu angka',
+    (0, class_validator_1.Matches)(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/, {
+        message: 'Password harus mengandung setidaknya satu huruf besar, satu huruf kecil, dan satu angka, dengan panjang minimal 8 karakter',
     }),
     __metadata("design:type", String)
 ], RegisterDto.prototype, "password", void 0);

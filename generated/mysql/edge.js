@@ -139,7 +139,7 @@ const config = {
       "value": "prisma-client-js"
     },
     "output": {
-      "value": "/Users/bhakti/Work/research/sso-boilerplate-ts/sso-server/generated/mysql",
+      "value": "/Users/bhakti/sso-server/generated/mysql",
       "fromEnvVar": null
     },
     "config": {
@@ -153,7 +153,7 @@ const config = {
       }
     ],
     "previewFeatures": [],
-    "sourceFilePath": "/Users/bhakti/Work/research/sso-boilerplate-ts/sso-server/prisma/mysql.prisma",
+    "sourceFilePath": "/Users/bhakti/sso-server/prisma/mysql.prisma",
     "isCustomOutput": true
   },
   "relativeEnvPaths": {

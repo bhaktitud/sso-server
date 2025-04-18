@@ -18,17 +18,17 @@ let UserService = class UserService {
         this.prisma = prisma;
     }
     async findOneByEmail(email) {
-        return this.prisma.mysql.userMysql.findUnique({
+        return await this.prisma.mysql.userMysql.findUnique({
             where: { email },
         });
     }
     async findById(id) {
-        return this.prisma.mysql.userMysql.findUnique({
+        return await this.prisma.mysql.userMysql.findUnique({
             where: { id },
         });
     }
     async create(data) {
-        return this.prisma.mysql.userMysql.create({
+        return await this.prisma.mysql.userMysql.create({
             data,
         });
     }
