@@ -17,10 +17,10 @@ import {
   Company,
 } from '../../generated/mysql'; // Import necessary types
 import { CreateAdminDto } from './dto/create-admin.dto';
-import { UpdateAdminDto } from './dto/update-admin.dto';
 
 // Mock bcrypt
 jest.mock('bcrypt');
+// Kembalikan ke bentuk asli
 const mockedBcrypt = bcrypt as jest.Mocked<typeof bcrypt>;
 
 // Mock Prisma Transaction
@@ -37,16 +37,15 @@ const mockTx = {
 
 describe('AdminService', () => {
   let service: AdminService;
-  let prisma: DeepMocked<PrismaService>;
-  let userService: DeepMocked<UserService>;
-  let rbacService: DeepMocked<RbacService>;
-
-  // Helper type for deep mocking
+  // Kembalikan definisi dan penggunaan DeepMocked helper type
   type DeepMocked<T> = {
     [K in keyof T]: T[K] extends (...args: any[]) => any
       ? jest.MockedFunction<T[K]>
       : DeepMocked<T[K]>;
   } & T;
+  let prisma: DeepMocked<PrismaService>;
+  let userService: DeepMocked<UserService>;
+  let rbacService: DeepMocked<RbacService>;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -59,7 +58,14 @@ describe('AdminService', () => {
               // Mock $transaction
               $transaction: jest
                 .fn()
-                .mockImplementation(async (callback) => callback(mockTx)),
+                .mockImplementation(async (callbackOrArray) => {
+                  if (typeof callbackOrArray === 'function') {
+                    return await callbackOrArray(mockTx);
+                  } else if (Array.isArray(callbackOrArray)) {
+                    return [];
+                  }
+                  throw new Error('Invalid $transaction usage in mock');
+                }),
               // Mock direct access if needed outside transaction
               user: {
                 findUnique: jest.fn(),
@@ -105,7 +111,7 @@ describe('AdminService', () => {
     }).compile();
 
     service = module.get<AdminService>(AdminService);
-    // Assign mocks for easier access in tests
+    // Pastikan assignment menggunakan tipe DeepMocked
     prisma = module.get(PrismaService);
     userService = module.get(UserService);
     rbacService = module.get(RbacService);
@@ -142,7 +148,6 @@ describe('AdminService', () => {
       passwordResetExpires: null,
       isEmailVerified: true,
       emailVerificationToken: null,
-      adminProfile: null, // adminProfile will be linked later
     };
     const mockRole: Role = {
       id: 1,
@@ -175,10 +180,10 @@ describe('AdminService', () => {
     };
 
     beforeEach(() => {
-      // Default mock implementations for success case
       userService.findOneByEmail.mockResolvedValue(null); // No existing user
       rbacService.findRoleById.mockResolvedValue(mockRole); // Valid role
       prisma.mysql.company.findUniqueOrThrow.mockResolvedValue(mockCompany); // Valid company
+      // @ts-expect-error - Mengabaikan error tipe 'never' yang aneh
       mockedBcrypt.hash.mockResolvedValue('hashedPassword'); // Mock hashing
       mockTx.user.create.mockResolvedValue(mockUser); // Mock user creation in tx
       mockTx.adminProfile.create.mockResolvedValue(mockAdminProfile); // Mock admin profile creation in tx (base)
@@ -187,6 +192,7 @@ describe('AdminService', () => {
 
     it('should create an admin user and profile successfully', async () => {
       const result = await service.createAdmin(createAdminDto);
+      const { mysql } = prisma; // Destrukturisasi
 
       expect(userService.findOneByEmail).toHaveBeenCalledWith(
         createAdminDto.email,
@@ -194,13 +200,13 @@ describe('AdminService', () => {
       expect(rbacService.findRoleById).toHaveBeenCalledWith(
         createAdminDto.roleIds[0],
       );
-      expect(prisma.mysql.company.findUniqueOrThrow).toHaveBeenCalledWith({
+      expect(mysql.company.findUniqueOrThrow).toHaveBeenCalledWith({
         where: { id: createAdminDto.companyId },
       });
       expect(mockedBcrypt.hash).toHaveBeenCalledWith(
         createAdminDto.password,
         10,
-      ); // Assuming saltRounds=10
+      );
       expect(prisma.mysql.$transaction).toHaveBeenCalled();
       expect(mockTx.user.create).toHaveBeenCalledWith({
         data: {
@@ -211,7 +217,6 @@ describe('AdminService', () => {
         },
       });
       expect(mockTx.adminProfile.create).toHaveBeenCalledWith({
-        // Create without roles first
         data: {
           userId: mockUser.id,
           name: createAdminDto.name,
@@ -219,7 +224,6 @@ describe('AdminService', () => {
         },
       });
       expect(mockTx.adminProfile.update).toHaveBeenCalledWith({
-        // Update to connect roles
         where: { id: mockAdminProfile.id },
         data: {
           roles: { connect: [{ id: mockRole.id }] },
@@ -230,11 +234,10 @@ describe('AdminService', () => {
     });
 
     it('should throw ConflictException if email already exists', async () => {
-      userService.findOneByEmail.mockResolvedValue(mockUser); // Simulate existing user
-
-      await expect(service.createAdmin(createAdminDto)).rejects.toThrow(
-        ConflictException,
-      );
+      userService.findOneByEmail.mockResolvedValue(mockUser);
+      await expect(async () =>
+        service.createAdmin(createAdminDto),
+      ).rejects.toThrow(ConflictException);
       expect(userService.findOneByEmail).toHaveBeenCalledWith(
         createAdminDto.email,
       );
@@ -243,11 +246,10 @@ describe('AdminService', () => {
     });
 
     it('should throw BadRequestException if roleId is invalid', async () => {
-      rbacService.findRoleById.mockRejectedValue(new Error('Not found')); // Simulate role not found
-
-      await expect(service.createAdmin(createAdminDto)).rejects.toThrow(
-        BadRequestException,
-      );
+      rbacService.findRoleById.mockRejectedValue(new Error('Not found'));
+      await expect(async () =>
+        service.createAdmin(createAdminDto),
+      ).rejects.toThrow(BadRequestException);
       expect(userService.findOneByEmail).toHaveBeenCalledWith(
         createAdminDto.email,
       );
@@ -258,44 +260,40 @@ describe('AdminService', () => {
     });
 
     it('should throw BadRequestException if companyId is invalid', async () => {
-      prisma.mysql.company.findUniqueOrThrow.mockRejectedValue(
-        new Error('Not found'),
-      ); // Simulate company not found
-
-      await expect(service.createAdmin(createAdminDto)).rejects.toThrow(
-        BadRequestException,
-      );
+      const { mysql } = prisma;
+      mysql.company.findUniqueOrThrow.mockRejectedValue(new Error('Not found'));
+      await expect(async () =>
+        service.createAdmin(createAdminDto),
+      ).rejects.toThrow(BadRequestException);
       expect(userService.findOneByEmail).toHaveBeenCalledWith(
         createAdminDto.email,
       );
       expect(rbacService.findRoleById).toHaveBeenCalledWith(
         createAdminDto.roleIds[0],
       );
-      expect(prisma.mysql.company.findUniqueOrThrow).toHaveBeenCalledWith({
+      expect(mysql.company.findUniqueOrThrow).toHaveBeenCalledWith({
         where: { id: createAdminDto.companyId },
       });
       expect(prisma.mysql.$transaction).not.toHaveBeenCalled();
     });
 
-    it('should handle errors during transaction', async () => {
-      const transactionError = new Error('Transaction failed');
-      prisma.mysql.$transaction.mockRejectedValue(transactionError); // Simulate transaction failure
-
+    it('should handle transaction failure', async () => {
+      prisma.mysql.$transaction.mockRejectedValue(
+        new Error('Transaction failed'),
+      );
       await expect(service.createAdmin(createAdminDto)).rejects.toThrow(
         'Gagal membuat admin baru.',
       );
       expect(prisma.mysql.$transaction).toHaveBeenCalled();
     });
 
-    // Tambahkan test case untuk companyId opsional
     it('should create an admin without companyId successfully', async () => {
+      const { mysql } = prisma;
       const dtoWithoutCompany: CreateAdminDto = {
         ...createAdminDto,
         companyId: undefined,
       };
-      // Reset mock for company check
-      prisma.mysql.company.findUniqueOrThrow.mockClear();
-      // Adjust mock for admin profile creation without companyId
+      mysql.company.findUniqueOrThrow.mockClear();
       mockTx.adminProfile.create.mockResolvedValue({
         ...mockAdminProfile,
         companyId: null,
@@ -308,18 +306,111 @@ describe('AdminService', () => {
 
       const result = await service.createAdmin(dtoWithoutCompany);
 
-      expect(prisma.mysql.company.findUniqueOrThrow).not.toHaveBeenCalled(); // Should not be called
+      expect(mysql.company.findUniqueOrThrow).not.toHaveBeenCalled();
       expect(mockTx.adminProfile.create).toHaveBeenCalledWith({
         data: {
           userId: mockUser.id,
           name: dtoWithoutCompany.name,
-          // companyId should not be present
         },
       });
-      expect(result.company).toBeNull();
+      expect((result as any).company).toBeNull();
     });
   });
 
-  // TODO: Tambahkan describe blok untuk metode lain (findAllAdmins, findAdminById, updateAdmin, deleteAdmin, assignRoleToAdmin, removeRoleFromAdmin)
-  // dengan test case yang relevan dan mock yang sesuai.
+  // --- Test Cases for findAllAdmins ---
+  describe('findAllAdmins', () => {
+    it('should return an array of admin profiles', async () => {
+      const { mysql } = prisma; // Destrukturisasi
+      const mockProfiles = [
+        { id: 1, name: 'Admin 1', user: {}, company: {}, roles: [] },
+      ];
+      mysql.adminProfile.findMany.mockResolvedValue(mockProfiles as any);
+      const result = await service.findAllAdmins();
+      expect(result).toEqual(mockProfiles);
+      expect(mysql.adminProfile.findMany).toHaveBeenCalledWith({
+        include: { user: true, company: true, roles: true },
+      });
+    });
+  });
+
+  // --- Test Cases for findAdminById ---
+  describe('findAdminById', () => {
+    const adminId = 1;
+    const mockProfile = { id: adminId, name: 'Test Admin' };
+    it('should return the admin profile if found', async () => {
+      const { mysql } = prisma;
+      mysql.adminProfile.findUnique.mockResolvedValue(mockProfile as any);
+      const result = await service.findAdminById(adminId);
+      expect(result).toEqual(mockProfile);
+      expect(mysql.adminProfile.findUnique).toHaveBeenCalledWith({
+        where: { id: adminId },
+        include: { user: true, company: true, roles: true },
+      });
+    });
+    it('should throw NotFoundException if admin profile not found', async () => {
+      const { mysql } = prisma;
+      mysql.adminProfile.findUnique.mockResolvedValue(null);
+      await expect(async () => service.findAdminById(adminId)).rejects.toThrow(
+        NotFoundException,
+      );
+      expect(mysql.adminProfile.findUnique).toHaveBeenCalledWith({
+        where: { id: adminId },
+        include: { user: true, company: true, roles: true },
+      });
+    });
+  });
+
+  // --- Test Cases for deleteAdmin ---
+  describe('deleteAdmin', () => {
+    const adminId = 1;
+    const mockProfile = { id: adminId, userId: 10, name: 'Test Admin' };
+    it('should delete the admin profile and associated user successfully', async () => {
+      const { mysql } = prisma;
+      mysql.adminProfile.findUnique.mockResolvedValue(mockProfile as any);
+      mysql.adminProfile.delete.mockResolvedValue({} as any);
+      mysql.user.delete.mockResolvedValue({} as any);
+      await service.deleteAdmin(adminId);
+      expect(mysql.adminProfile.findUnique).toHaveBeenCalledWith({
+        where: { id: adminId },
+        include: { user: true, company: true, roles: true },
+      });
+      expect(mysql.adminProfile.delete).toHaveBeenCalledWith({
+        where: { id: adminId },
+      });
+      expect(mysql.user.delete).toHaveBeenCalledWith({
+        where: { id: mockProfile.userId },
+      });
+    });
+    it('should throw NotFoundException if admin profile not found', async () => {
+      const { mysql } = prisma;
+      mysql.adminProfile.findUnique.mockResolvedValue(null);
+      await expect(async () => service.deleteAdmin(adminId)).rejects.toThrow(
+        NotFoundException,
+      );
+      expect(mysql.adminProfile.findUnique).toHaveBeenCalledWith({
+        where: { id: adminId },
+        include: { user: true, company: true, roles: true },
+      });
+      expect(mysql.adminProfile.delete).not.toHaveBeenCalled();
+      expect(mysql.user.delete).not.toHaveBeenCalled();
+    });
+    it('should throw error if transaction fails during delete', async () => {
+      const { mysql } = prisma;
+      mysql.adminProfile.findUnique.mockResolvedValue(mockProfile as any);
+      prisma.mysql.$transaction.mockRejectedValue(
+        new Error('DB Transaction Failed'),
+      );
+      await expect(service.deleteAdmin(1)).rejects.toThrow(
+        'Failed to delete admin.',
+      );
+      expect(mysql.adminProfile.findUnique).toHaveBeenCalledWith({
+        where: { id: 1 },
+        include: { user: true, company: true, roles: true },
+      });
+      expect(prisma.mysql.$transaction).toHaveBeenCalled();
+    });
+  });
+
+  // --- Test Cases for assignRoleToAdmin & removeRoleFromAdmin ---
+  // ... (Tambahkan tes, terapkan pola yang sama untuk rejects.toThrow)
 });

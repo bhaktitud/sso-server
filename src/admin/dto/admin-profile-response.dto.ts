@@ -50,4 +50,4 @@ export class AdminProfileResponseDto {
   updatedAt: Date;
 
   // Tambahkan properti lain dari AdminProfile jika ada
-} 
+}
