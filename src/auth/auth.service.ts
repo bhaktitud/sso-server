@@ -167,7 +167,7 @@ export class AuthService {
       },
       select: { action: true, subject: true },
     });
-    
+
     // Buat format permissions seperti 'action:subject'
     const permissionStrings = permissions.map(
       (p) => `${p.action}:${p.subject}`,

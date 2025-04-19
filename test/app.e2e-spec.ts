@@ -279,7 +279,7 @@ describe('AppController & AuthController (e2e)', () => {
     it('POST /refresh - should successfully refresh tokens', async () => {
       // Tunggu sedikit untuk memastikan token baru berbeda
       await new Promise((resolve) => setTimeout(resolve, 1000));
-      
+
       const response = await request(app.getHttpServer())
         .post('/auth/refresh')
         .send({ refreshToken }) // Sebelumnya mungkin menggunakan cookie
