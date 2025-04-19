@@ -24,13 +24,13 @@ export class AppService {
       healthStatus.mysql = `failed: ${error instanceof Error ? error.message : String(error)}`;
     }
 
-    try {
-      await this.prisma.mongo.$runCommandRaw({ ping: 1 });
-      healthStatus.mongo = 'connected';
-    } catch (error: unknown) {
-      console.error('MongoDB connection failed:', error);
-      healthStatus.mongo = `failed: ${error instanceof Error ? error.message : String(error)}`;
-    }
+    // try {
+    //   await this.prisma.mongo.$runCommandRaw({ ping: 1 });
+    //   healthStatus.mongo = 'connected';
+    // } catch (error: unknown) {
+    //   console.error('MongoDB connection failed:', error);
+    //   healthStatus.mongo = `failed: ${error instanceof Error ? error.message : String(error)}`;
+    // }
 
     if (
       healthStatus.mysql === 'connected' &&

@@ -12,22 +12,17 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.PrismaService = void 0;
 const common_1 = require("@nestjs/common");
 const mysql_1 = require("../../generated/mysql");
-const mongo_1 = require("../../generated/mongo");
 let PrismaService = class PrismaService {
     mysql;
-    mongo;
     constructor() {
         this.mysql = new mysql_1.PrismaClient();
-        this.mongo = new mongo_1.PrismaClient();
     }
     async onModuleInit() {
         await this.mysql.$connect();
-        await this.mongo.$connect();
         console.log('Successfully connected to MySQL and MongoDB');
     }
     async onModuleDestroy() {
         await this.mysql.$disconnect();
-        await this.mongo.$disconnect();
         console.log('Disconnected from MySQL and MongoDB');
     }
 };

@@ -34,14 +34,6 @@ let AppService = class AppService {
             console.error('MySQL connection failed:', error);
             healthStatus.mysql = `failed: ${error instanceof Error ? error.message : String(error)}`;
         }
-        try {
-            await this.prisma.mongo.$runCommandRaw({ ping: 1 });
-            healthStatus.mongo = 'connected';
-        }
-        catch (error) {
-            console.error('MongoDB connection failed:', error);
-            healthStatus.mongo = `failed: ${error instanceof Error ? error.message : String(error)}`;
-        }
         if (healthStatus.mysql === 'connected' &&
             healthStatus.mongo === 'connected') {
             healthStatus.status = 'healthy';
