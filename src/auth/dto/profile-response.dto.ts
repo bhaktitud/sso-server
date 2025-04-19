@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Role } from '../roles/roles.enum';
+import { UserType } from '../../../generated/mysql';
 
 export class ProfileResponseDto {
   @ApiProperty({ example: 1, description: 'Unique user ID' })
@@ -19,9 +19,9 @@ export class ProfileResponseDto {
   name: string | null;
 
   @ApiProperty({
-    example: Role.USER,
-    description: 'User role',
-    enum: Role, // Menunjukkan bahwa ini adalah enum
+    example: UserType.APP_USER,
+    description: 'User type',
+    enum: UserType, // Menunjukkan bahwa ini adalah enum
   })
-  role: Role;
+  userType: UserType;
 }

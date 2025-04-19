@@ -6,6 +6,8 @@ import { AppModule } from './../src/app.module'; // Import AppModule utama
 import { PrismaService } from './../src/prisma/prisma.service'; // Untuk setup/cleanup data jika perlu
 import { CreateRoleDto } from './../src/rbac/dto/create-role.dto';
 import { CreatePermissionDto } from './../src/rbac/dto/create-permission.dto';
+import { UserType } from '../generated/mysql';
+import * as bcrypt from 'bcrypt';
 
 describe('RBACController (e2e)', () => {
   let app: INestApplication;
@@ -33,8 +35,92 @@ describe('RBACController (e2e)', () => {
 
     prisma = moduleFixture.get<PrismaService>(PrismaService); // Dapatkan instance Prisma
 
+    // Memastikan user admin tersedia untuk testing
+    try {
+      // Cek apakah admin sudah ada
+      const adminUser = await prisma.mysql.user.findUnique({
+        where: { email: TEST_ADMIN_EMAIL },
+      });
+
+      const saltRounds = 10;
+      const hashedPassword = await bcrypt.hash(TEST_ADMIN_PASSWORD, saltRounds);
+
+      let userId: number;
+
+      // Jika tidak ada, buat admin baru
+      if (!adminUser) {
+        const newAdmin = await prisma.mysql.user.create({
+          data: {
+            email: TEST_ADMIN_EMAIL,
+            password: hashedPassword,
+            userType: UserType.ADMIN_USER,
+            isEmailVerified: true,
+            name: 'E2E Test Admin',
+          },
+        });
+        userId = newAdmin.id;
+        console.log('Created admin user for E2E tests');
+      } else {
+        // Update password untuk memastikan sesuai dengan yang digunakan di test
+        await prisma.mysql.user.update({
+          where: { id: adminUser.id },
+          data: { password: hashedPassword },
+        });
+        console.log('Updated admin user password');
+        userId = adminUser.id;
+      }
+
+      // Periksa apakah AdminProfile sudah ada
+      const adminProfile = await prisma.mysql.adminProfile.findUnique({
+        where: { userId: userId },
+      });
+
+      // Jika tidak ada, buat AdminProfile
+      if (!adminProfile) {
+        await prisma.mysql.adminProfile.create({
+          data: {
+            userId: userId,
+            name: 'E2E Test Admin Profile',
+          },
+        });
+        console.log('Created admin profile for E2E tests');
+      }
+
+      // Buat role admin jika belum ada
+      const adminRole = await prisma.mysql.role.findUnique({
+        where: { name: 'Admin' },
+      });
+
+      let roleId: number;
+      if (!adminRole) {
+        const newRole = await prisma.mysql.role.create({
+          data: {
+            name: 'Admin',
+            description: 'Administrator role with full access',
+          },
+        });
+        roleId = newRole.id;
+        console.log('Created admin role for E2E tests');
+      } else {
+        roleId = adminRole.id;
+      }
+
+      // Tambahkan role ke admin profile
+      await prisma.mysql.adminProfile.update({
+        where: { userId: userId },
+        data: {
+          roles: {
+            connect: { id: roleId },
+          },
+        },
+      });
+      console.log('Assigned admin role to admin profile');
+
+    } catch (error) {
+      console.error('Failed to prepare admin user', error);
+    }
+
     // --- Login Admin untuk Mendapatkan Token ---
-    // Pastikan user admin ini sudah ada di DB pengujian Anda!
     try {
       const loginResponse = await request(app.getHttpServer())
         .post('/auth/admin/login')
@@ -56,15 +142,58 @@ describe('RBACController (e2e)', () => {
     }
 
     // --- Opsional: Setup Data Awal ---
-    // Misalnya, pastikan permission dasar sudah ada
     try {
-      // Contoh: memastikan permission read:role ada
-      await prisma.mysql.permission.upsert({
-        where: { action_subject: { action: 'read', subject: 'role' } },
-        update: {},
-        create: { action: 'read', subject: 'role' },
+      // Membuat beberapa permission dasar jika belum ada
+      const basicPermissions = [
+        { action: 'read', subject: 'role' },
+        { action: 'create', subject: 'role' },
+        { action: 'update', subject: 'role' },
+        { action: 'delete', subject: 'role' },
+        { action: 'read', subject: 'permission' },
+        { action: 'create', subject: 'permission' },
+        { action: 'update', subject: 'permission' },
+        { action: 'delete', subject: 'permission' },
+        { action: 'assign', subject: 'permission:role' },
+        { action: 'remove', subject: 'permission:role' },
+      ];
+      
+      // Membuat semua permission dasar
+      for (const perm of basicPermissions) {
+        const existingPerm = await prisma.mysql.permission.findFirst({
+          where: { 
+            action: perm.action,
+            subject: perm.subject
+          }
+        });
+        
+        if (!existingPerm) {
+          await prisma.mysql.permission.create({
+            data: perm
+          });
+          console.log(`Created permission: ${perm.action}:${perm.subject}`);
+        }
+      }
+
+      // Dapatkan adminRole dan semua permission
+      const adminRole = await prisma.mysql.role.findUnique({
+        where: { name: 'Admin' },
       });
-      // Tambahkan upsert untuk permission lain yang dibutuhkan tes
+      
+      if (adminRole) {
+        const allPermissions = await prisma.mysql.permission.findMany();
+        
+        // Assign semua permission ke admin role
+        await prisma.mysql.role.update({
+          where: { id: adminRole.id },
+          data: {
+            permissions: {
+              connect: allPermissions.map(p => ({ id: p.id }))
+            }
+          }
+        });
+        
+        console.log('Assigned all permissions to Admin role');
+      }
     } catch (error) {
       console.error('Failed initial permission setup', error);
     }
@@ -72,7 +201,6 @@ describe('RBACController (e2e)', () => {
 
   afterAll(async () => {
     // --- Opsional: Cleanup Data ---
-    // Hapus data yang dibuat selama tes jika diperlukan
     try {
       if (createdRoleId) {
         await prisma.mysql.role.deleteMany({ where: { id: createdRoleId } });

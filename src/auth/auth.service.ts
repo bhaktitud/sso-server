@@ -81,7 +81,7 @@ export class AuthService {
     const user = await this.prisma.mysql.user.findUnique({
       where: { email },
     });
-
+    
     // 1. Cek User ada, password cocok, DAN userType adalah ADMIN_USER
     if (
       user &&

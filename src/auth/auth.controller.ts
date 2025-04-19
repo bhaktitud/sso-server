@@ -8,6 +8,7 @@ import {
   HttpCode,
   HttpStatus,
   Param,
+  ForbiddenException,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -21,7 +22,7 @@ import { AuthService } from './auth.service';
 import { LocalAuthGuard } from './guards/local-auth.guard';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { RefreshTokenGuard } from './guards/refresh-token.guard';
-import { User } from '../../generated/mysql';
+import { User, UserType } from '../../generated/mysql';
 import { Roles } from './roles/roles.decorator';
 import { Role } from './roles/roles.enum';
 import { RolesGuard } from './roles/roles.guard';
@@ -43,7 +44,7 @@ interface AuthenticatedJwtPayload {
   userId: number;
   email: string;
   name?: string | null;
-  role: Role;
+  userType: UserType;
 }
 
 // Tipe untuk payload yang divalidasi oleh RefreshTokenStrategy
@@ -181,7 +182,7 @@ export class AuthController {
       userId: req.user.userId,
       email: req.user.email,
       name: req.user.name ?? null, // Pastikan null jika undefined/null
-      role: req.user.role,
+      userType: req.user.userType,
     };
     return userProfile;
   }
@@ -203,14 +204,18 @@ export class AuthController {
   }
 
   @Get('admin-only')
-  @Roles(Role.ADMIN)
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseGuards(JwtAuthGuard)
   @ApiBearerAuth('jwt')
   @ApiOperation({ summary: 'Admin-only endpoint example' })
   @ApiResponse({ status: 200, description: 'Success (for admins).' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @ApiResponse({ status: 403, description: 'Forbidden (User is not Admin)' })
   adminOnlyEndpoint(@Request() req: { user: AuthenticatedJwtPayload }) {
+    // Periksa userType untuk admin
+    if (req.user.userType !== UserType.ADMIN_USER) {
+      throw new ForbiddenException('Akses ditolak. Hanya untuk admin.');
+    }
+    
     return {
       message: 'Welcome, Admin!',
       user: req.user,
