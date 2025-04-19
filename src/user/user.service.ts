@@ -6,6 +6,21 @@ import { User, Prisma } from '../../generated/mysql';
 export class UserService {
   constructor(private prisma: PrismaService) {}
 
+  async findAll(params: {
+    skip?: number;
+    take?: number;
+    where?: Prisma.UserWhereInput;
+    orderBy?: Prisma.UserOrderByWithRelationInput;
+  }): Promise<User[]> {
+    const { skip, take, where, orderBy } = params;
+    return await this.prisma.mysql.user.findMany({
+      skip,
+      take,
+      where,
+      orderBy,
+    });
+  }
+
   async findOneByEmail(email: string): Promise<User | null> {
     return await this.prisma.mysql.user.findUnique({
       where: { email },
@@ -23,6 +38,19 @@ export class UserService {
     // dan pastikan data menyertakan userType
     return await this.prisma.mysql.user.create({
       data,
+    });
+  }
+
+  async update(id: number, data: Prisma.UserUpdateInput): Promise<User> {
+    return await this.prisma.mysql.user.update({
+      where: { id },
+      data,
+    });
+  }
+
+  async remove(id: number): Promise<User> {
+    return await this.prisma.mysql.user.delete({
+      where: { id },
     });
   }
 

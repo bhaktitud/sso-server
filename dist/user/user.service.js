@@ -17,6 +17,15 @@ let UserService = class UserService {
     constructor(prisma) {
         this.prisma = prisma;
     }
+    async findAll(params) {
+        const { skip, take, where, orderBy } = params;
+        return await this.prisma.mysql.user.findMany({
+            skip,
+            take,
+            where,
+            orderBy,
+        });
+    }
     async findOneByEmail(email) {
         return await this.prisma.mysql.user.findUnique({
             where: { email },
@@ -30,6 +39,17 @@ let UserService = class UserService {
     async create(data) {
         return await this.prisma.mysql.user.create({
             data,
+        });
+    }
+    async update(id, data) {
+        return await this.prisma.mysql.user.update({
+            where: { id },
+            data,
+        });
+    }
+    async remove(id) {
+        return await this.prisma.mysql.user.delete({
+            where: { id },
         });
     }
     async updateRefreshToken(userId, hashedRefreshToken) {

@@ -7,6 +7,9 @@ import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
+  // Aktifkan CORS
+  app.enableCors(); // Anda bisa menambahkan opsi di sini: app.enableCors({ origin: 'https://domain-frontend-anda.com' });
+
   app.useGlobalFilters(new AllExceptionsFilter());
 
   app.useGlobalPipes(
