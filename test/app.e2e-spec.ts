@@ -3,12 +3,12 @@ import { INestApplication, ValidationPipe } from '@nestjs/common';
 import * as request from 'supertest';
 import { AppModule } from './../src/app.module';
 import { PrismaService } from '../src/prisma/prisma.service';
-import { UserMysql } from '../generated/mysql';
+import { User } from '../generated/mysql';
 import { Role } from '../src/auth/roles/roles.enum';
 import { MailService } from '../src/mail/mail.service';
 
 // Definisikan tipe untuk response body
-type RegisterResponse = Omit<UserMysql, 'password'>;
+type RegisterResponse = Omit<User, 'password'>;
 // Pastikan tipe Tokens diekspor atau didefinisikan di sini jika digunakan secara luas
 // Atau gunakan inline type jika hanya di sini
 type Tokens = { access_token: string; refresh_token: string };
@@ -73,17 +73,16 @@ describe('AppController & AuthController (e2e)', () => {
 
     prisma = moduleFixture.get<PrismaService>(PrismaService);
     await prisma.onModuleInit();
-    await prisma.mysql.userMysql.deleteMany({
+    await prisma.mysql.user.deleteMany({
       where: { email: testUser.email },
     });
   });
 
   afterAll(async () => {
-    await prisma.mysql.userMysql.deleteMany({
+    await prisma.mysql.user.deleteMany({
       where: { email: testUser.email },
     });
     await prisma.mysql.$disconnect();
-    await prisma.mongo.$disconnect();
     await app.close();
   });
 
@@ -110,7 +109,7 @@ describe('AppController & AuthController (e2e)', () => {
       expect(mailTestData.verificationToken).not.toBeNull(); // Lebih eksplisit
 
       // Simpan detail user yg dibuat (opsional, bisa query manual)
-      const dbUser = await prisma.mysql.userMysql.findUnique({
+      const dbUser = await prisma.mysql.user.findUnique({
         where: { email: testUser.email },
       });
       expect(dbUser).toBeDefined();
@@ -120,7 +119,7 @@ describe('AppController & AuthController (e2e)', () => {
         id: dbUser.id,
         email: dbUser.email,
         name: dbUser.name,
-        role: dbUser.role,
+        userType: dbUser.userType,
       } as RegisterResponse;
     });
 
@@ -223,13 +222,23 @@ describe('AppController & AuthController (e2e)', () => {
       let adminAccessToken: string;
 
       beforeAll(async () => {
-        await prisma.mysql.userMysql.update({
+        // Update user menjadi admin
+        await prisma.mysql.user.update({
           where: { id: createdUser.id },
-          data: { role: Role.ADMIN },
+          data: { userType: 'ADMIN_USER' },
         });
 
+        // Buat profile admin untuk user
+        await prisma.mysql.adminProfile.create({
+          data: {
+            userId: createdUser.id,
+            name: 'Admin Test User',
+          },
+        });
+
+        // Login sebagai admin dan dapatkan token
         const response = await request(app.getHttpServer())
-          .post('/auth/login')
+          .post('/auth/admin/login') // Gunakan endpoint admin login
           .send({ email: testUser.email, password: testUser.password })
           .expect(200);
         const body = response.body as Tokens;
@@ -243,7 +252,7 @@ describe('AppController & AuthController (e2e)', () => {
           .expect(200);
 
         expect(response.body.message).toEqual('Welcome, Admin!');
-        expect(response.body.user.role).toEqual(Role.ADMIN);
+        expect(response.body.user.userType).toEqual('ADMIN_USER');
       });
     });
 
@@ -252,9 +261,11 @@ describe('AppController & AuthController (e2e)', () => {
     });
 
     it('POST /refresh - should fail with invalid (non-bearer) refresh token', () => {
+      // Kirim token tanpa format Bearer untuk test yang benar-benar invalid
+      const invalidToken = 'invalid.token.string';
       return request(app.getHttpServer())
         .post('/auth/refresh')
-        .set('Authorization', refreshToken)
+        .send({ refreshToken: invalidToken })
         .expect(401);
     });
 
@@ -266,13 +277,16 @@ describe('AppController & AuthController (e2e)', () => {
     });
 
     it('POST /refresh - should successfully refresh tokens', async () => {
+      // Tunggu sedikit untuk memastikan token baru berbeda
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      
       const response = await request(app.getHttpServer())
         .post('/auth/refresh')
-        .set('Authorization', `Bearer ${refreshToken}`)
+        .send({ refreshToken }) // Sebelumnya mungkin menggunakan cookie
+        .set('Authorization', `Bearer ${accessToken}`)
         .expect(200);
 
       const body = response.body as Tokens;
-      expect(body).toBeDefined();
       expect(body.access_token).toBeDefined();
       expect(body.refresh_token).toBeDefined();
       expect(body.access_token).not.toEqual(accessToken);

@@ -9,7 +9,7 @@ declare const RefreshTokenStrategy_base: new (...args: [opt: import("passport-jw
 export declare class RefreshTokenStrategy extends RefreshTokenStrategy_base {
     constructor();
     validate(req: Request, payload: RefreshTokenPayload): {
-        refreshToken: string;
+        refreshToken: any;
         sub: number;
     };
 }

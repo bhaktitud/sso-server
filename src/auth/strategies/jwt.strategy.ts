@@ -12,10 +12,12 @@ interface JwtPayload {
   email: string;
   userType: UserType; // Tipe user (APP_USER atau ADMIN_USER)
   name?: string | null;
+  role?: string; // Role untuk backward compatibility
 
   // Admin specific (opsional)
   profileId?: number; // AdminProfile ID
   roles?: string[]; // Array nama role
+  permissions?: string[]; // Array nama permissions
 }
 
 // Tipe untuk objek req.user yang dihasilkan
@@ -24,8 +26,10 @@ interface RequestUser {
   email: string;
   userType: UserType;
   name?: string | null;
+  role?: string; // Role untuk backward compatibility
   profileId?: number;
   roles?: string[];
+  permissions?: string[];
 }
 
 @Injectable()
@@ -68,8 +72,10 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       email: payload.email,
       userType: payload.userType,
       name: payload.name,
+      role: payload.role,
       profileId: payload.profileId,
       roles: payload.roles,
+      permissions: payload.permissions,
     };
   }
 }

@@ -14,10 +14,20 @@ const passport_1 = require("@nestjs/passport");
 const passport_jwt_1 = require("passport-jwt");
 const common_1 = require("@nestjs/common");
 const constants_1 = require("../constants");
+const extractTokenFromRequest = (req) => {
+    if (req.body?.refreshToken) {
+        return req.body.refreshToken;
+    }
+    const authHeader = req.get('authorization');
+    if (authHeader) {
+        return authHeader.replace('Bearer', '').trim();
+    }
+    return null;
+};
 let RefreshTokenStrategy = class RefreshTokenStrategy extends (0, passport_1.PassportStrategy)(passport_jwt_1.Strategy, 'jwt-refresh') {
     constructor() {
         super({
-            jwtFromRequest: passport_jwt_1.ExtractJwt.fromAuthHeaderAsBearerToken(),
+            jwtFromRequest: (req) => extractTokenFromRequest(req),
             secretOrKey: constants_1.jwtConstants.refresh.secret,
             ignoreExpiration: false,
             passReqToCallback: true,
@@ -25,11 +35,10 @@ let RefreshTokenStrategy = class RefreshTokenStrategy extends (0, passport_1.Pas
         });
     }
     validate(req, payload) {
-        const authHeader = req.get('authorization');
-        if (!authHeader) {
-            throw new Error('Authorization header not found');
+        const refreshToken = extractTokenFromRequest(req);
+        if (!refreshToken) {
+            throw new Error('Refresh token not found');
         }
-        const refreshToken = authHeader.replace('Bearer', '').trim();
         return { ...payload, refreshToken };
     }
 };

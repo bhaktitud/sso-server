@@ -128,6 +128,7 @@ export class AuthService {
       sub: user.id,
       name: user.name,
       userType: UserType.APP_USER, // Tambahkan userType
+      role: 'USER', // Tambahkan role untuk backward compatibility
     };
     const refreshTokenPayload = {
       sub: user.id,
@@ -155,6 +156,23 @@ export class AuthService {
   private async _generateAdminTokens(
     adminPayload: ValidatedAdminPayload,
   ): Promise<Tokens> {
+    // Dapatkan permissions untuk role-role yang dimiliki admin
+    const permissions = await this.prisma.mysql.permission.findMany({
+      where: {
+        roles: {
+          some: {
+            id: { in: adminPayload.roles.map((role) => role.id) },
+          },
+        },
+      },
+      select: { action: true, subject: true },
+    });
+    
+    // Buat format permissions seperti 'action:subject'
+    const permissionStrings = permissions.map(
+      (p) => `${p.action}:${p.subject}`,
+    );
+
     const accessTokenPayload = {
       sub: adminPayload.userId,
       email: adminPayload.email,
@@ -162,6 +180,7 @@ export class AuthService {
       profileId: adminPayload.adminProfileId,
       name: adminPayload.name,
       roles: adminPayload.roles.map((role) => role.name),
+      permissions: permissionStrings, // Tambahkan permissions ke token
     };
     const refreshTokenPayload = {
       sub: adminPayload.userId,

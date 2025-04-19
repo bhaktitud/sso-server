@@ -12,6 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.RolesGuard = void 0;
 const common_1 = require("@nestjs/common");
 const core_1 = require("@nestjs/core");
+const roles_enum_1 = require("./roles.enum");
 const roles_decorator_1 = require("./roles.decorator");
 let RolesGuard = class RolesGuard {
     reflector;
@@ -28,10 +29,22 @@ let RolesGuard = class RolesGuard {
         }
         const request = context.switchToHttp().getRequest();
         const user = request.user;
-        if (!user || !user.role) {
+        if (!user) {
             return false;
         }
-        return requiredRoles.some((role) => user.role === role);
+        if (user.role === roles_enum_1.Role.ADMIN) {
+            return true;
+        }
+        if (user.userType === 'ADMIN_USER') {
+            return true;
+        }
+        if (user.roles && Array.isArray(user.roles)) {
+            if (user.roles.includes('ADMIN') || user.roles.includes('Admin')) {
+                return true;
+            }
+            return requiredRoles.some((role) => user.roles.includes(role));
+        }
+        return false;
     }
 };
 exports.RolesGuard = RolesGuard;

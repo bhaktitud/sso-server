@@ -79,6 +79,7 @@ let AuthService = class AuthService {
             sub: user.id,
             name: user.name,
             userType: mysql_1.UserType.APP_USER,
+            role: 'USER',
         };
         const refreshTokenPayload = {
             sub: user.id,
@@ -98,6 +99,17 @@ let AuthService = class AuthService {
         };
     }
     async _generateAdminTokens(adminPayload) {
+        const permissions = await this.prisma.mysql.permission.findMany({
+            where: {
+                roles: {
+                    some: {
+                        id: { in: adminPayload.roles.map((role) => role.id) },
+                    },
+                },
+            },
+            select: { action: true, subject: true },
+        });
+        const permissionStrings = permissions.map((p) => `${p.action}:${p.subject}`);
         const accessTokenPayload = {
             sub: adminPayload.userId,
             email: adminPayload.email,
@@ -105,6 +117,7 @@ let AuthService = class AuthService {
             profileId: adminPayload.adminProfileId,
             name: adminPayload.name,
             roles: adminPayload.roles.map((role) => role.name),
+            permissions: permissionStrings,
         };
         const refreshTokenPayload = {
             sub: adminPayload.userId,
