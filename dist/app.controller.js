@@ -13,6 +13,7 @@ exports.AppController = void 0;
 const common_1 = require("@nestjs/common");
 const app_service_1 = require("./app.service");
 const swagger_1 = require("@nestjs/swagger");
+const cache_manager_1 = require("@nestjs/cache-manager");
 let AppController = class AppController {
     appService;
     constructor(appService) {
@@ -24,16 +25,18 @@ let AppController = class AppController {
     async getHealth() {
         return this.appService.getHealth();
     }
+    getCountries() {
+        return this.appService.getCountries();
+    }
+    getTimezones() {
+        return this.appService.getTimezones();
+    }
 };
 exports.AppController = AppController;
 __decorate([
     (0, common_1.Get)(),
-    (0, swagger_1.ApiOperation)({ summary: 'Get a simple hello message' }),
-    (0, swagger_1.ApiResponse)({
-        status: 200,
-        description: 'Returns hello message.',
-        type: String,
-    }),
+    (0, swagger_1.ApiOperation)({ summary: 'Hello World endpoint' }),
+    (0, swagger_1.ApiResponse)({ status: 200, description: 'Returns hello message' }),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", String)
@@ -50,6 +53,28 @@ __decorate([
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", Promise)
 ], AppController.prototype, "getHealth", null);
+__decorate([
+    (0, common_1.Get)('countries'),
+    (0, common_1.UseInterceptors)(cache_manager_1.CacheInterceptor),
+    (0, cache_manager_1.CacheKey)('all_countries_list'),
+    (0, cache_manager_1.CacheTTL)(3600000),
+    (0, swagger_1.ApiOperation)({ summary: 'Get list of countries (cached for 1 hour)' }),
+    (0, swagger_1.ApiResponse)({ status: 200, description: 'List of countries' }),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", void 0)
+], AppController.prototype, "getCountries", null);
+__decorate([
+    (0, common_1.Get)('timezones'),
+    (0, common_1.UseInterceptors)(cache_manager_1.CacheInterceptor),
+    (0, cache_manager_1.CacheKey)('all_timezones_list'),
+    (0, cache_manager_1.CacheTTL)(86400000),
+    (0, swagger_1.ApiOperation)({ summary: 'Get list of timezones (cached for 24 hours)' }),
+    (0, swagger_1.ApiResponse)({ status: 200, description: 'List of timezones' }),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", void 0)
+], AppController.prototype, "getTimezones", null);
 exports.AppController = AppController = __decorate([
     (0, swagger_1.ApiTags)('app'),
     (0, common_1.Controller)(),

@@ -22,6 +22,7 @@ const swagger_1 = require("@nestjs/swagger");
 const jwt_auth_guard_1 = require("../auth/guards/jwt-auth.guard");
 const permissions_guard_1 = require("../auth/permissions/permissions.guard");
 const permissions_decorator_1 = require("../auth/permissions/permissions.decorator");
+const permissions_1 = require("../const/permissions");
 let AdminController = class AdminController {
     adminService;
     constructor(adminService) {
@@ -69,7 +70,7 @@ __decorate([
         status: 403,
         description: 'Forbidden. Missing required permissions.',
     }),
-    (0, permissions_decorator_1.RequirePermissions)('create:admin'),
+    (0, permissions_decorator_1.RequirePermissions)(permissions_1.PERMISSIONS_KEY.ADMIN_CREATE),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [create_admin_dto_1.CreateAdminDto]),
@@ -87,7 +88,7 @@ __decorate([
         status: 403,
         description: 'Forbidden. Missing required permissions.',
     }),
-    (0, permissions_decorator_1.RequirePermissions)('read:admin'),
+    (0, permissions_decorator_1.RequirePermissions)(permissions_1.PERMISSIONS_KEY.ADMIN_READ),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", Promise)
@@ -106,7 +107,7 @@ __decorate([
         status: 403,
         description: 'Forbidden. Missing required permissions.',
     }),
-    (0, permissions_decorator_1.RequirePermissions)('read:admin'),
+    (0, permissions_decorator_1.RequirePermissions)(permissions_1.PERMISSIONS_KEY.ADMIN_READ),
     __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Number]),
@@ -131,7 +132,7 @@ __decorate([
         status: 403,
         description: 'Forbidden. Missing required permissions.',
     }),
-    (0, permissions_decorator_1.RequirePermissions)('update:admin'),
+    (0, permissions_decorator_1.RequirePermissions)(permissions_1.PERMISSIONS_KEY.ADMIN_UPDATE),
     __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),
     __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
@@ -149,7 +150,7 @@ __decorate([
         status: 403,
         description: 'Forbidden. Missing required permissions.',
     }),
-    (0, permissions_decorator_1.RequirePermissions)('delete:admin'),
+    (0, permissions_decorator_1.RequirePermissions)(permissions_1.PERMISSIONS_KEY.ADMIN_DELETE),
     __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Number]),
@@ -171,7 +172,7 @@ __decorate([
         status: 403,
         description: 'Forbidden. Missing required permissions.',
     }),
-    (0, permissions_decorator_1.RequirePermissions)('assign:role:admin'),
+    (0, permissions_decorator_1.RequirePermissions)(permissions_1.PERMISSIONS_KEY.PERMISSION_ASSIGN_ROLE),
     __param(0, (0, common_1.Param)('adminId', common_1.ParseIntPipe)),
     __param(1, (0, common_1.Param)('roleId', common_1.ParseIntPipe)),
     __metadata("design:type", Function),
@@ -194,7 +195,7 @@ __decorate([
         status: 403,
         description: 'Forbidden. Missing required permissions.',
     }),
-    (0, permissions_decorator_1.RequirePermissions)('remove:role:admin'),
+    (0, permissions_decorator_1.RequirePermissions)(permissions_1.PERMISSIONS_KEY.PERMISSION_REMOVE_ROLE),
     __param(0, (0, common_1.Param)('adminId', common_1.ParseIntPipe)),
     __param(1, (0, common_1.Param)('roleId', common_1.ParseIntPipe)),
     __metadata("design:type", Function),

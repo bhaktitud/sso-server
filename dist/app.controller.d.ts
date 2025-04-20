@@ -4,4 +4,13 @@ export declare class AppController {
     constructor(appService: AppService);
     getHello(): string;
     getHealth(): Promise<Record<string, string>>;
+    getCountries(): {
+        code: string;
+        name: string;
+    }[];
+    getTimezones(): {
+        id: string;
+        offset: string;
+        name: string;
+    }[];
 }

@@ -33,7 +33,7 @@ import { PermissionResponseDto } from './dto/permission-response.dto';
 import { JwtAuthGuard } from '@src/auth/guards/jwt-auth.guard';
 import { PermissionsGuard } from '@src/auth/permissions/permissions.guard';
 import { RequirePermissions } from '@src/auth/permissions/permissions.decorator';
-
+import { PERMISSIONS_KEY } from '@src/const/permissions';
 @ApiTags('RBAC (Roles & Permissions)')
 @Controller('rbac') // Base path bisa disesuaikan (misal /admin/rbac)
 @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
@@ -58,7 +58,7 @@ export class RbacController {
     status: 403,
     description: 'Forbidden. Missing required permissions.',
   })
-  @RequirePermissions('create:role')
+  @RequirePermissions(PERMISSIONS_KEY.ROLE_CREATE)
   createRole(@Body() createRoleDto: CreateRoleDto): Promise<Role> {
     return this.rbacService.createRole(createRoleDto);
   }
@@ -74,7 +74,7 @@ export class RbacController {
     status: 403,
     description: 'Forbidden. Missing required permissions.',
   })
-  @RequirePermissions('read:role')
+  @RequirePermissions(PERMISSIONS_KEY.ROLE_READ)
   findAllRoles(): Promise<Role[]> {
     return this.rbacService.findAllRoles();
   }
@@ -92,7 +92,7 @@ export class RbacController {
     status: 403,
     description: 'Forbidden. Missing required permissions.',
   })
-  @RequirePermissions('read:role')
+  @RequirePermissions(PERMISSIONS_KEY.ROLE_READ)
   findRoleById(@Param('id', ParseIntPipe) id: number): Promise<Role> {
     return this.rbacService.findRoleById(id);
   }
@@ -111,7 +111,7 @@ export class RbacController {
     status: 403,
     description: 'Forbidden. Missing required permissions.',
   })
-  @RequirePermissions('update:role')
+  @RequirePermissions(PERMISSIONS_KEY.ROLE_UPDATE)
   updateRole(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateRoleDto: UpdateRoleDto,
@@ -129,7 +129,7 @@ export class RbacController {
     status: 403,
     description: 'Forbidden. Missing required permissions.',
   })
-  @RequirePermissions('delete:role')
+  @RequirePermissions(PERMISSIONS_KEY.ROLE_DELETE)
   async deleteRole(@Param('id', ParseIntPipe) id: number): Promise<void> {
     await this.rbacService.deleteRole(id);
   }
@@ -149,7 +149,7 @@ export class RbacController {
     status: 403,
     description: 'Forbidden. Missing required permissions.',
   })
-  @RequirePermissions('create:permission')
+  @RequirePermissions(PERMISSIONS_KEY.PERMISSION_CREATE)
   createPermission(
     @Body() createPermissionDto: CreatePermissionDto,
   ): Promise<Permission> {
@@ -167,7 +167,7 @@ export class RbacController {
     status: 403,
     description: 'Forbidden. Missing required permissions.',
   })
-  @RequirePermissions('read:permission')
+  @RequirePermissions(PERMISSIONS_KEY.PERMISSION_READ)
   findAllPermissions(): Promise<Permission[]> {
     return this.rbacService.findAllPermissions();
   }
@@ -185,7 +185,7 @@ export class RbacController {
     status: 403,
     description: 'Forbidden. Missing required permissions.',
   })
-  @RequirePermissions('read:permission')
+  @RequirePermissions(PERMISSIONS_KEY.PERMISSION_READ)
   findPermissionById(
     @Param('id', ParseIntPipe) id: number,
   ): Promise<Permission> {
@@ -206,7 +206,7 @@ export class RbacController {
     status: 403,
     description: 'Forbidden. Missing required permissions.',
   })
-  @RequirePermissions('update:permission')
+  @RequirePermissions(PERMISSIONS_KEY.PERMISSION_UPDATE)
   updatePermission(
     @Param('id', ParseIntPipe) id: number,
     @Body() updatePermissionDto: UpdatePermissionDto,
@@ -224,7 +224,7 @@ export class RbacController {
     status: 403,
     description: 'Forbidden. Missing required permissions.',
   })
-  @RequirePermissions('delete:permission')
+  @RequirePermissions(PERMISSIONS_KEY.PERMISSION_DELETE)
   async deletePermission(@Param('id', ParseIntPipe) id: number): Promise<void> {
     await this.rbacService.deletePermission(id);
   }
@@ -246,7 +246,7 @@ export class RbacController {
     status: 403,
     description: 'Forbidden. Missing required permissions.',
   })
-  @RequirePermissions('assign:permission:role')
+  @RequirePermissions(PERMISSIONS_KEY.PERMISSION_ASSIGN_ROLE)
   assignPermissionToRole(
     @Param('roleId', ParseIntPipe) roleId: number,
     @Param('permissionId', ParseIntPipe) permissionId: number,
@@ -269,7 +269,7 @@ export class RbacController {
     status: 403,
     description: 'Forbidden. Missing required permissions.',
   })
-  @RequirePermissions('remove:permission:role')
+  @RequirePermissions(PERMISSIONS_KEY.PERMISSION_REMOVE_ROLE)
   removePermissionFromRole(
     @Param('roleId', ParseIntPipe) roleId: number,
     @Param('permissionId', ParseIntPipe) permissionId: number,
@@ -290,7 +290,10 @@ export class RbacController {
     status: 403,
     description: 'Forbidden. Missing required permissions.',
   })
-  @RequirePermissions('read:role', 'read:permission')
+  @RequirePermissions(
+    PERMISSIONS_KEY.ROLE_READ,
+    PERMISSIONS_KEY.PERMISSION_READ,
+  )
   findPermissionsForRole(
     @Param('roleId', ParseIntPipe) roleId: number,
   ): Promise<Permission[]> {

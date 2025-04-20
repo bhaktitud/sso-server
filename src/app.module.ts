@@ -10,12 +10,23 @@ import { APP_GUARD } from '@nestjs/core';
 import { RBACModule } from './rbac/rbac.module';
 import { CompanyModule } from './company/company.module';
 import { AdminModule } from './admin/admin.module';
+import { CacheModule } from '@nestjs/cache-manager';
+import { ScheduleModule } from '@nestjs/schedule';
+import { TasksModule } from './tasks/tasks.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
     }),
+    // CacheModule dengan konfigurasi TTL 5 menit (global)
+    CacheModule.register({
+      isGlobal: true,
+      ttl: 300000, // 5 menit dalam milidetik
+      max: 100, // maksimum 100 item dalam cache
+    }),
+    // ScheduleModule untuk menjalankan tugas terjadwal
+    ScheduleModule.forRoot(),
     ThrottlerModule.forRoot([
       {
         ttl: 60000,
@@ -28,6 +39,7 @@ import { AdminModule } from './admin/admin.module';
     RBACModule,
     CompanyModule,
     AdminModule,
+    TasksModule,
   ],
   controllers: [AppController],
   providers: [

@@ -59,7 +59,7 @@ export class AdminService {
     }
 
     const hashedPassword = await bcrypt.hash(password, this.saltRounds);
-    
+
     // Generate token verifikasi email
     const rawVerificationToken = crypto.randomBytes(32).toString('hex');
     const hashedVerificationToken = crypto

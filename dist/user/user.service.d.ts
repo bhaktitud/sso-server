@@ -1,8 +1,10 @@
 import { PrismaService } from '@src/prisma/prisma.service';
 import { User, Prisma } from '../../generated/mysql';
+import { Cache } from 'cache-manager';
 export declare class UserService {
     private prisma;
-    constructor(prisma: PrismaService);
+    private cacheManager;
+    constructor(prisma: PrismaService, cacheManager: Cache);
     findAll(params: {
         skip?: number;
         take?: number;

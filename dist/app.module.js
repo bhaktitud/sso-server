@@ -19,6 +19,9 @@ const core_1 = require("@nestjs/core");
 const rbac_module_1 = require("./rbac/rbac.module");
 const company_module_1 = require("./company/company.module");
 const admin_module_1 = require("./admin/admin.module");
+const cache_manager_1 = require("@nestjs/cache-manager");
+const schedule_1 = require("@nestjs/schedule");
+const tasks_module_1 = require("./tasks/tasks.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -28,6 +31,12 @@ exports.AppModule = AppModule = __decorate([
             config_1.ConfigModule.forRoot({
                 isGlobal: true,
             }),
+            cache_manager_1.CacheModule.register({
+                isGlobal: true,
+                ttl: 300000,
+                max: 100,
+            }),
+            schedule_1.ScheduleModule.forRoot(),
             throttler_1.ThrottlerModule.forRoot([
                 {
                     ttl: 60000,
@@ -40,6 +49,7 @@ exports.AppModule = AppModule = __decorate([
             rbac_module_1.RBACModule,
             company_module_1.CompanyModule,
             admin_module_1.AdminModule,
+            tasks_module_1.TasksModule,
         ],
         controllers: [app_controller_1.AppController],
         providers: [

@@ -40,6 +40,27 @@ let AppService = class AppService {
         }
         return healthStatus;
     }
+    getCountries() {
+        return [
+            { code: 'ID', name: 'Indonesia' },
+            { code: 'MY', name: 'Malaysia' },
+            { code: 'SG', name: 'Singapore' },
+            { code: 'US', name: 'United States' },
+            { code: 'GB', name: 'United Kingdom' },
+            { code: 'AU', name: 'Australia' },
+            { code: 'JP', name: 'Japan' },
+        ];
+    }
+    getTimezones() {
+        return [
+            { id: 'Asia/Jakarta', offset: '+07:00', name: 'Jakarta' },
+            { id: 'Asia/Singapore', offset: '+08:00', name: 'Singapore' },
+            { id: 'Asia/Tokyo', offset: '+09:00', name: 'Tokyo' },
+            { id: 'Europe/London', offset: '+00:00', name: 'London' },
+            { id: 'America/New_York', offset: '-05:00', name: 'New York' },
+            { id: 'Australia/Sydney', offset: '+10:00', name: 'Sydney' },
+        ];
+    }
 };
 exports.AppService = AppService;
 exports.AppService = AppService = __decorate([

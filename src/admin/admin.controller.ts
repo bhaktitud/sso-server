@@ -29,6 +29,7 @@ import { AdminProfile } from '../../generated/mysql';
 import { JwtAuthGuard } from '@src/auth/guards/jwt-auth.guard';
 import { PermissionsGuard } from '@src/auth/permissions/permissions.guard';
 import { RequirePermissions } from '@src/auth/permissions/permissions.decorator';
+import { PERMISSIONS_KEY } from '@src/const/permissions';
 
 @ApiTags('Admins Management')
 @Controller('admins')
@@ -56,7 +57,7 @@ export class AdminController {
     status: 403,
     description: 'Forbidden. Missing required permissions.',
   })
-  @RequirePermissions('create:admin')
+  @RequirePermissions(PERMISSIONS_KEY.ADMIN_CREATE)
   create(@Body() createAdminDto: CreateAdminDto): Promise<AdminProfile> {
     return this.adminService.createAdmin(createAdminDto);
   }
@@ -72,7 +73,7 @@ export class AdminController {
     status: 403,
     description: 'Forbidden. Missing required permissions.',
   })
-  @RequirePermissions('read:admin')
+  @RequirePermissions(PERMISSIONS_KEY.ADMIN_READ)
   findAll(): Promise<AdminProfile[]> {
     return this.adminService.findAllAdmins();
   }
@@ -90,7 +91,7 @@ export class AdminController {
     status: 403,
     description: 'Forbidden. Missing required permissions.',
   })
-  @RequirePermissions('read:admin')
+  @RequirePermissions(PERMISSIONS_KEY.ADMIN_READ)
   findOne(@Param('id', ParseIntPipe) id: number): Promise<AdminProfile> {
     return this.adminService.findAdminById(id);
   }
@@ -113,7 +114,7 @@ export class AdminController {
     status: 403,
     description: 'Forbidden. Missing required permissions.',
   })
-  @RequirePermissions('update:admin')
+  @RequirePermissions(PERMISSIONS_KEY.ADMIN_UPDATE)
   update(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateAdminDto: UpdateAdminDto,
@@ -131,7 +132,7 @@ export class AdminController {
     status: 403,
     description: 'Forbidden. Missing required permissions.',
   })
-  @RequirePermissions('delete:admin')
+  @RequirePermissions(PERMISSIONS_KEY.ADMIN_DELETE)
   async remove(@Param('id', ParseIntPipe) id: number): Promise<void> {
     await this.adminService.deleteAdmin(id);
   }
@@ -151,7 +152,7 @@ export class AdminController {
     status: 403,
     description: 'Forbidden. Missing required permissions.',
   })
-  @RequirePermissions('assign:role:admin')
+  @RequirePermissions(PERMISSIONS_KEY.PERMISSION_ASSIGN_ROLE)
   assignRole(
     @Param('adminId', ParseIntPipe) adminId: number,
     @Param('roleId', ParseIntPipe) roleId: number,
@@ -174,7 +175,7 @@ export class AdminController {
     status: 403,
     description: 'Forbidden. Missing required permissions.',
   })
-  @RequirePermissions('remove:role:admin')
+  @RequirePermissions(PERMISSIONS_KEY.PERMISSION_REMOVE_ROLE)
   removeRole(
     @Param('adminId', ParseIntPipe) adminId: number,
     @Param('roleId', ParseIntPipe) roleId: number,
