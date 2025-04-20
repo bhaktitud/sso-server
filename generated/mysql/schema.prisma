@@ -60,6 +60,35 @@ model Company {
   admins      AdminProfile[] // Relasi One-to-Many ke AdminProfile
   createdAt   DateTime       @default(now())
   updatedAt   DateTime       @updatedAt
+  apiKeys     ApiKey[] // Relasi One-to-Many ke ApiKey
+}
+
+// Model untuk API Key
+model ApiKey {
+  id          Int       @id @default(autoincrement())
+  key         String    @unique
+  name        String // Nama untuk identifikasi API key (contoh: "Production", "Development", dll)
+  description String?
+  isActive    Boolean   @default(true)
+  companyId   Int // Kunci asing ke Company
+  company     Company   @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  lastUsedAt  DateTime?
+  expiresAt   DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  apiLogs     ApiLog[] // Relasi One-to-Many ke ApiLog
+}
+
+// Model untuk API Log (mencatat penggunaan API)
+model ApiLog {
+  id          Int      @id @default(autoincrement())
+  apiKeyId    Int
+  apiKey      ApiKey   @relation(fields: [apiKeyId], references: [id], onDelete: Cascade)
+  endpoint    String // Endpoint yang diakses
+  method      String // HTTP method (GET, POST, PUT, DELETE, dll)
+  statusCode  Int // HTTP status code
+  requestBody String?  @db.Text // Request body (opsional, untuk debugging)
+  createdAt   DateTime @default(now())
 }
 
 // Model untuk Peran (Role) - Menggantikan enum Role sebelumnya

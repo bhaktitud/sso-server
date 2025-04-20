@@ -22,6 +22,8 @@ const admin_module_1 = require("./admin/admin.module");
 const cache_manager_1 = require("@nestjs/cache-manager");
 const schedule_1 = require("@nestjs/schedule");
 const tasks_module_1 = require("./tasks/tasks.module");
+const apikey_module_1 = require("./apikey/apikey.module");
+const api_module_1 = require("./api/api.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -50,6 +52,8 @@ exports.AppModule = AppModule = __decorate([
             company_module_1.CompanyModule,
             admin_module_1.AdminModule,
             tasks_module_1.TasksModule,
+            apikey_module_1.ApikeyModule,
+            api_module_1.ApiModule,
         ],
         controllers: [app_controller_1.AppController],
         providers: [

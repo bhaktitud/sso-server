@@ -12,6 +12,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.AdminProfileResponseDto = void 0;
 const swagger_1 = require("@nestjs/swagger");
 const role_response_dto_1 = require("../../rbac/dto/role-response.dto");
+const company_response_dto_1 = require("../../company/dto/company-response.dto");
+const api_key_entity_1 = require("../../apikey/entities/api-key.entity");
 class AdminProfileResponseDto {
     id;
     name;
@@ -19,6 +21,8 @@ class AdminProfileResponseDto {
     title;
     phone;
     roles;
+    company;
+    apiKeys;
     createdAt;
     updatedAt;
 }
@@ -67,6 +71,23 @@ __decorate([
     }),
     __metadata("design:type", Array)
 ], AdminProfileResponseDto.prototype, "roles", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({
+        type: () => company_response_dto_1.CompanyResponseDto,
+        description: 'Company associated with the admin.',
+        required: false,
+        nullable: true,
+    }),
+    __metadata("design:type", Object)
+], AdminProfileResponseDto.prototype, "company", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({
+        type: () => [api_key_entity_1.ApiKeyEntity],
+        description: "API keys for the admin's company",
+        required: false,
+    }),
+    __metadata("design:type", Array)
+], AdminProfileResponseDto.prototype, "apiKeys", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)(),
     __metadata("design:type", Date)

@@ -2,7 +2,6 @@ import { AuthService } from './auth.service';
 import { User } from '../../generated/mysql';
 import { Role } from './roles/roles.enum';
 import { RegisterDto } from './dto/register.dto';
-import { ProfileResponseDto } from './dto/profile-response.dto';
 import { SuccessMessageResponseDto } from '@src/common/dto/success-message-response.dto';
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
@@ -44,7 +43,7 @@ export declare class AuthController {
     }>;
     getProfile(req: {
         user: AuthenticatedJwtPayload;
-    }): ProfileResponseDto;
+    }): AuthenticatedJwtPayload;
     verifyEmail(token: string): Promise<{
         message: string;
     }>;

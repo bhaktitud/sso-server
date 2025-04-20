@@ -12,6 +12,7 @@ import {
   UsePipes,
   ValidationPipe,
   UseGuards,
+  Request,
 } from '@nestjs/common';
 import { AdminService } from './admin.service';
 import { CreateAdminDto } from './dto/create-admin.dto';
@@ -25,11 +26,22 @@ import {
   ApiBody,
   ApiBearerAuth,
 } from '@nestjs/swagger';
-import { AdminProfile } from '../../generated/mysql';
+import { AdminProfile, User, ApiKey, Prisma } from '../../generated/mysql';
 import { JwtAuthGuard } from '@src/auth/guards/jwt-auth.guard';
 import { PermissionsGuard } from '@src/auth/permissions/permissions.guard';
 import { RequirePermissions } from '@src/auth/permissions/permissions.decorator';
 import { PERMISSIONS_KEY } from '@src/const/permissions';
+import { Public } from '@src/auth/decorators/public.decorator';
+import { RequireApiKey } from '@src/auth/decorators/require-apikey.decorator';
+
+// Definisikan tipe yang mencakup hasil query findAdminProfileWithDetails
+type AdminProfileWithDetails = AdminProfile & {
+  user: Partial<User>;
+  company?: {
+    apiKeys: ApiKey[];
+  } | null;
+  roles: any[];
+};
 
 @ApiTags('Admins Management')
 @Controller('admins')
@@ -40,6 +52,7 @@ export class AdminController {
   constructor(private readonly adminService: AdminService) {}
 
   @Post()
+  @Public()
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Create a new admin user and profile' })
   @ApiBody({ type: CreateAdminDto })
@@ -62,7 +75,36 @@ export class AdminController {
     return this.adminService.createAdmin(createAdminDto);
   }
 
+  @Get('profile')
+  @RequireApiKey(false)
+  @ApiOperation({ summary: 'Mendapatkan profil admin yang sedang login' })
+  @ApiResponse({
+    status: 200,
+    description: 'Detail profil admin, termasuk perusahaan dan API keys',
+    type: AdminProfileResponseDto,
+  })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  async getProfile(@Request() req: any) {
+    const userId = req.user.userId;
+    const adminProfile = (await this.adminService.findAdminProfileWithDetails(
+      userId,
+    )) as AdminProfileWithDetails;
+
+    // Extract api keys from company if available
+    const apiKeys = adminProfile.company?.apiKeys || [];
+
+    // Map to response DTO format
+    const response = {
+      ...adminProfile,
+      email: adminProfile.user.email,
+      apiKeys,
+    };
+
+    return response;
+  }
+
   @Get()
+  @Public()
   @ApiOperation({ summary: 'Get a list of all admin profiles' })
   @ApiResponse({
     status: 200,
@@ -79,6 +121,7 @@ export class AdminController {
   }
 
   @Get(':id')
+  @Public()
   @ApiOperation({ summary: 'Get a specific admin profile by ID' })
   @ApiParam({ name: 'id', description: 'Admin Profile ID', type: Number })
   @ApiResponse({
@@ -97,6 +140,7 @@ export class AdminController {
   }
 
   @Patch(':id')
+  @Public()
   @ApiOperation({ summary: 'Update an admin profile' })
   @ApiParam({ name: 'id', description: 'Admin Profile ID', type: Number })
   @ApiBody({ type: UpdateAdminDto })

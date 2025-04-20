@@ -23,6 +23,8 @@ const jwt_auth_guard_1 = require("../auth/guards/jwt-auth.guard");
 const permissions_guard_1 = require("../auth/permissions/permissions.guard");
 const permissions_decorator_1 = require("../auth/permissions/permissions.decorator");
 const permissions_1 = require("../const/permissions");
+const public_decorator_1 = require("../auth/decorators/public.decorator");
+const require_apikey_decorator_1 = require("../auth/decorators/require-apikey.decorator");
 let AdminController = class AdminController {
     adminService;
     constructor(adminService) {
@@ -30,6 +32,17 @@ let AdminController = class AdminController {
     }
     create(createAdminDto) {
         return this.adminService.createAdmin(createAdminDto);
+    }
+    async getProfile(req) {
+        const userId = req.user.userId;
+        const adminProfile = (await this.adminService.findAdminProfileWithDetails(userId));
+        const apiKeys = adminProfile.company?.apiKeys || [];
+        const response = {
+            ...adminProfile,
+            email: adminProfile.user.email,
+            apiKeys,
+        };
+        return response;
     }
     findAll() {
         return this.adminService.findAllAdmins();
@@ -53,6 +66,7 @@ let AdminController = class AdminController {
 exports.AdminController = AdminController;
 __decorate([
     (0, common_1.Post)(),
+    (0, public_decorator_1.Public)(),
     (0, common_1.HttpCode)(common_1.HttpStatus.CREATED),
     (0, swagger_1.ApiOperation)({ summary: 'Create a new admin user and profile' }),
     (0, swagger_1.ApiBody)({ type: create_admin_dto_1.CreateAdminDto }),
@@ -77,7 +91,23 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], AdminController.prototype, "create", null);
 __decorate([
+    (0, common_1.Get)('profile'),
+    (0, require_apikey_decorator_1.RequireApiKey)(false),
+    (0, swagger_1.ApiOperation)({ summary: 'Mendapatkan profil admin yang sedang login' }),
+    (0, swagger_1.ApiResponse)({
+        status: 200,
+        description: 'Detail profil admin, termasuk perusahaan dan API keys',
+        type: admin_profile_response_dto_1.AdminProfileResponseDto,
+    }),
+    (0, swagger_1.ApiResponse)({ status: 401, description: 'Unauthorized' }),
+    __param(0, (0, common_1.Request)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], AdminController.prototype, "getProfile", null);
+__decorate([
     (0, common_1.Get)(),
+    (0, public_decorator_1.Public)(),
     (0, swagger_1.ApiOperation)({ summary: 'Get a list of all admin profiles' }),
     (0, swagger_1.ApiResponse)({
         status: 200,
@@ -95,6 +125,7 @@ __decorate([
 ], AdminController.prototype, "findAll", null);
 __decorate([
     (0, common_1.Get)(':id'),
+    (0, public_decorator_1.Public)(),
     (0, swagger_1.ApiOperation)({ summary: 'Get a specific admin profile by ID' }),
     (0, swagger_1.ApiParam)({ name: 'id', description: 'Admin Profile ID', type: Number }),
     (0, swagger_1.ApiResponse)({
@@ -115,6 +146,7 @@ __decorate([
 ], AdminController.prototype, "findOne", null);
 __decorate([
     (0, common_1.Patch)(':id'),
+    (0, public_decorator_1.Public)(),
     (0, swagger_1.ApiOperation)({ summary: 'Update an admin profile' }),
     (0, swagger_1.ApiParam)({ name: 'id', description: 'Admin Profile ID', type: Number }),
     (0, swagger_1.ApiBody)({ type: update_admin_dto_1.UpdateAdminDto }),

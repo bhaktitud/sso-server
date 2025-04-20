@@ -36,6 +36,7 @@ import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { AdminLoginDto } from './dto/admin-login.dto';
 import { ResendVerificationEmailDto } from './dto/resend-verification-email.dto';
+import { Public } from './decorators/public.decorator';
 
 // Tipe untuk req.user setelah LocalAuthGuard
 type AuthenticatedUser = Omit<User, 'password'>;
@@ -167,6 +168,7 @@ export class AuthController {
   @UseGuards(JwtAuthGuard)
   @Get('profile')
   @ApiBearerAuth('jwt')
+  @Public()
   @ApiOperation({ summary: 'Get current user profile' })
   @ApiResponse({
     status: 200,
@@ -177,14 +179,16 @@ export class AuthController {
   // Tipe user dari JwtStrategy.validate
   getProfile(
     @Request() req: { user: AuthenticatedJwtPayload },
-  ): ProfileResponseDto {
+  ): AuthenticatedJwtPayload {
     // Buat objek baru yang sesuai dengan DTO untuk memastikan tipe
-    const userProfile: ProfileResponseDto = {
-      userId: req.user.userId,
-      email: req.user.email,
-      name: req.user.name ?? null, // Pastikan null jika undefined/null
-      role: req.user.role,
-    };
+    console.log(req.user);
+    const userProfile: AuthenticatedJwtPayload = req.user;
+    // const userProfile: ProfileResponseDto = {
+    //   userId: req.user.userId,
+    //   email: req.user.email,
+    //   name: req.user.name ?? null, // Pastikan null jika undefined/null
+    //   role: req.user.role,
+    // };
     return userProfile;
   }
 
@@ -259,6 +263,7 @@ export class AuthController {
    * POST /auth/admin/login
    */
   @Post('admin/login')
+  @Public()
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Log in an administrator' })
   @ApiBody({ type: AdminLoginDto })

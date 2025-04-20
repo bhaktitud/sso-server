@@ -243,4 +243,43 @@ export class AdminService {
       include: { roles: true },
     });
   }
+
+  async findAdminProfileWithDetails(userId: number): Promise<AdminProfile> {
+    const adminProfile = await this.prisma.mysql.adminProfile.findUnique({
+      where: { userId },
+      include: {
+        user: {
+          select: {
+            id: true,
+            email: true,
+            name: true,
+            isEmailVerified: true,
+            createdAt: true,
+            updatedAt: true,
+          },
+        },
+        company: {
+          include: {
+            apiKeys: {
+              where: { isActive: true },
+              orderBy: { createdAt: 'desc' },
+            },
+          },
+        },
+        roles: {
+          include: {
+            permissions: true,
+          },
+        },
+      },
+    });
+
+    if (!adminProfile) {
+      throw new NotFoundException(
+        `Admin profile not found for user ID ${userId}`,
+      );
+    }
+
+    return adminProfile;
+  }
 }

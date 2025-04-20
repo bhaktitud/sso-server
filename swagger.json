@@ -1,0 +1,2754 @@
+{
+  "openapi": "3.0.0",
+  "paths": {
+    "/": {
+      "get": {
+        "operationId": "AppController_getHello",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Returns hello message"
+          }
+        },
+        "summary": "Hello World endpoint",
+        "tags": [
+          "app"
+        ]
+      }
+    },
+    "/health": {
+      "get": {
+        "operationId": "AppController_getHealth",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Returns application health status.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Check application health",
+        "tags": [
+          "app"
+        ]
+      }
+    },
+    "/countries": {
+      "get": {
+        "operationId": "AppController_getCountries",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "List of countries"
+          }
+        },
+        "summary": "Get list of countries (cached for 1 hour)",
+        "tags": [
+          "app"
+        ]
+      }
+    },
+    "/timezones": {
+      "get": {
+        "operationId": "AppController_getTimezones",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "List of timezones"
+          }
+        },
+        "summary": "Get list of timezones (cached for 24 hours)",
+        "tags": [
+          "app"
+        ]
+      }
+    },
+    "/auth/register": {
+      "post": {
+        "operationId": "AuthController_register",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegisterDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "User registered, verification email sent.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessMessageResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation failed"
+          },
+          "409": {
+            "description": "Email already exists"
+          }
+        },
+        "summary": "Register a new user",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/auth/login": {
+      "post": {
+        "operationId": "AuthController_login",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Login successful, returns tokens.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoginResponseDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized (Invalid credentials)"
+          },
+          "403": {
+            "description": "Forbidden (Account not verified)"
+          }
+        },
+        "summary": "Log in a user",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/auth/logout": {
+      "post": {
+        "operationId": "AuthController_logout",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Logout successful.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessMessageResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "jwt": []
+          }
+        ],
+        "summary": "Log out the current user",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/auth/refresh": {
+      "post": {
+        "operationId": "AuthController_refreshTokens",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Tokens refreshed successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoginResponseDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized (Invalid/Expired Refresh Token)"
+          },
+          "403": {
+            "description": "Forbidden (Refresh token revoked/not found)"
+          }
+        },
+        "security": [
+          {
+            "jwt": []
+          }
+        ],
+        "summary": "Refresh access and refresh tokens",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/auth/profile": {
+      "get": {
+        "operationId": "AuthController_getProfile",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Returns current user profile data.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProfileResponseDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "jwt": []
+          }
+        ],
+        "summary": "Get current user profile",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/auth/verify-email/{token}": {
+      "get": {
+        "operationId": "AuthController_verifyEmail",
+        "parameters": [
+          {
+            "name": "token",
+            "required": true,
+            "in": "path",
+            "description": "Verification token from email",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Email verified successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessMessageResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid or expired token"
+          }
+        },
+        "summary": "Verify user email address",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/auth/admin-only": {
+      "get": {
+        "operationId": "AuthController_adminOnlyEndpoint",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Success (for admins)."
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden (User is not Admin)"
+          }
+        },
+        "security": [
+          {
+            "jwt": []
+          }
+        ],
+        "summary": "Admin-only endpoint example",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/auth/forgot-password": {
+      "post": {
+        "operationId": "AuthController_forgotPassword",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ForgotPasswordDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Password reset instructions sent (if email exists).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessMessageResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation failed"
+          }
+        },
+        "summary": "Request a password reset email",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/auth/reset-password": {
+      "post": {
+        "operationId": "AuthController_resetPassword",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResetPasswordDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Password reset successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessMessageResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid/expired token or validation failed"
+          }
+        },
+        "summary": "Reset password using token",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/auth/admin/login": {
+      "post": {
+        "operationId": "AuthController_adminLogin",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdminLoginDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Admin login successful, returns tokens.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoginResponseDto"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden (Invalid credentials or not an admin)"
+          }
+        },
+        "summary": "Log in an administrator",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/auth/resend-verification-email": {
+      "post": {
+        "operationId": "AuthController_resendVerificationEmail",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResendVerificationEmailDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Verification email resent (if email exists and not verified)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessMessageResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation failed"
+          },
+          "429": {
+            "description": "Too Many Requests - Rate limit exceeded"
+          }
+        },
+        "summary": "Resend email verification link",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/users": {
+      "get": {
+        "operationId": "UserController_findAll",
+        "parameters": [
+          {
+            "name": "skip",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "take",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "User"
+        ]
+      },
+      "post": {
+        "operationId": "UserController_create",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "User"
+        ]
+      }
+    },
+    "/users/{id}": {
+      "get": {
+        "operationId": "UserController_findOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "User"
+        ]
+      },
+      "patch": {
+        "operationId": "UserController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "User"
+        ]
+      },
+      "delete": {
+        "operationId": "UserController_remove",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "User"
+        ]
+      }
+    },
+    "/rbac/roles": {
+      "post": {
+        "operationId": "RbacController_createRole",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateRoleDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Role created.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RoleResponseDto"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden. Missing required permissions."
+          }
+        },
+        "security": [
+          {
+            "jwt": []
+          }
+        ],
+        "summary": "Create a new role",
+        "tags": [
+          "RBAC (Roles & Permissions)"
+        ]
+      },
+      "get": {
+        "operationId": "RbacController_findAllRoles",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "List of roles.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/RoleResponseDto"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden. Missing required permissions."
+          }
+        },
+        "security": [
+          {
+            "jwt": []
+          }
+        ],
+        "summary": "Get all roles",
+        "tags": [
+          "RBAC (Roles & Permissions)"
+        ]
+      }
+    },
+    "/rbac/roles/{id}": {
+      "get": {
+        "operationId": "RbacController_findRoleById",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Role details.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RoleResponseDto"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden. Missing required permissions."
+          },
+          "404": {
+            "description": "Role not found."
+          }
+        },
+        "security": [
+          {
+            "jwt": []
+          }
+        ],
+        "summary": "Get a role by ID",
+        "tags": [
+          "RBAC (Roles & Permissions)"
+        ]
+      },
+      "patch": {
+        "operationId": "RbacController_updateRole",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateRoleDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Role updated.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RoleResponseDto"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden. Missing required permissions."
+          },
+          "404": {
+            "description": "Role not found."
+          }
+        },
+        "security": [
+          {
+            "jwt": []
+          }
+        ],
+        "summary": "Update a role",
+        "tags": [
+          "RBAC (Roles & Permissions)"
+        ]
+      },
+      "delete": {
+        "operationId": "RbacController_deleteRole",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Role deleted."
+          },
+          "403": {
+            "description": "Forbidden. Missing required permissions."
+          },
+          "404": {
+            "description": "Role not found."
+          }
+        },
+        "security": [
+          {
+            "jwt": []
+          }
+        ],
+        "summary": "Delete a role",
+        "tags": [
+          "RBAC (Roles & Permissions)"
+        ]
+      }
+    },
+    "/rbac/permissions": {
+      "post": {
+        "operationId": "RbacController_createPermission",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreatePermissionDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Permission created.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PermissionResponseDto"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden. Missing required permissions."
+          }
+        },
+        "security": [
+          {
+            "jwt": []
+          }
+        ],
+        "summary": "Create a new permission",
+        "tags": [
+          "RBAC (Roles & Permissions)"
+        ]
+      },
+      "get": {
+        "operationId": "RbacController_findAllPermissions",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "List of permissions.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PermissionResponseDto"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden. Missing required permissions."
+          }
+        },
+        "security": [
+          {
+            "jwt": []
+          }
+        ],
+        "summary": "Get all permissions",
+        "tags": [
+          "RBAC (Roles & Permissions)"
+        ]
+      }
+    },
+    "/rbac/permissions/{id}": {
+      "get": {
+        "operationId": "RbacController_findPermissionById",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Permission details.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PermissionResponseDto"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden. Missing required permissions."
+          },
+          "404": {
+            "description": "Permission not found."
+          }
+        },
+        "security": [
+          {
+            "jwt": []
+          }
+        ],
+        "summary": "Get a permission by ID",
+        "tags": [
+          "RBAC (Roles & Permissions)"
+        ]
+      },
+      "patch": {
+        "operationId": "RbacController_updatePermission",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdatePermissionDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Permission updated.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PermissionResponseDto"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden. Missing required permissions."
+          },
+          "404": {
+            "description": "Permission not found."
+          }
+        },
+        "security": [
+          {
+            "jwt": []
+          }
+        ],
+        "summary": "Update a permission",
+        "tags": [
+          "RBAC (Roles & Permissions)"
+        ]
+      },
+      "delete": {
+        "operationId": "RbacController_deletePermission",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Permission deleted."
+          },
+          "403": {
+            "description": "Forbidden. Missing required permissions."
+          },
+          "404": {
+            "description": "Permission not found."
+          }
+        },
+        "security": [
+          {
+            "jwt": []
+          }
+        ],
+        "summary": "Delete a permission",
+        "tags": [
+          "RBAC (Roles & Permissions)"
+        ]
+      }
+    },
+    "/rbac/roles/{roleId}/permissions/{permissionId}": {
+      "post": {
+        "operationId": "RbacController_assignPermissionToRole",
+        "parameters": [
+          {
+            "name": "roleId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "permissionId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Permission assigned.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RoleResponseDto"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden. Missing required permissions."
+          },
+          "404": {
+            "description": "Role or Permission not found."
+          }
+        },
+        "security": [
+          {
+            "jwt": []
+          }
+        ],
+        "summary": "Assign a permission to a role",
+        "tags": [
+          "RBAC (Roles & Permissions)"
+        ]
+      },
+      "delete": {
+        "operationId": "RbacController_removePermissionFromRole",
+        "parameters": [
+          {
+            "name": "roleId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "permissionId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Permission removed.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RoleResponseDto"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden. Missing required permissions."
+          },
+          "404": {
+            "description": "Role or Permission not found."
+          }
+        },
+        "security": [
+          {
+            "jwt": []
+          }
+        ],
+        "summary": "Remove a permission from a role",
+        "tags": [
+          "RBAC (Roles & Permissions)"
+        ]
+      }
+    },
+    "/rbac/roles/{roleId}/permissions": {
+      "get": {
+        "operationId": "RbacController_findPermissionsForRole",
+        "parameters": [
+          {
+            "name": "roleId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of permissions.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PermissionResponseDto"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden. Missing required permissions."
+          },
+          "404": {
+            "description": "Role not found."
+          }
+        },
+        "security": [
+          {
+            "jwt": []
+          }
+        ],
+        "summary": "Get permissions for a specific role",
+        "tags": [
+          "RBAC (Roles & Permissions)"
+        ]
+      }
+    },
+    "/companies": {
+      "post": {
+        "operationId": "CompanyController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateCompanyDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Company created successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CompanyResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation failed."
+          },
+          "403": {
+            "description": "Forbidden. Missing required permissions."
+          }
+        },
+        "security": [
+          {
+            "jwt": []
+          }
+        ],
+        "summary": "Create a new company",
+        "tags": [
+          "Companies Management"
+        ]
+      },
+      "get": {
+        "operationId": "CompanyController_findAll",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "List of companies.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CompanyResponseDto"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden. Missing required permissions."
+          }
+        },
+        "security": [
+          {
+            "jwt": []
+          }
+        ],
+        "summary": "Get a list of all companies",
+        "tags": [
+          "Companies Management"
+        ]
+      }
+    },
+    "/companies/{id}": {
+      "get": {
+        "operationId": "CompanyController_findOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Company ID",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Company details.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CompanyResponseDto"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden. Missing required permissions."
+          },
+          "404": {
+            "description": "Company not found."
+          }
+        },
+        "security": [
+          {
+            "jwt": []
+          }
+        ],
+        "summary": "Get a specific company by ID",
+        "tags": [
+          "Companies Management"
+        ]
+      },
+      "patch": {
+        "operationId": "CompanyController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Company ID",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateCompanyDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Company updated successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CompanyResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation failed."
+          },
+          "403": {
+            "description": "Forbidden. Missing required permissions."
+          },
+          "404": {
+            "description": "Company not found."
+          }
+        },
+        "security": [
+          {
+            "jwt": []
+          }
+        ],
+        "summary": "Update a company",
+        "tags": [
+          "Companies Management"
+        ]
+      },
+      "delete": {
+        "operationId": "CompanyController_remove",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Company ID",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Company deleted successfully."
+          },
+          "403": {
+            "description": "Forbidden. Missing required permissions."
+          },
+          "404": {
+            "description": "Company not found."
+          },
+          "409": {
+            "description": "Conflict (e.g., company still has admins)."
+          }
+        },
+        "security": [
+          {
+            "jwt": []
+          }
+        ],
+        "summary": "Delete a company",
+        "tags": [
+          "Companies Management"
+        ]
+      }
+    },
+    "/admins": {
+      "post": {
+        "operationId": "AdminController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateAdminDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Admin created successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminProfileResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation failed or invalid input."
+          },
+          "403": {
+            "description": "Forbidden. Missing required permissions."
+          },
+          "409": {
+            "description": "Email already exists."
+          }
+        },
+        "security": [
+          {
+            "jwt": []
+          }
+        ],
+        "summary": "Create a new admin user and profile",
+        "tags": [
+          "Admins Management"
+        ]
+      },
+      "get": {
+        "operationId": "AdminController_findAll",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "List of admin profiles.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AdminProfileResponseDto"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden. Missing required permissions."
+          }
+        },
+        "security": [
+          {
+            "jwt": []
+          }
+        ],
+        "summary": "Get a list of all admin profiles",
+        "tags": [
+          "Admins Management"
+        ]
+      }
+    },
+    "/admins/profile": {
+      "get": {
+        "operationId": "AdminController_getProfile",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Detail profil admin, termasuk perusahaan dan API keys",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminProfileResponseDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "jwt": []
+          }
+        ],
+        "summary": "Mendapatkan profil admin yang sedang login",
+        "tags": [
+          "Admins Management"
+        ]
+      }
+    },
+    "/admins/{id}": {
+      "get": {
+        "operationId": "AdminController_findOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Admin Profile ID",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Admin profile details.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminProfileResponseDto"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden. Missing required permissions."
+          },
+          "404": {
+            "description": "Admin profile not found."
+          }
+        },
+        "security": [
+          {
+            "jwt": []
+          }
+        ],
+        "summary": "Get a specific admin profile by ID",
+        "tags": [
+          "Admins Management"
+        ]
+      },
+      "patch": {
+        "operationId": "AdminController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Admin Profile ID",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateAdminDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Admin profile updated successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminProfileResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation failed or invalid input."
+          },
+          "403": {
+            "description": "Forbidden. Missing required permissions."
+          },
+          "404": {
+            "description": "Admin profile not found."
+          }
+        },
+        "security": [
+          {
+            "jwt": []
+          }
+        ],
+        "summary": "Update an admin profile",
+        "tags": [
+          "Admins Management"
+        ]
+      },
+      "delete": {
+        "operationId": "AdminController_remove",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Admin Profile ID",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Admin deleted successfully."
+          },
+          "403": {
+            "description": "Forbidden. Missing required permissions."
+          },
+          "404": {
+            "description": "Admin profile not found."
+          }
+        },
+        "security": [
+          {
+            "jwt": []
+          }
+        ],
+        "summary": "Delete an admin profile (and associated user)",
+        "tags": [
+          "Admins Management"
+        ]
+      }
+    },
+    "/admins/{adminId}/roles/{roleId}": {
+      "post": {
+        "operationId": "AdminController_assignRole",
+        "parameters": [
+          {
+            "name": "adminId",
+            "required": true,
+            "in": "path",
+            "description": "Admin Profile ID",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "roleId",
+            "required": true,
+            "in": "path",
+            "description": "Role ID",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Role assigned successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminProfileResponseDto"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden. Missing required permissions."
+          },
+          "404": {
+            "description": "Admin or Role not found."
+          }
+        },
+        "security": [
+          {
+            "jwt": []
+          }
+        ],
+        "summary": "Assign a role to an admin",
+        "tags": [
+          "Admins Management"
+        ]
+      },
+      "delete": {
+        "operationId": "AdminController_removeRole",
+        "parameters": [
+          {
+            "name": "adminId",
+            "required": true,
+            "in": "path",
+            "description": "Admin Profile ID",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "roleId",
+            "required": true,
+            "in": "path",
+            "description": "Role ID",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Role removed successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminProfileResponseDto"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden. Missing required permissions."
+          },
+          "404": {
+            "description": "Admin or Role not found."
+          }
+        },
+        "security": [
+          {
+            "jwt": []
+          }
+        ],
+        "summary": "Remove a role from an admin",
+        "tags": [
+          "Admins Management"
+        ]
+      }
+    },
+    "/api-keys": {
+      "post": {
+        "operationId": "ApikeyController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateApikeyDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "API key berhasil dibuat",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiKeyEntity"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Data tidak valid"
+          },
+          "404": {
+            "description": "Perusahaan tidak ditemukan"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Membuat API key baru",
+        "tags": [
+          "api-keys"
+        ]
+      }
+    },
+    "/api-keys/company/{companyId}": {
+      "get": {
+        "operationId": "ApikeyController_findAllByCompany",
+        "parameters": [
+          {
+            "name": "companyId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Daftar API key berhasil diambil",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ApiKeyEntity"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Mendapatkan semua API key untuk perusahaan tertentu",
+        "tags": [
+          "api-keys"
+        ]
+      }
+    },
+    "/api-keys/{id}": {
+      "get": {
+        "operationId": "ApikeyController_findOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "API key berhasil diambil",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiKeyEntity"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "API key tidak ditemukan"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Mendapatkan API key berdasarkan ID",
+        "tags": [
+          "api-keys"
+        ]
+      },
+      "put": {
+        "operationId": "ApikeyController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateApikeyDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "API key berhasil diupdate",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiKeyEntity"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "API key tidak ditemukan"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Mengupdate API key",
+        "tags": [
+          "api-keys"
+        ]
+      },
+      "delete": {
+        "operationId": "ApikeyController_remove",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "API key berhasil dihapus",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiKeyEntity"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "API key tidak ditemukan"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Menghapus API key",
+        "tags": [
+          "api-keys"
+        ]
+      }
+    },
+    "/api-keys/{id}/logs": {
+      "get": {
+        "operationId": "ApikeyController_getApiLogs",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Log API berhasil diambil",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ApiLogEntity"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "API key tidak ditemukan"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Mendapatkan log penggunaan API untuk API key tertentu",
+        "tags": [
+          "api-keys"
+        ]
+      }
+    },
+    "/api/examples": {
+      "get": {
+        "operationId": "ExampleController_getData",
+        "parameters": [
+          {
+            "name": "X-API-KEY",
+            "in": "header",
+            "description": "API key untuk autentikasi",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Data berhasil diambil",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetExampleResponseDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "API key tidak valid atau tidak ditemukan"
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ],
+        "summary": "Mendapatkan contoh data",
+        "tags": [
+          "api-examples"
+        ]
+      },
+      "post": {
+        "operationId": "ExampleController_createData",
+        "parameters": [
+          {
+            "name": "X-API-KEY",
+            "in": "header",
+            "description": "API key untuk autentikasi",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateExampleDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Data berhasil dibuat",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateExampleResponseDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "API key tidak valid atau tidak ditemukan"
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          }
+        ],
+        "summary": "Membuat contoh data baru",
+        "tags": [
+          "api-examples"
+        ]
+      }
+    }
+  },
+  "info": {
+    "title": "SSO Boilerplate API",
+    "description": "API documentation for the SSO Boilerplate application",
+    "version": "1.0",
+    "contact": {}
+  },
+  "tags": [
+    {
+      "name": "auth",
+      "description": "Authentication related endpoints"
+    },
+    {
+      "name": "app",
+      "description": "General application endpoints"
+    },
+    {
+      "name": "api-keys",
+      "description": "API Key management"
+    },
+    {
+      "name": "api-examples",
+      "description": "Example API endpoints protected by API Key"
+    }
+  ],
+  "servers": [],
+  "components": {
+    "securitySchemes": {
+      "jwt": {
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "type": "http",
+        "name": "JWT",
+        "description": "Enter JWT token",
+        "in": "header"
+      },
+      "api-key": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-API-KEY",
+        "description": "API Key untuk autentikasi akses API"
+      }
+    },
+    "schemas": {
+      "RegisterDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "John Doe",
+            "description": "Full name of the user"
+          },
+          "email": {
+            "type": "string",
+            "example": "john.doe@example.com",
+            "description": "Unique email address for the user"
+          },
+          "password": {
+            "type": "string",
+            "example": "Password123",
+            "description": "User password. Must contain at least one uppercase letter, one lowercase letter, and one number with minimum 8 characters",
+            "minLength": 8
+          }
+        },
+        "required": [
+          "email",
+          "password"
+        ]
+      },
+      "SuccessMessageResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "message"
+        ]
+      },
+      "LoginDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "example": "john.doe@example.com",
+            "description": "The email address used during registration"
+          },
+          "password": {
+            "type": "string",
+            "example": "Password123",
+            "description": "Your account password",
+            "minLength": 8
+          }
+        },
+        "required": [
+          "email",
+          "password"
+        ]
+      },
+      "LoginResponseDto": {
+        "type": "object",
+        "properties": {
+          "access_token": {
+            "type": "string",
+            "description": "JWT Access Token",
+            "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+          },
+          "refresh_token": {
+            "type": "string",
+            "description": "JWT Refresh Token",
+            "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+          }
+        },
+        "required": [
+          "access_token",
+          "refresh_token"
+        ]
+      },
+      "ProfileResponseDto": {
+        "type": "object",
+        "properties": {
+          "userId": {
+            "type": "number",
+            "example": 1,
+            "description": "Unique user ID"
+          },
+          "email": {
+            "type": "string",
+            "example": "user@example.com",
+            "description": "User email address"
+          },
+          "name": {
+            "type": "object",
+            "example": "John Doe",
+            "description": "User full name (can be null)",
+            "nullable": true
+          },
+          "role": {
+            "type": "string",
+            "example": "USER",
+            "description": "User role",
+            "enum": [
+              "USER",
+              "ADMIN"
+            ]
+          }
+        },
+        "required": [
+          "userId",
+          "email",
+          "name",
+          "role"
+        ]
+      },
+      "ForgotPasswordDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "example": "user@example.com",
+            "description": "Email address registered in the system to send password reset link"
+          }
+        },
+        "required": [
+          "email"
+        ]
+      },
+      "SuccessMessageResponseDto": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "example": "Operation successful",
+            "description": "Success message"
+          }
+        },
+        "required": [
+          "message"
+        ]
+      },
+      "ResetPasswordDto": {
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string",
+            "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9",
+            "description": "Reset token received in the password reset email link"
+          },
+          "password": {
+            "type": "string",
+            "example": "NewPassword123",
+            "description": "New password that meets the requirements: at least one uppercase letter, one lowercase letter, and one number",
+            "minLength": 8
+          }
+        },
+        "required": [
+          "token",
+          "password"
+        ]
+      },
+      "AdminLoginDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "example": "john.doe@example.com",
+            "description": "The email address used during registration"
+          },
+          "password": {
+            "type": "string",
+            "example": "Password123",
+            "description": "Your account password",
+            "minLength": 8
+          }
+        },
+        "required": [
+          "email",
+          "password"
+        ]
+      },
+      "ResendVerificationEmailDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "example": "user@example.com",
+            "description": "Email address to resend verification email"
+          }
+        },
+        "required": [
+          "email"
+        ]
+      },
+      "CreateRoleDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "Content Manager",
+            "description": "Name of the role (unique)",
+            "maxLength": 100
+          },
+          "description": {
+            "type": "string",
+            "example": "Role for managing content and articles",
+            "description": "Brief description of role responsibilities",
+            "maxLength": 255
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "RoleResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number",
+            "example": 1
+          },
+          "name": {
+            "type": "string",
+            "example": "admin"
+          },
+          "description": {
+            "type": "object",
+            "example": "Administrator role",
+            "nullable": true
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "UpdateRoleDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "Content Editor",
+            "description": "Updated role name",
+            "maxLength": 100
+          },
+          "description": {
+            "type": "string",
+            "example": "Updated role description",
+            "description": "Updated description for the role",
+            "maxLength": 255
+          }
+        }
+      },
+      "CreatePermissionDto": {
+        "type": "object",
+        "properties": {
+          "action": {
+            "type": "string",
+            "example": "create",
+            "description": "Action that can be performed (e.g., create, read, update, delete, manage)",
+            "maxLength": 100
+          },
+          "subject": {
+            "type": "string",
+            "example": "article",
+            "description": "Resource or subject on which the action is performed (e.g., user, article, product)",
+            "maxLength": 100
+          }
+        },
+        "required": [
+          "action",
+          "subject"
+        ]
+      },
+      "PermissionResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number"
+          },
+          "action": {
+            "type": "string"
+          },
+          "subject": {
+            "type": "string"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "action",
+          "subject",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "UpdatePermissionDto": {
+        "type": "object",
+        "properties": {
+          "action": {
+            "type": "string",
+            "example": "manage",
+            "description": "Updated action value",
+            "maxLength": 100
+          },
+          "subject": {
+            "type": "string",
+            "example": "content",
+            "description": "Updated subject/resource value",
+            "maxLength": 100
+          }
+        }
+      },
+      "CreateCompanyDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "Acme Corporation",
+            "description": "Name of the company",
+            "maxLength": 150
+          },
+          "description": {
+            "type": "string",
+            "example": "A leading provider of services and products",
+            "description": "Brief description about the company",
+            "maxLength": 500
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "ApiKeyEntity": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number",
+            "description": "ID unik API key",
+            "example": 1
+          },
+          "key": {
+            "type": "string",
+            "description": "API Key string (hanya ditampilkan saat pembuatan)",
+            "example": "7c8a5d69f43e5c8a94d7ec68"
+          },
+          "name": {
+            "type": "string",
+            "description": "Nama untuk identifikasi API key",
+            "example": "Production Key"
+          },
+          "description": {
+            "type": "string",
+            "description": "Deskripsi tentang tujuan penggunaan API key",
+            "example": "API key untuk akses ke production environment"
+          },
+          "isActive": {
+            "type": "boolean",
+            "description": "Status API key (aktif/tidak aktif)",
+            "example": true
+          },
+          "companyId": {
+            "type": "number",
+            "description": "ID perusahaan yang memiliki API key",
+            "example": 1
+          },
+          "lastUsedAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Terakhir kali API key digunakan",
+            "example": "2023-05-20T15:45:30Z"
+          },
+          "expiresAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Tanggal kadaluarsa API key (jika ada)",
+            "example": "2023-12-31T23:59:59Z"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Tanggal pembuatan API key",
+            "example": "2023-01-15T10:30:45Z"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Tanggal update terakhir API key",
+            "example": "2023-01-15T10:30:45Z"
+          }
+        },
+        "required": [
+          "id",
+          "key",
+          "name",
+          "isActive",
+          "companyId",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "CompanyResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number",
+            "example": 1,
+            "description": "The unique identifier of the company"
+          },
+          "name": {
+            "type": "string",
+            "example": "Acme Corp",
+            "description": "The name of the company"
+          },
+          "description": {
+            "type": "object",
+            "example": "Leading provider of innovative solutions",
+            "description": "Company description",
+            "nullable": true
+          },
+          "apiKeys": {
+            "description": "API keys belonging to the company",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ApiKeyEntity"
+            }
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "UpdateCompanyDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "Acme Corporation Updated",
+            "description": "Updated company name",
+            "maxLength": 150
+          },
+          "description": {
+            "type": "string",
+            "example": "Updated description for the company",
+            "description": "Updated company description",
+            "maxLength": 500
+          }
+        }
+      },
+      "CreateAdminDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "example": "admin@example.com",
+            "description": "Email address for the admin user"
+          },
+          "password": {
+            "type": "string",
+            "example": "AdminPass123",
+            "description": "Password with minimum 8 characters",
+            "minLength": 8
+          },
+          "name": {
+            "type": "string",
+            "example": "John Admin",
+            "description": "Full name of the admin",
+            "maxLength": 150
+          },
+          "companyId": {
+            "type": "number",
+            "example": 1,
+            "description": "ID of the company this admin belongs to (optional)"
+          },
+          "roleIds": {
+            "example": [
+              1,
+              2
+            ],
+            "description": "Array of role IDs assigned to this admin",
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
+          }
+        },
+        "required": [
+          "email",
+          "password",
+          "name",
+          "roleIds"
+        ]
+      },
+      "AdminProfileResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number",
+            "example": 1,
+            "description": "The unique identifier of the admin profile."
+          },
+          "name": {
+            "type": "string",
+            "example": "John Doe",
+            "description": "The name of the admin."
+          },
+          "email": {
+            "type": "string",
+            "example": "john.doe@example.com",
+            "description": "The email of the admin user."
+          },
+          "title": {
+            "type": "object",
+            "example": "Administrator",
+            "description": "Optional title or position.",
+            "nullable": true
+          },
+          "phone": {
+            "type": "object",
+            "example": "+1234567890",
+            "description": "Optional contact phone number.",
+            "nullable": true
+          },
+          "roles": {
+            "description": "Roles assigned to the admin.",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RoleResponseDto"
+            }
+          },
+          "company": {
+            "description": "Company associated with the admin.",
+            "nullable": true,
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CompanyResponseDto"
+              }
+            ]
+          },
+          "apiKeys": {
+            "description": "API keys for the admin's company",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ApiKeyEntity"
+            }
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "email",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "UpdateAdminDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "John Doe Updated",
+            "description": "Updated name for the admin",
+            "maxLength": 150
+          },
+          "companyId": {
+            "type": "object",
+            "example": 2,
+            "description": "Updated company ID (set null to remove company association)",
+            "nullable": true
+          },
+          "roleIds": {
+            "example": [
+              1,
+              3,
+              5
+            ],
+            "description": "Updated array of role IDs",
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
+          }
+        }
+      },
+      "CreateApikeyDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Nama untuk identifikasi API key (contoh: \"Production\", \"Development\")",
+            "example": "Production Key"
+          },
+          "description": {
+            "type": "string",
+            "description": "Deskripsi tentang tujuan penggunaan API key",
+            "example": "API key untuk akses ke production environment"
+          },
+          "companyId": {
+            "type": "number",
+            "description": "ID perusahaan yang memiliki API key",
+            "example": 1
+          },
+          "expiresAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Tanggal kadaluarsa API key (opsional)",
+            "example": "2023-12-31T23:59:59Z"
+          }
+        },
+        "required": [
+          "name",
+          "companyId"
+        ]
+      },
+      "UpdateApikeyDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Nama untuk identifikasi API key (contoh: \"Production\", \"Development\")",
+            "example": "Production Key"
+          },
+          "description": {
+            "type": "string",
+            "description": "Deskripsi tentang tujuan penggunaan API key",
+            "example": "API key untuk akses ke production environment"
+          },
+          "companyId": {
+            "type": "number",
+            "description": "ID perusahaan yang memiliki API key",
+            "example": 1
+          },
+          "expiresAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Tanggal kadaluarsa API key (opsional)",
+            "example": "2023-12-31T23:59:59Z"
+          },
+          "isActive": {
+            "type": "boolean",
+            "description": "Mengaktifkan atau menonaktifkan API key",
+            "example": true
+          }
+        }
+      },
+      "ApiLogEntity": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number",
+            "description": "ID unik API log",
+            "example": 1
+          },
+          "apiKeyId": {
+            "type": "number",
+            "description": "ID API key yang digunakan",
+            "example": 1
+          },
+          "endpoint": {
+            "type": "string",
+            "description": "Endpoint yang diakses",
+            "example": "/api/examples"
+          },
+          "method": {
+            "type": "string",
+            "description": "HTTP method yang digunakan",
+            "example": "GET"
+          },
+          "statusCode": {
+            "type": "number",
+            "description": "HTTP status code dari response",
+            "example": 200
+          },
+          "requestBody": {
+            "type": "string",
+            "description": "Request body yang dikirim (jika ada)",
+            "example": "{\"name\": \"Test Data\"}"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Tanggal dan waktu request",
+            "example": "2023-05-20T15:45:30Z"
+          }
+        },
+        "required": [
+          "id",
+          "apiKeyId",
+          "endpoint",
+          "method",
+          "statusCode",
+          "createdAt"
+        ]
+      },
+      "GetExampleResponseDto": {
+        "type": "object",
+        "properties": {}
+      },
+      "CreateExampleDto": {
+        "type": "object",
+        "properties": {}
+      },
+      "CreateExampleResponseDto": {
+        "type": "object",
+        "properties": {}
+      }
+    }
+  }
+}

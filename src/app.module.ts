@@ -13,6 +13,8 @@ import { AdminModule } from './admin/admin.module';
 import { CacheModule } from '@nestjs/cache-manager';
 import { ScheduleModule } from '@nestjs/schedule';
 import { TasksModule } from './tasks/tasks.module';
+import { ApikeyModule } from './apikey/apikey.module';
+import { ApiModule } from './api/api.module';
 
 @Module({
   imports: [
@@ -40,6 +42,8 @@ import { TasksModule } from './tasks/tasks.module';
     CompanyModule,
     AdminModule,
     TasksModule,
+    ApikeyModule,
+    ApiModule,
   ],
   controllers: [AppController],
   providers: [

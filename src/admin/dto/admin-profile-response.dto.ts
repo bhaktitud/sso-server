@@ -1,6 +1,8 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Role } from 'generated/mysql'; // Import tipe Role asli
 import { RoleResponseDto } from '@src/rbac/dto/role-response.dto'; // Import DTO Role
+import { CompanyResponseDto } from '@src/company/dto/company-response.dto';
+import { ApiKeyEntity } from '@src/apikey/entities/api-key.entity';
 
 // Asumsi struktur AdminProfile berdasarkan penggunaan umum
 // Sesuaikan properti dan tipe berdasarkan definisi AdminProfile Anda di Prisma Schema
@@ -42,6 +44,21 @@ export class AdminProfileResponseDto {
     required: false,
   })
   roles?: RoleResponseDto[]; // Gunakan DTO Role
+
+  @ApiProperty({
+    type: () => CompanyResponseDto,
+    description: 'Company associated with the admin.',
+    required: false,
+    nullable: true,
+  })
+  company?: CompanyResponseDto | null;
+
+  @ApiProperty({
+    type: () => [ApiKeyEntity],
+    description: "API keys for the admin's company",
+    required: false,
+  })
+  apiKeys?: ApiKeyEntity[];
 
   @ApiProperty()
   createdAt: Date;

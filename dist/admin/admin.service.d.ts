@@ -23,4 +23,5 @@ export declare class AdminService {
     }>;
     assignRoleToAdmin(adminId: number, roleId: number): Promise<AdminProfile>;
     removeRoleFromAdmin(adminId: number, roleId: number): Promise<AdminProfile>;
+    findAdminProfileWithDetails(userId: number): Promise<AdminProfile>;
 }

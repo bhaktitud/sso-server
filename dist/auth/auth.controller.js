@@ -33,6 +33,7 @@ const forgot_password_dto_1 = require("./dto/forgot-password.dto");
 const reset_password_dto_1 = require("./dto/reset-password.dto");
 const admin_login_dto_1 = require("./dto/admin-login.dto");
 const resend_verification_email_dto_1 = require("./dto/resend-verification-email.dto");
+const public_decorator_1 = require("./decorators/public.decorator");
 class SuccessMessageResponse {
     message;
 }
@@ -61,12 +62,8 @@ let AuthController = class AuthController {
         return this.authService.refreshTokens(userId, refreshToken);
     }
     getProfile(req) {
-        const userProfile = {
-            userId: req.user.userId,
-            email: req.user.email,
-            name: req.user.name ?? null,
-            role: req.user.role,
-        };
+        console.log(req.user);
+        const userProfile = req.user;
         return userProfile;
     }
     async verifyEmail(token) {
@@ -175,6 +172,7 @@ __decorate([
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
     (0, common_1.Get)('profile'),
     (0, swagger_1.ApiBearerAuth)('jwt'),
+    (0, public_decorator_1.Public)(),
     (0, swagger_1.ApiOperation)({ summary: 'Get current user profile' }),
     (0, swagger_1.ApiResponse)({
         status: 200,
@@ -185,7 +183,7 @@ __decorate([
     __param(0, (0, common_1.Request)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object]),
-    __metadata("design:returntype", profile_response_dto_1.ProfileResponseDto)
+    __metadata("design:returntype", Object)
 ], AuthController.prototype, "getProfile", null);
 __decorate([
     (0, common_1.Get)('verify-email/:token'),
@@ -254,6 +252,7 @@ __decorate([
 ], AuthController.prototype, "resetPassword", null);
 __decorate([
     (0, common_1.Post)('admin/login'),
+    (0, public_decorator_1.Public)(),
     (0, common_1.HttpCode)(common_1.HttpStatus.OK),
     (0, swagger_1.ApiOperation)({ summary: 'Log in an administrator' }),
     (0, swagger_1.ApiBody)({ type: admin_login_dto_1.AdminLoginDto }),

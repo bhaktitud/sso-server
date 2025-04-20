@@ -20,6 +20,8 @@ async function bootstrap() {
         .setVersion('1.0')
         .addTag('auth', 'Authentication related endpoints')
         .addTag('app', 'General application endpoints')
+        .addTag('api-keys', 'API Key management')
+        .addTag('api-examples', 'Example API endpoints protected by API Key')
         .addBearerAuth({
         type: 'http',
         scheme: 'bearer',
@@ -28,8 +30,19 @@ async function bootstrap() {
         description: 'Enter JWT token',
         in: 'header',
     }, 'jwt')
+        .addApiKey({
+        type: 'apiKey',
+        name: 'X-API-KEY',
+        in: 'header',
+        description: 'API Key untuk autentikasi akses API',
+    }, 'api-key')
         .build();
     const document = swagger_1.SwaggerModule.createDocument(app, config);
+    const fs = require('fs');
+    const path = require('path');
+    const outputPath = path.resolve(process.cwd(), 'swagger.json');
+    fs.writeFileSync(outputPath, JSON.stringify(document, null, 2));
+    console.log(`Swagger JSON file written to: ${outputPath}`);
     swagger_1.SwaggerModule.setup('api', app, document);
     const port = process.env.PORT || 5001;
     await app.listen(port);

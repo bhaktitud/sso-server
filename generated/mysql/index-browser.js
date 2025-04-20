@@ -149,6 +149,29 @@ exports.Prisma.CompanyScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
+exports.Prisma.ApiKeyScalarFieldEnum = {
+  id: 'id',
+  key: 'key',
+  name: 'name',
+  description: 'description',
+  isActive: 'isActive',
+  companyId: 'companyId',
+  lastUsedAt: 'lastUsedAt',
+  expiresAt: 'expiresAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.ApiLogScalarFieldEnum = {
+  id: 'id',
+  apiKeyId: 'apiKeyId',
+  endpoint: 'endpoint',
+  method: 'method',
+  statusCode: 'statusCode',
+  requestBody: 'requestBody',
+  createdAt: 'createdAt'
+};
+
 exports.Prisma.RoleScalarFieldEnum = {
   id: 'id',
   name: 'name',
@@ -193,6 +216,18 @@ exports.Prisma.CompanyOrderByRelevanceFieldEnum = {
   description: 'description'
 };
 
+exports.Prisma.ApiKeyOrderByRelevanceFieldEnum = {
+  key: 'key',
+  name: 'name',
+  description: 'description'
+};
+
+exports.Prisma.ApiLogOrderByRelevanceFieldEnum = {
+  endpoint: 'endpoint',
+  method: 'method',
+  requestBody: 'requestBody'
+};
+
 exports.Prisma.RoleOrderByRelevanceFieldEnum = {
   name: 'name',
   description: 'description'
@@ -211,6 +246,8 @@ exports.Prisma.ModelName = {
   User: 'User',
   AdminProfile: 'AdminProfile',
   Company: 'Company',
+  ApiKey: 'ApiKey',
+  ApiLog: 'ApiLog',
   Role: 'Role',
   Permission: 'Permission'
 };

@@ -1,8 +1,9 @@
-import { Company } from '../../../generated/mysql';
-export declare class CompanyResponseDto implements Omit<Company, 'admins'> {
+import { ApiKeyEntity } from '@src/apikey/entities/api-key.entity';
+export declare class CompanyResponseDto {
     id: number;
     name: string;
-    description: string | null;
+    description?: string | null;
+    apiKeys?: ApiKeyEntity[];
     createdAt: Date;
     updatedAt: Date;
 }

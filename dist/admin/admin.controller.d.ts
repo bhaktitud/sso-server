@@ -1,11 +1,37 @@
 import { AdminService } from './admin.service';
 import { CreateAdminDto } from './dto/create-admin.dto';
 import { UpdateAdminDto } from './dto/update-admin.dto';
-import { AdminProfile } from '../../generated/mysql';
+import { AdminProfile, User, ApiKey } from '../../generated/mysql';
 export declare class AdminController {
     private readonly adminService;
     constructor(adminService: AdminService);
     create(createAdminDto: CreateAdminDto): Promise<AdminProfile>;
+    getProfile(req: any): Promise<{
+        email: string | undefined;
+        apiKeys: {
+            name: string;
+            id: number;
+            createdAt: Date;
+            updatedAt: Date;
+            companyId: number;
+            description: string | null;
+            key: string;
+            isActive: boolean;
+            lastUsedAt: Date | null;
+            expiresAt: Date | null;
+        }[];
+        name: string;
+        id: number;
+        createdAt: Date;
+        updatedAt: Date;
+        userId: number;
+        companyId: number | null;
+        user: Partial<User>;
+        company?: {
+            apiKeys: ApiKey[];
+        } | null;
+        roles: any[];
+    }>;
     findAll(): Promise<AdminProfile[]>;
     findOne(id: number): Promise<AdminProfile>;
     update(id: number, updateAdminDto: UpdateAdminDto): Promise<AdminProfile>;

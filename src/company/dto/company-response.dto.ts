@@ -1,22 +1,37 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Company } from '../../../generated/mysql';
+import { ApiKeyEntity } from '@src/apikey/entities/api-key.entity';
 
-// Pilih field yang ingin diekspos
-export class CompanyResponseDto implements Omit<Company, 'admins'> {
-  @ApiProperty()
+export class CompanyResponseDto {
+  @ApiProperty({
+    example: 1,
+    description: 'The unique identifier of the company',
+  })
   id: number;
 
-  @ApiProperty()
+  @ApiProperty({
+    example: 'Acme Corp',
+    description: 'The name of the company',
+  })
   name: string;
 
-  @ApiProperty({ required: false, nullable: true })
-  description: string | null;
+  @ApiProperty({
+    example: 'Leading provider of innovative solutions',
+    description: 'Company description',
+    required: false,
+    nullable: true,
+  })
+  description?: string | null;
+
+  @ApiProperty({
+    type: () => [ApiKeyEntity],
+    description: 'API keys belonging to the company',
+    required: false,
+  })
+  apiKeys?: ApiKeyEntity[];
 
   @ApiProperty()
   createdAt: Date;
 
   @ApiProperty()
   updatedAt: Date;
-
-  // Kita sengaja tidak memasukkan 'admins' di sini
 }

@@ -11,26 +11,47 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CompanyResponseDto = void 0;
 const swagger_1 = require("@nestjs/swagger");
+const api_key_entity_1 = require("../../apikey/entities/api-key.entity");
 class CompanyResponseDto {
     id;
     name;
     description;
+    apiKeys;
     createdAt;
     updatedAt;
 }
 exports.CompanyResponseDto = CompanyResponseDto;
 __decorate([
-    (0, swagger_1.ApiProperty)(),
+    (0, swagger_1.ApiProperty)({
+        example: 1,
+        description: 'The unique identifier of the company',
+    }),
     __metadata("design:type", Number)
 ], CompanyResponseDto.prototype, "id", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)(),
+    (0, swagger_1.ApiProperty)({
+        example: 'Acme Corp',
+        description: 'The name of the company',
+    }),
     __metadata("design:type", String)
 ], CompanyResponseDto.prototype, "name", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ required: false, nullable: true }),
+    (0, swagger_1.ApiProperty)({
+        example: 'Leading provider of innovative solutions',
+        description: 'Company description',
+        required: false,
+        nullable: true,
+    }),
     __metadata("design:type", Object)
 ], CompanyResponseDto.prototype, "description", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({
+        type: () => [api_key_entity_1.ApiKeyEntity],
+        description: 'API keys belonging to the company',
+        required: false,
+    }),
+    __metadata("design:type", Array)
+], CompanyResponseDto.prototype, "apiKeys", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)(),
     __metadata("design:type", Date)
