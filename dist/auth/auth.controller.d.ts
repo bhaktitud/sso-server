@@ -7,6 +7,7 @@ import { SuccessMessageResponseDto } from '@src/common/dto/success-message-respo
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { AdminLoginDto } from './dto/admin-login.dto';
+import { ResendVerificationEmailDto } from './dto/resend-verification-email.dto';
 type AuthenticatedUser = Omit<User, 'password'>;
 interface AuthenticatedJwtPayload {
     userId: number;
@@ -58,6 +59,9 @@ export declare class AuthController {
     adminLogin(adminLoginDto: AdminLoginDto): Promise<{
         access_token: string;
         refresh_token: string;
+    }>;
+    resendVerificationEmail(resendVerificationEmailDto: ResendVerificationEmailDto): Promise<{
+        message: string;
     }>;
 }
 export {};

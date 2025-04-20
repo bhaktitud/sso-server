@@ -1,6 +1,7 @@
 import { PrismaService } from '@src/prisma/prisma.service';
 import { UserService } from '@src/user/user.service';
 import { RbacService } from '@src/rbac/rbac.service';
+import { MailService } from '@src/mail/mail.service';
 import { AdminProfile, User } from '../../generated/mysql';
 import { CreateAdminDto } from './dto/create-admin.dto';
 import { UpdateAdminDto } from './dto/update-admin.dto';
@@ -8,8 +9,9 @@ export declare class AdminService {
     private prisma;
     private userService;
     private rbacService;
+    private mailService;
     private saltRounds;
-    constructor(prisma: PrismaService, userService: UserService, rbacService: RbacService);
+    constructor(prisma: PrismaService, userService: UserService, rbacService: RbacService, mailService: MailService);
     createAdmin(createAdminDto: CreateAdminDto): Promise<AdminProfile>;
     findAllAdmins(): Promise<AdminProfile[]>;
     findAdminById(id: number): Promise<AdminProfile>;

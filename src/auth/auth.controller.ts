@@ -9,6 +9,7 @@ import {
   HttpStatus,
   Param,
 } from '@nestjs/common';
+import { Throttle } from '@nestjs/throttler';
 import {
   ApiTags,
   ApiOperation,
@@ -34,6 +35,7 @@ import { SuccessMessageResponseDto } from '@src/common/dto/success-message-respo
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { AdminLoginDto } from './dto/admin-login.dto';
+import { ResendVerificationEmailDto } from './dto/resend-verification-email.dto';
 
 // Tipe untuk req.user setelah LocalAuthGuard
 type AuthenticatedUser = Omit<User, 'password'>;
@@ -271,5 +273,32 @@ export class AuthController {
   })
   adminLogin(@Body() adminLoginDto: AdminLoginDto) {
     return this.authService.adminLogin(adminLoginDto);
+  }
+
+  /**
+   * Endpoint untuk mengirim ulang email verifikasi
+   * Throttle diatur ketat untuk mencegah spam: 3 request per 10 menit
+   */
+  @Post('resend-verification-email')
+  @Throttle({ default: { limit: 3, ttl: 600000 } }) // 3 requests per 10 minutes
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Resend email verification link' })
+  @ApiBody({ type: ResendVerificationEmailDto })
+  @ApiResponse({
+    status: 200,
+    description: 'Verification email resent (if email exists and not verified)',
+    type: SuccessMessageResponseDto,
+  })
+  @ApiResponse({ status: 400, description: 'Validation failed' })
+  @ApiResponse({
+    status: 429,
+    description: 'Too Many Requests - Rate limit exceeded',
+  })
+  async resendVerificationEmail(
+    @Body() resendVerificationEmailDto: ResendVerificationEmailDto,
+  ): Promise<{ message: string }> {
+    return this.authService.resendVerificationEmail(
+      resendVerificationEmailDto.email,
+    );
   }
 }

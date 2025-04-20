@@ -14,17 +14,21 @@ const common_1 = require("@nestjs/common");
 const prisma_service_1 = require("../prisma/prisma.service");
 const user_service_1 = require("../user/user.service");
 const rbac_service_1 = require("../rbac/rbac.service");
+const mail_service_1 = require("../mail/mail.service");
 const mysql_1 = require("../../generated/mysql");
 const bcrypt = require("bcrypt");
+const crypto = require("crypto");
 let AdminService = class AdminService {
     prisma;
     userService;
     rbacService;
+    mailService;
     saltRounds = 10;
-    constructor(prisma, userService, rbacService) {
+    constructor(prisma, userService, rbacService, mailService) {
         this.prisma = prisma;
         this.userService = userService;
         this.rbacService = rbacService;
+        this.mailService = mailService;
     }
     async createAdmin(createAdminDto) {
         const { email, password, name, companyId, roleIds } = createAdminDto;
@@ -51,6 +55,11 @@ let AdminService = class AdminService {
             }
         }
         const hashedPassword = await bcrypt.hash(password, this.saltRounds);
+        const rawVerificationToken = crypto.randomBytes(32).toString('hex');
+        const hashedVerificationToken = crypto
+            .createHash('sha256')
+            .update(rawVerificationToken)
+            .digest('hex');
         try {
             const createdAdmin = await this.prisma.mysql.$transaction(async (tx) => {
                 const newUser = await tx.user.create({
@@ -59,6 +68,8 @@ let AdminService = class AdminService {
                         password: hashedPassword,
                         name,
                         userType: mysql_1.UserType.ADMIN_USER,
+                        emailVerificationToken: hashedVerificationToken,
+                        isEmailVerified: false,
                     },
                 });
                 const adminData = {
@@ -78,6 +89,12 @@ let AdminService = class AdminService {
                 });
                 return newAdminProfileWithRoles;
             });
+            try {
+                await this.mailService.sendVerificationEmail(email, name, rawVerificationToken);
+            }
+            catch (error) {
+                console.error('Error sending verification email to admin:', error);
+            }
             return createdAdmin;
         }
         catch (error) {
@@ -188,6 +205,7 @@ exports.AdminService = AdminService = __decorate([
     (0, common_1.Injectable)(),
     __metadata("design:paramtypes", [prisma_service_1.PrismaService,
         user_service_1.UserService,
-        rbac_service_1.RbacService])
+        rbac_service_1.RbacService,
+        mail_service_1.MailService])
 ], AdminService);
 //# sourceMappingURL=admin.service.js.map

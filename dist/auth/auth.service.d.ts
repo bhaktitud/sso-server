@@ -45,5 +45,8 @@ export declare class AuthService {
     verifyEmail(rawToken: string): Promise<{
         message: string;
     }>;
+    resendVerificationEmail(email: string): Promise<{
+        message: string;
+    }>;
 }
 export {};

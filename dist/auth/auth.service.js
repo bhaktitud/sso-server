@@ -50,6 +50,9 @@ let AuthService = class AuthService {
         if (user &&
             user.userType === mysql_1.UserType.ADMIN_USER &&
             (await bcrypt.compare(pass, user.password))) {
+            if (!user.isEmailVerified) {
+                throw new common_1.ForbiddenException('Akun admin belum diverifikasi. Silakan cek email Anda.');
+            }
             const adminProfile = await this.prisma.mysql.adminProfile.findUnique({
                 where: { userId: user.id },
                 include: {
@@ -308,6 +311,42 @@ let AuthService = class AuthService {
             throw new common_1.InternalServerErrorException('Gagal memverifikasi email.');
         }
         return { message: 'Email berhasil diverifikasi.' };
+    }
+    async resendVerificationEmail(email) {
+        const user = await this.userService.findOneByEmail(email);
+        if (!user) {
+            return {
+                message: 'Jika email terdaftar, email verifikasi baru akan dikirim.',
+            };
+        }
+        if (user.isEmailVerified) {
+            return { message: 'Email ini sudah diverifikasi sebelumnya.' };
+        }
+        const rawVerificationToken = crypto.randomBytes(32).toString('hex');
+        const hashedVerificationToken = crypto
+            .createHash('sha256')
+            .update(rawVerificationToken)
+            .digest('hex');
+        try {
+            await this.prisma.mysql.user.update({
+                where: { id: user.id },
+                data: { emailVerificationToken: hashedVerificationToken },
+            });
+        }
+        catch (error) {
+            console.error('Error updating email verification token:', error);
+            throw new common_1.InternalServerErrorException('Gagal menyimpan token verifikasi baru.');
+        }
+        try {
+            await this.mailService.sendVerificationEmail(user.email, user.name || 'Pengguna', rawVerificationToken);
+        }
+        catch (error) {
+            console.error('Error sending verification email:', error);
+            throw new common_1.InternalServerErrorException('Gagal mengirim email verifikasi.');
+        }
+        return {
+            message: 'Jika email terdaftar, email verifikasi baru akan dikirim.',
+        };
     }
 };
 exports.AuthService = AuthService;

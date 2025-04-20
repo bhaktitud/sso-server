@@ -14,6 +14,7 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AuthController = void 0;
 const common_1 = require("@nestjs/common");
+const throttler_1 = require("@nestjs/throttler");
 const swagger_1 = require("@nestjs/swagger");
 const auth_service_1 = require("./auth.service");
 const local_auth_guard_1 = require("./guards/local-auth.guard");
@@ -31,6 +32,7 @@ const success_message_response_dto_1 = require("../common/dto/success-message-re
 const forgot_password_dto_1 = require("./dto/forgot-password.dto");
 const reset_password_dto_1 = require("./dto/reset-password.dto");
 const admin_login_dto_1 = require("./dto/admin-login.dto");
+const resend_verification_email_dto_1 = require("./dto/resend-verification-email.dto");
 class SuccessMessageResponse {
     message;
 }
@@ -84,6 +86,9 @@ let AuthController = class AuthController {
     }
     adminLogin(adminLoginDto) {
         return this.authService.adminLogin(adminLoginDto);
+    }
+    async resendVerificationEmail(resendVerificationEmailDto) {
+        return this.authService.resendVerificationEmail(resendVerificationEmailDto.email);
     }
 };
 exports.AuthController = AuthController;
@@ -266,6 +271,27 @@ __decorate([
     __metadata("design:paramtypes", [admin_login_dto_1.AdminLoginDto]),
     __metadata("design:returntype", void 0)
 ], AuthController.prototype, "adminLogin", null);
+__decorate([
+    (0, common_1.Post)('resend-verification-email'),
+    (0, throttler_1.Throttle)({ default: { limit: 3, ttl: 600000 } }),
+    (0, common_1.HttpCode)(common_1.HttpStatus.OK),
+    (0, swagger_1.ApiOperation)({ summary: 'Resend email verification link' }),
+    (0, swagger_1.ApiBody)({ type: resend_verification_email_dto_1.ResendVerificationEmailDto }),
+    (0, swagger_1.ApiResponse)({
+        status: 200,
+        description: 'Verification email resent (if email exists and not verified)',
+        type: success_message_response_dto_1.SuccessMessageResponseDto,
+    }),
+    (0, swagger_1.ApiResponse)({ status: 400, description: 'Validation failed' }),
+    (0, swagger_1.ApiResponse)({
+        status: 429,
+        description: 'Too Many Requests - Rate limit exceeded',
+    }),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [resend_verification_email_dto_1.ResendVerificationEmailDto]),
+    __metadata("design:returntype", Promise)
+], AuthController.prototype, "resendVerificationEmail", null);
 exports.AuthController = AuthController = __decorate([
     (0, swagger_1.ApiTags)('auth'),
     (0, common_1.Controller)('auth'),

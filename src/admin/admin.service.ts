@@ -8,10 +8,12 @@ import {
 import { PrismaService } from '@src/prisma/prisma.service';
 import { UserService } from '@src/user/user.service';
 import { RbacService } from '@src/rbac/rbac.service';
+import { MailService } from '@src/mail/mail.service';
 import { AdminProfile, User, UserType, Prisma } from '../../generated/mysql';
 import { CreateAdminDto } from './dto/create-admin.dto';
 import { UpdateAdminDto } from './dto/update-admin.dto';
 import * as bcrypt from 'bcrypt';
+import * as crypto from 'crypto';
 
 @Injectable()
 export class AdminService {
@@ -21,6 +23,7 @@ export class AdminService {
     private prisma: PrismaService,
     private userService: UserService,
     private rbacService: RbacService,
+    private mailService: MailService,
   ) {}
 
   async createAdmin(createAdminDto: CreateAdminDto): Promise<AdminProfile> {
@@ -56,6 +59,13 @@ export class AdminService {
     }
 
     const hashedPassword = await bcrypt.hash(password, this.saltRounds);
+    
+    // Generate token verifikasi email
+    const rawVerificationToken = crypto.randomBytes(32).toString('hex');
+    const hashedVerificationToken = crypto
+      .createHash('sha256')
+      .update(rawVerificationToken)
+      .digest('hex');
 
     try {
       const createdAdmin = await this.prisma.mysql.$transaction(async (tx) => {
@@ -65,6 +75,8 @@ export class AdminService {
             password: hashedPassword,
             name,
             userType: UserType.ADMIN_USER,
+            emailVerificationToken: hashedVerificationToken,
+            isEmailVerified: false, // Set false karena perlu verifikasi email
           },
         });
 
@@ -88,6 +100,19 @@ export class AdminService {
 
         return newAdminProfileWithRoles;
       });
+
+      // Kirim email verifikasi setelah admin berhasil dibuat
+      try {
+        await this.mailService.sendVerificationEmail(
+          email,
+          name,
+          rawVerificationToken,
+        );
+      } catch (error) {
+        console.error('Error sending verification email to admin:', error);
+        // Tidak menggagalkan proses pembuatan admin, tapi perlu dicatat errornya
+      }
+
       return createdAdmin;
     } catch (error) {
       console.error('Error creating admin:', error);

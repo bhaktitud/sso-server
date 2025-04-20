@@ -13,12 +13,13 @@ const admin_controller_1 = require("./admin.controller");
 const prisma_module_1 = require("../prisma/prisma.module");
 const user_module_1 = require("../user/user.module");
 const rbac_module_1 = require("../rbac/rbac.module");
+const mail_module_1 = require("../mail/mail.module");
 let AdminModule = class AdminModule {
 };
 exports.AdminModule = AdminModule;
 exports.AdminModule = AdminModule = __decorate([
     (0, common_1.Module)({
-        imports: [prisma_module_1.PrismaModule, user_module_1.UserModule, rbac_module_1.RBACModule],
+        imports: [prisma_module_1.PrismaModule, user_module_1.UserModule, rbac_module_1.RBACModule, mail_module_1.MailModule],
         controllers: [admin_controller_1.AdminController],
         providers: [admin_service_1.AdminService],
         exports: [admin_service_1.AdminService],

@@ -88,6 +88,13 @@ export class AuthService {
       user.userType === UserType.ADMIN_USER &&
       (await bcrypt.compare(pass, user.password))
     ) {
+      // Tambahan: Periksa verifikasi email
+      if (!user.isEmailVerified) {
+        throw new ForbiddenException(
+          'Akun admin belum diverifikasi. Silakan cek email Anda.',
+        );
+      }
+
       // 2. Ambil AdminProfile terkait beserta roles-nya
       const adminProfile = await this.prisma.mysql.adminProfile.findUnique({
         where: { userId: user.id },
@@ -484,5 +491,63 @@ export class AuthService {
     }
 
     return { message: 'Email berhasil diverifikasi.' };
+  }
+
+  /**
+   * Kirim ulang email verifikasi
+   */
+  async resendVerificationEmail(email: string): Promise<{ message: string }> {
+    // 1. Cari user berdasarkan email
+    const user = await this.userService.findOneByEmail(email);
+    // 2. Validasi user
+    if (!user) {
+      // Untuk keamanan, berikan pesan yang sama meskipun user tidak ditemukan
+      return {
+        message: 'Jika email terdaftar, email verifikasi baru akan dikirim.',
+      };
+    }
+
+    // 3. Cek apakah email sudah diverifikasi
+    if (user.isEmailVerified) {
+      return { message: 'Email ini sudah diverifikasi sebelumnya.' };
+    }
+
+    // 4. Buat token verifikasi baru
+    const rawVerificationToken = crypto.randomBytes(32).toString('hex');
+    const hashedVerificationToken = crypto
+      .createHash('sha256')
+      .update(rawVerificationToken)
+      .digest('hex');
+
+    // 5. Update token verifikasi user di database
+    try {
+      await this.prisma.mysql.user.update({
+        where: { id: user.id },
+        data: { emailVerificationToken: hashedVerificationToken },
+      });
+    } catch (error) {
+      console.error('Error updating email verification token:', error);
+      throw new InternalServerErrorException(
+        'Gagal menyimpan token verifikasi baru.',
+      );
+    }
+
+    // 6. Kirim email verifikasi baru
+    try {
+      await this.mailService.sendVerificationEmail(
+        user.email,
+        user.name || 'Pengguna',
+        rawVerificationToken,
+      );
+    } catch (error) {
+      console.error('Error sending verification email:', error);
+      throw new InternalServerErrorException(
+        'Gagal mengirim email verifikasi.',
+      );
+    }
+
+    return {
+      message: 'Jika email terdaftar, email verifikasi baru akan dikirim.',
+    };
   }
 }
