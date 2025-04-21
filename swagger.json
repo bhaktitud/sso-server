@@ -1329,7 +1329,7 @@
         },
         "security": [
           {
-            "jwt": []
+            "bearer": []
           }
         ],
         "summary": "Create a new admin user and profile",
@@ -1360,7 +1360,7 @@
         },
         "security": [
           {
-            "jwt": []
+            "bearer": []
           }
         ],
         "summary": "Get a list of all admin profiles",
@@ -1390,7 +1390,7 @@
         },
         "security": [
           {
-            "jwt": []
+            "bearer": []
           }
         ],
         "summary": "Mendapatkan profil admin yang sedang login",
@@ -1433,7 +1433,7 @@
         },
         "security": [
           {
-            "jwt": []
+            "bearer": []
           }
         ],
         "summary": "Get a specific admin profile by ID",
@@ -1487,7 +1487,7 @@
         },
         "security": [
           {
-            "jwt": []
+            "bearer": []
           }
         ],
         "summary": "Update an admin profile",
@@ -1521,7 +1521,7 @@
         },
         "security": [
           {
-            "jwt": []
+            "bearer": []
           }
         ],
         "summary": "Delete an admin profile (and associated user)",
@@ -1573,7 +1573,7 @@
         },
         "security": [
           {
-            "jwt": []
+            "bearer": []
           }
         ],
         "summary": "Assign a role to an admin",
@@ -1623,7 +1623,7 @@
         },
         "security": [
           {
-            "jwt": []
+            "bearer": []
           }
         ],
         "summary": "Remove a role from an admin",
@@ -1701,6 +1701,9 @@
                 }
               }
             }
+          },
+          "404": {
+            "description": "API key tidak ditemukan"
           }
         },
         "security": [

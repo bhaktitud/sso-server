@@ -23,6 +23,8 @@ export class ApiKeyGuard implements CanActivate {
       context.getClass(),
     ]);
 
+    console.log('isPublic value:', isPublic);
+
     // Jika endpoint public, tidak perlu autentikasi
     if (isPublic) {
       return true;
@@ -41,6 +43,10 @@ export class ApiKeyGuard implements CanActivate {
 
     const request = context.switchToHttp().getRequest<Request>();
     const apiKey = this.extractApiKeyFromHeader(request);
+
+    console.log('Request path:', request.path);
+    console.log('requireApiKey value:', requireApiKey);
+    console.log('API Key in header:', apiKey);
 
     if (!apiKey) {
       throw new UnauthorizedException('API key diperlukan');

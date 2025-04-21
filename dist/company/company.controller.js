@@ -22,6 +22,7 @@ const swagger_1 = require("@nestjs/swagger");
 const jwt_auth_guard_1 = require("../auth/guards/jwt-auth.guard");
 const permissions_guard_1 = require("../auth/permissions/permissions.guard");
 const permissions_decorator_1 = require("../auth/permissions/permissions.decorator");
+const require_apikey_decorator_1 = require("../auth/decorators/require-apikey.decorator");
 let CompanyController = class CompanyController {
     companyService;
     constructor(companyService) {
@@ -151,6 +152,7 @@ exports.CompanyController = CompanyController = __decorate([
     (0, common_1.Controller)('companies'),
     (0, common_1.UsePipes)(new common_1.ValidationPipe({ whitelist: true, transform: true })),
     (0, swagger_1.ApiBearerAuth)('jwt'),
+    (0, require_apikey_decorator_1.RequireApiKey)(false),
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, permissions_guard_1.PermissionsGuard),
     __metadata("design:paramtypes", [company_service_1.CompanyService])
 ], CompanyController);

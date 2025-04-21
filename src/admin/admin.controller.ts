@@ -46,8 +46,8 @@ type AdminProfileWithDetails = AdminProfile & {
 @ApiTags('Admins Management')
 @Controller('admins')
 @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
-@ApiBearerAuth('jwt')
-@UseGuards(JwtAuthGuard, PermissionsGuard)
+@ApiBearerAuth()
+@UseGuards(JwtAuthGuard)
 export class AdminController {
   constructor(private readonly adminService: AdminService) {}
 
@@ -197,6 +197,7 @@ export class AdminController {
     description: 'Forbidden. Missing required permissions.',
   })
   @RequirePermissions(PERMISSIONS_KEY.PERMISSION_ASSIGN_ROLE)
+  @RequireApiKey(false)
   assignRole(
     @Param('adminId', ParseIntPipe) adminId: number,
     @Param('roleId', ParseIntPipe) roleId: number,

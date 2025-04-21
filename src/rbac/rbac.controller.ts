@@ -34,10 +34,12 @@ import { JwtAuthGuard } from '@src/auth/guards/jwt-auth.guard';
 import { PermissionsGuard } from '@src/auth/permissions/permissions.guard';
 import { RequirePermissions } from '@src/auth/permissions/permissions.decorator';
 import { PERMISSIONS_KEY } from '@src/const/permissions';
+import { RequireApiKey } from '@src/auth/decorators/require-apikey.decorator';
 @ApiTags('RBAC (Roles & Permissions)')
 @Controller('rbac') // Base path bisa disesuaikan (misal /admin/rbac)
 @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
 @ApiBearerAuth('jwt')
+@RequireApiKey(false)
 @UseGuards(JwtAuthGuard, PermissionsGuard)
 // TODO: Tambahkan Guard di level controller untuk memastikan hanya admin yang bisa akses
 export class RbacController {

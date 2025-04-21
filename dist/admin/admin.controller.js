@@ -20,7 +20,6 @@ const update_admin_dto_1 = require("./dto/update-admin.dto");
 const admin_profile_response_dto_1 = require("./dto/admin-profile-response.dto");
 const swagger_1 = require("@nestjs/swagger");
 const jwt_auth_guard_1 = require("../auth/guards/jwt-auth.guard");
-const permissions_guard_1 = require("../auth/permissions/permissions.guard");
 const permissions_decorator_1 = require("../auth/permissions/permissions.decorator");
 const permissions_1 = require("../const/permissions");
 const public_decorator_1 = require("../auth/decorators/public.decorator");
@@ -205,6 +204,7 @@ __decorate([
         description: 'Forbidden. Missing required permissions.',
     }),
     (0, permissions_decorator_1.RequirePermissions)(permissions_1.PERMISSIONS_KEY.PERMISSION_ASSIGN_ROLE),
+    (0, require_apikey_decorator_1.RequireApiKey)(false),
     __param(0, (0, common_1.Param)('adminId', common_1.ParseIntPipe)),
     __param(1, (0, common_1.Param)('roleId', common_1.ParseIntPipe)),
     __metadata("design:type", Function),
@@ -238,8 +238,8 @@ exports.AdminController = AdminController = __decorate([
     (0, swagger_1.ApiTags)('Admins Management'),
     (0, common_1.Controller)('admins'),
     (0, common_1.UsePipes)(new common_1.ValidationPipe({ whitelist: true, transform: true })),
-    (0, swagger_1.ApiBearerAuth)('jwt'),
-    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, permissions_guard_1.PermissionsGuard),
+    (0, swagger_1.ApiBearerAuth)(),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
     __metadata("design:paramtypes", [admin_service_1.AdminService])
 ], AdminController);
 //# sourceMappingURL=admin.controller.js.map

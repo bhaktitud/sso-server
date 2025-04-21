@@ -12,8 +12,9 @@ import {
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { User, Prisma } from '../../generated/mysql';
-
+import { RequireApiKey } from '@src/auth/decorators/require-apikey.decorator';
 @Controller('users')
+@RequireApiKey(false)
 export class UserController {
   constructor(private readonly userService: UserService) {}
 

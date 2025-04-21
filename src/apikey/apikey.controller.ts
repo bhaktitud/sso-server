@@ -21,11 +21,16 @@ import {
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { ApiKeyEntity } from './entities/api-key.entity';
 import { ApiLogEntity } from './entities/api-log.entity';
-
+import { RequireApiKey } from '@src/auth/decorators/require-apikey.decorator';
+import { PERMISSIONS_KEY } from '@src/const/permissions';
+import { RequirePermissions } from '@src/auth/permissions/permissions.decorator';
+import { Public } from '@src/auth/decorators/public.decorator';
 @ApiTags('api-keys')
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard)
 @Controller('api-keys')
+@Public()
+@RequireApiKey(false)
 export class ApikeyController {
   constructor(private readonly apikeyService: ApikeyService) {}
 
@@ -38,7 +43,9 @@ export class ApikeyController {
   })
   @ApiResponse({ status: 400, description: 'Data tidak valid' })
   @ApiResponse({ status: 404, description: 'Perusahaan tidak ditemukan' })
+  @RequirePermissions(PERMISSIONS_KEY.API_KEY_CREATE)
   create(@Body() createApikeyDto: CreateApikeyDto) {
+    console.log(createApikeyDto);
     return this.apikeyService.create(createApikeyDto);
   }
 
@@ -51,6 +58,8 @@ export class ApikeyController {
     description: 'Daftar API key berhasil diambil',
     type: [ApiKeyEntity],
   })
+  @ApiResponse({ status: 404, description: 'API key tidak ditemukan' })
+  @RequirePermissions(PERMISSIONS_KEY.API_KEY_READ)
   findAllByCompany(@Param('companyId', ParseIntPipe) companyId: number) {
     return this.apikeyService.findAllByCompany(companyId);
   }
@@ -63,6 +72,7 @@ export class ApikeyController {
     type: ApiKeyEntity,
   })
   @ApiResponse({ status: 404, description: 'API key tidak ditemukan' })
+  @RequirePermissions(PERMISSIONS_KEY.API_KEY_READ)
   findOne(@Param('id', ParseIntPipe) id: number) {
     return this.apikeyService.findOne(id);
   }
@@ -75,6 +85,7 @@ export class ApikeyController {
     type: ApiKeyEntity,
   })
   @ApiResponse({ status: 404, description: 'API key tidak ditemukan' })
+  @RequirePermissions(PERMISSIONS_KEY.API_KEY_UPDATE)
   update(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateApikeyDto: UpdateApikeyDto,
@@ -90,6 +101,7 @@ export class ApikeyController {
     type: ApiKeyEntity,
   })
   @ApiResponse({ status: 404, description: 'API key tidak ditemukan' })
+  @RequirePermissions(PERMISSIONS_KEY.API_KEY_DELETE)
   remove(@Param('id', ParseIntPipe) id: number) {
     return this.apikeyService.remove(id);
   }
@@ -104,6 +116,7 @@ export class ApikeyController {
     type: [ApiLogEntity],
   })
   @ApiResponse({ status: 404, description: 'API key tidak ditemukan' })
+  @RequirePermissions(PERMISSIONS_KEY.API_KEY_READ)
   getApiLogs(@Param('id', ParseIntPipe) id: number) {
     return this.apikeyService.getApiLogs(id);
   }

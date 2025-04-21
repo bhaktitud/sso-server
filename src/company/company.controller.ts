@@ -30,11 +30,12 @@ import { Company } from '../../generated/mysql';
 import { JwtAuthGuard } from '@src/auth/guards/jwt-auth.guard';
 import { PermissionsGuard } from '@src/auth/permissions/permissions.guard';
 import { RequirePermissions } from '@src/auth/permissions/permissions.decorator';
-
+import { RequireApiKey } from '@src/auth/decorators/require-apikey.decorator';
 @ApiTags('Companies Management')
 @Controller('companies')
 @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
 @ApiBearerAuth('jwt')
+@RequireApiKey(false)
 @UseGuards(JwtAuthGuard, PermissionsGuard)
 export class CompanyController {
   constructor(private readonly companyService: CompanyService) {}

@@ -24,4 +24,8 @@ export const PERMISSIONS_KEY = {
   ADMIN_CREATE: 'create:admin',
   ADMIN_UPDATE: 'update:admin',
   ADMIN_DELETE: 'delete:admin',
+  API_KEY_READ: 'read:api-key',
+  API_KEY_CREATE: 'create:api-key',
+  API_KEY_UPDATE: 'update:api-key',
+  API_KEY_DELETE: 'delete:api-key',
 };

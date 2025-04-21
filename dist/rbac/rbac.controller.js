@@ -26,6 +26,7 @@ const jwt_auth_guard_1 = require("../auth/guards/jwt-auth.guard");
 const permissions_guard_1 = require("../auth/permissions/permissions.guard");
 const permissions_decorator_1 = require("../auth/permissions/permissions.decorator");
 const permissions_1 = require("../const/permissions");
+const require_apikey_decorator_1 = require("../auth/decorators/require-apikey.decorator");
 let RbacController = class RbacController {
     rbacService;
     constructor(rbacService) {
@@ -335,6 +336,7 @@ exports.RbacController = RbacController = __decorate([
     (0, common_1.Controller)('rbac'),
     (0, common_1.UsePipes)(new common_1.ValidationPipe({ whitelist: true, transform: true })),
     (0, swagger_1.ApiBearerAuth)('jwt'),
+    (0, require_apikey_decorator_1.RequireApiKey)(false),
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, permissions_guard_1.PermissionsGuard),
     __metadata("design:paramtypes", [rbac_service_1.RbacService])
 ], RbacController);
