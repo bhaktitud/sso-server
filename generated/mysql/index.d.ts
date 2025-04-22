@@ -5899,42 +5899,61 @@ export namespace Prisma {
   export type ApiLogAvgAggregateOutputType = {
     id: number | null
     apiKeyId: number | null
+    companyId: number | null
     statusCode: number | null
+    responseTime: number | null
   }
 
   export type ApiLogSumAggregateOutputType = {
     id: number | null
     apiKeyId: number | null
+    companyId: number | null
     statusCode: number | null
+    responseTime: number | null
   }
 
   export type ApiLogMinAggregateOutputType = {
     id: number | null
     apiKeyId: number | null
+    companyId: number | null
     endpoint: string | null
     method: string | null
     statusCode: number | null
     requestBody: string | null
+    responseBody: string | null
+    responseTime: number | null
+    ipAddress: string | null
+    userAgent: string | null
     createdAt: Date | null
   }
 
   export type ApiLogMaxAggregateOutputType = {
     id: number | null
     apiKeyId: number | null
+    companyId: number | null
     endpoint: string | null
     method: string | null
     statusCode: number | null
     requestBody: string | null
+    responseBody: string | null
+    responseTime: number | null
+    ipAddress: string | null
+    userAgent: string | null
     createdAt: Date | null
   }
 
   export type ApiLogCountAggregateOutputType = {
     id: number
     apiKeyId: number
+    companyId: number
     endpoint: number
     method: number
     statusCode: number
     requestBody: number
+    responseBody: number
+    responseTime: number
+    ipAddress: number
+    userAgent: number
     createdAt: number
     _all: number
   }
@@ -5943,42 +5962,61 @@ export namespace Prisma {
   export type ApiLogAvgAggregateInputType = {
     id?: true
     apiKeyId?: true
+    companyId?: true
     statusCode?: true
+    responseTime?: true
   }
 
   export type ApiLogSumAggregateInputType = {
     id?: true
     apiKeyId?: true
+    companyId?: true
     statusCode?: true
+    responseTime?: true
   }
 
   export type ApiLogMinAggregateInputType = {
     id?: true
     apiKeyId?: true
+    companyId?: true
     endpoint?: true
     method?: true
     statusCode?: true
     requestBody?: true
+    responseBody?: true
+    responseTime?: true
+    ipAddress?: true
+    userAgent?: true
     createdAt?: true
   }
 
   export type ApiLogMaxAggregateInputType = {
     id?: true
     apiKeyId?: true
+    companyId?: true
     endpoint?: true
     method?: true
     statusCode?: true
     requestBody?: true
+    responseBody?: true
+    responseTime?: true
+    ipAddress?: true
+    userAgent?: true
     createdAt?: true
   }
 
   export type ApiLogCountAggregateInputType = {
     id?: true
     apiKeyId?: true
+    companyId?: true
     endpoint?: true
     method?: true
     statusCode?: true
     requestBody?: true
+    responseBody?: true
+    responseTime?: true
+    ipAddress?: true
+    userAgent?: true
     createdAt?: true
     _all?: true
   }
@@ -6072,10 +6110,15 @@ export namespace Prisma {
   export type ApiLogGroupByOutputType = {
     id: number
     apiKeyId: number
+    companyId: number | null
     endpoint: string
     method: string
     statusCode: number
     requestBody: string | null
+    responseBody: string | null
+    responseTime: number | null
+    ipAddress: string | null
+    userAgent: string | null
     createdAt: Date
     _count: ApiLogCountAggregateOutputType | null
     _avg: ApiLogAvgAggregateOutputType | null
@@ -6101,10 +6144,15 @@ export namespace Prisma {
   export type ApiLogSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     apiKeyId?: boolean
+    companyId?: boolean
     endpoint?: boolean
     method?: boolean
     statusCode?: boolean
     requestBody?: boolean
+    responseBody?: boolean
+    responseTime?: boolean
+    ipAddress?: boolean
+    userAgent?: boolean
     createdAt?: boolean
     apiKey?: boolean | ApiKeyDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["apiLog"]>
@@ -6114,14 +6162,19 @@ export namespace Prisma {
   export type ApiLogSelectScalar = {
     id?: boolean
     apiKeyId?: boolean
+    companyId?: boolean
     endpoint?: boolean
     method?: boolean
     statusCode?: boolean
     requestBody?: boolean
+    responseBody?: boolean
+    responseTime?: boolean
+    ipAddress?: boolean
+    userAgent?: boolean
     createdAt?: boolean
   }
 
-  export type ApiLogOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "apiKeyId" | "endpoint" | "method" | "statusCode" | "requestBody" | "createdAt", ExtArgs["result"]["apiLog"]>
+  export type ApiLogOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "apiKeyId" | "companyId" | "endpoint" | "method" | "statusCode" | "requestBody" | "responseBody" | "responseTime" | "ipAddress" | "userAgent" | "createdAt", ExtArgs["result"]["apiLog"]>
   export type ApiLogInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     apiKey?: boolean | ApiKeyDefaultArgs<ExtArgs>
   }
@@ -6134,10 +6187,15 @@ export namespace Prisma {
     scalars: $Extensions.GetPayloadResult<{
       id: number
       apiKeyId: number
+      companyId: number | null
       endpoint: string
       method: string
       statusCode: number
       requestBody: string | null
+      responseBody: string | null
+      responseTime: number | null
+      ipAddress: string | null
+      userAgent: string | null
       createdAt: Date
     }, ExtArgs["result"]["apiLog"]>
     composites: {}
@@ -6511,10 +6569,15 @@ export namespace Prisma {
   interface ApiLogFieldRefs {
     readonly id: FieldRef<"ApiLog", 'Int'>
     readonly apiKeyId: FieldRef<"ApiLog", 'Int'>
+    readonly companyId: FieldRef<"ApiLog", 'Int'>
     readonly endpoint: FieldRef<"ApiLog", 'String'>
     readonly method: FieldRef<"ApiLog", 'String'>
     readonly statusCode: FieldRef<"ApiLog", 'Int'>
     readonly requestBody: FieldRef<"ApiLog", 'String'>
+    readonly responseBody: FieldRef<"ApiLog", 'String'>
+    readonly responseTime: FieldRef<"ApiLog", 'Int'>
+    readonly ipAddress: FieldRef<"ApiLog", 'String'>
+    readonly userAgent: FieldRef<"ApiLog", 'String'>
     readonly createdAt: FieldRef<"ApiLog", 'DateTime'>
   }
     
@@ -9970,10 +10033,15 @@ export namespace Prisma {
   export const ApiLogScalarFieldEnum: {
     id: 'id',
     apiKeyId: 'apiKeyId',
+    companyId: 'companyId',
     endpoint: 'endpoint',
     method: 'method',
     statusCode: 'statusCode',
     requestBody: 'requestBody',
+    responseBody: 'responseBody',
+    responseTime: 'responseTime',
+    ipAddress: 'ipAddress',
+    userAgent: 'userAgent',
     createdAt: 'createdAt'
   };
 
@@ -10072,7 +10140,10 @@ export namespace Prisma {
   export const ApiLogOrderByRelevanceFieldEnum: {
     endpoint: 'endpoint',
     method: 'method',
-    requestBody: 'requestBody'
+    requestBody: 'requestBody',
+    responseBody: 'responseBody',
+    ipAddress: 'ipAddress',
+    userAgent: 'userAgent'
   };
 
   export type ApiLogOrderByRelevanceFieldEnum = (typeof ApiLogOrderByRelevanceFieldEnum)[keyof typeof ApiLogOrderByRelevanceFieldEnum]
@@ -10481,10 +10552,15 @@ export namespace Prisma {
     NOT?: ApiLogWhereInput | ApiLogWhereInput[]
     id?: IntFilter<"ApiLog"> | number
     apiKeyId?: IntFilter<"ApiLog"> | number
+    companyId?: IntNullableFilter<"ApiLog"> | number | null
     endpoint?: StringFilter<"ApiLog"> | string
     method?: StringFilter<"ApiLog"> | string
     statusCode?: IntFilter<"ApiLog"> | number
     requestBody?: StringNullableFilter<"ApiLog"> | string | null
+    responseBody?: StringNullableFilter<"ApiLog"> | string | null
+    responseTime?: IntNullableFilter<"ApiLog"> | number | null
+    ipAddress?: StringNullableFilter<"ApiLog"> | string | null
+    userAgent?: StringNullableFilter<"ApiLog"> | string | null
     createdAt?: DateTimeFilter<"ApiLog"> | Date | string
     apiKey?: XOR<ApiKeyScalarRelationFilter, ApiKeyWhereInput>
   }
@@ -10492,10 +10568,15 @@ export namespace Prisma {
   export type ApiLogOrderByWithRelationInput = {
     id?: SortOrder
     apiKeyId?: SortOrder
+    companyId?: SortOrderInput | SortOrder
     endpoint?: SortOrder
     method?: SortOrder
     statusCode?: SortOrder
     requestBody?: SortOrderInput | SortOrder
+    responseBody?: SortOrderInput | SortOrder
+    responseTime?: SortOrderInput | SortOrder
+    ipAddress?: SortOrderInput | SortOrder
+    userAgent?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     apiKey?: ApiKeyOrderByWithRelationInput
     _relevance?: ApiLogOrderByRelevanceInput
@@ -10507,10 +10588,15 @@ export namespace Prisma {
     OR?: ApiLogWhereInput[]
     NOT?: ApiLogWhereInput | ApiLogWhereInput[]
     apiKeyId?: IntFilter<"ApiLog"> | number
+    companyId?: IntNullableFilter<"ApiLog"> | number | null
     endpoint?: StringFilter<"ApiLog"> | string
     method?: StringFilter<"ApiLog"> | string
     statusCode?: IntFilter<"ApiLog"> | number
     requestBody?: StringNullableFilter<"ApiLog"> | string | null
+    responseBody?: StringNullableFilter<"ApiLog"> | string | null
+    responseTime?: IntNullableFilter<"ApiLog"> | number | null
+    ipAddress?: StringNullableFilter<"ApiLog"> | string | null
+    userAgent?: StringNullableFilter<"ApiLog"> | string | null
     createdAt?: DateTimeFilter<"ApiLog"> | Date | string
     apiKey?: XOR<ApiKeyScalarRelationFilter, ApiKeyWhereInput>
   }, "id">
@@ -10518,10 +10604,15 @@ export namespace Prisma {
   export type ApiLogOrderByWithAggregationInput = {
     id?: SortOrder
     apiKeyId?: SortOrder
+    companyId?: SortOrderInput | SortOrder
     endpoint?: SortOrder
     method?: SortOrder
     statusCode?: SortOrder
     requestBody?: SortOrderInput | SortOrder
+    responseBody?: SortOrderInput | SortOrder
+    responseTime?: SortOrderInput | SortOrder
+    ipAddress?: SortOrderInput | SortOrder
+    userAgent?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     _count?: ApiLogCountOrderByAggregateInput
     _avg?: ApiLogAvgOrderByAggregateInput
@@ -10536,10 +10627,15 @@ export namespace Prisma {
     NOT?: ApiLogScalarWhereWithAggregatesInput | ApiLogScalarWhereWithAggregatesInput[]
     id?: IntWithAggregatesFilter<"ApiLog"> | number
     apiKeyId?: IntWithAggregatesFilter<"ApiLog"> | number
+    companyId?: IntNullableWithAggregatesFilter<"ApiLog"> | number | null
     endpoint?: StringWithAggregatesFilter<"ApiLog"> | string
     method?: StringWithAggregatesFilter<"ApiLog"> | string
     statusCode?: IntWithAggregatesFilter<"ApiLog"> | number
     requestBody?: StringNullableWithAggregatesFilter<"ApiLog"> | string | null
+    responseBody?: StringNullableWithAggregatesFilter<"ApiLog"> | string | null
+    responseTime?: IntNullableWithAggregatesFilter<"ApiLog"> | number | null
+    ipAddress?: StringNullableWithAggregatesFilter<"ApiLog"> | string | null
+    userAgent?: StringNullableWithAggregatesFilter<"ApiLog"> | string | null
     createdAt?: DateTimeWithAggregatesFilter<"ApiLog"> | Date | string
   }
 
@@ -11070,10 +11166,15 @@ export namespace Prisma {
   }
 
   export type ApiLogCreateInput = {
+    companyId?: number | null
     endpoint: string
     method: string
     statusCode: number
     requestBody?: string | null
+    responseBody?: string | null
+    responseTime?: number | null
+    ipAddress?: string | null
+    userAgent?: string | null
     createdAt?: Date | string
     apiKey: ApiKeyCreateNestedOneWithoutApiLogsInput
   }
@@ -11081,18 +11182,28 @@ export namespace Prisma {
   export type ApiLogUncheckedCreateInput = {
     id?: number
     apiKeyId: number
+    companyId?: number | null
     endpoint: string
     method: string
     statusCode: number
     requestBody?: string | null
+    responseBody?: string | null
+    responseTime?: number | null
+    ipAddress?: string | null
+    userAgent?: string | null
     createdAt?: Date | string
   }
 
   export type ApiLogUpdateInput = {
+    companyId?: NullableIntFieldUpdateOperationsInput | number | null
     endpoint?: StringFieldUpdateOperationsInput | string
     method?: StringFieldUpdateOperationsInput | string
     statusCode?: IntFieldUpdateOperationsInput | number
     requestBody?: NullableStringFieldUpdateOperationsInput | string | null
+    responseBody?: NullableStringFieldUpdateOperationsInput | string | null
+    responseTime?: NullableIntFieldUpdateOperationsInput | number | null
+    ipAddress?: NullableStringFieldUpdateOperationsInput | string | null
+    userAgent?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     apiKey?: ApiKeyUpdateOneRequiredWithoutApiLogsNestedInput
   }
@@ -11100,38 +11211,58 @@ export namespace Prisma {
   export type ApiLogUncheckedUpdateInput = {
     id?: IntFieldUpdateOperationsInput | number
     apiKeyId?: IntFieldUpdateOperationsInput | number
+    companyId?: NullableIntFieldUpdateOperationsInput | number | null
     endpoint?: StringFieldUpdateOperationsInput | string
     method?: StringFieldUpdateOperationsInput | string
     statusCode?: IntFieldUpdateOperationsInput | number
     requestBody?: NullableStringFieldUpdateOperationsInput | string | null
+    responseBody?: NullableStringFieldUpdateOperationsInput | string | null
+    responseTime?: NullableIntFieldUpdateOperationsInput | number | null
+    ipAddress?: NullableStringFieldUpdateOperationsInput | string | null
+    userAgent?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type ApiLogCreateManyInput = {
     id?: number
     apiKeyId: number
+    companyId?: number | null
     endpoint: string
     method: string
     statusCode: number
     requestBody?: string | null
+    responseBody?: string | null
+    responseTime?: number | null
+    ipAddress?: string | null
+    userAgent?: string | null
     createdAt?: Date | string
   }
 
   export type ApiLogUpdateManyMutationInput = {
+    companyId?: NullableIntFieldUpdateOperationsInput | number | null
     endpoint?: StringFieldUpdateOperationsInput | string
     method?: StringFieldUpdateOperationsInput | string
     statusCode?: IntFieldUpdateOperationsInput | number
     requestBody?: NullableStringFieldUpdateOperationsInput | string | null
+    responseBody?: NullableStringFieldUpdateOperationsInput | string | null
+    responseTime?: NullableIntFieldUpdateOperationsInput | number | null
+    ipAddress?: NullableStringFieldUpdateOperationsInput | string | null
+    userAgent?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type ApiLogUncheckedUpdateManyInput = {
     id?: IntFieldUpdateOperationsInput | number
     apiKeyId?: IntFieldUpdateOperationsInput | number
+    companyId?: NullableIntFieldUpdateOperationsInput | number | null
     endpoint?: StringFieldUpdateOperationsInput | string
     method?: StringFieldUpdateOperationsInput | string
     statusCode?: IntFieldUpdateOperationsInput | number
     requestBody?: NullableStringFieldUpdateOperationsInput | string | null
+    responseBody?: NullableStringFieldUpdateOperationsInput | string | null
+    responseTime?: NullableIntFieldUpdateOperationsInput | number | null
+    ipAddress?: NullableStringFieldUpdateOperationsInput | string | null
+    userAgent?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -11816,43 +11947,62 @@ export namespace Prisma {
   export type ApiLogCountOrderByAggregateInput = {
     id?: SortOrder
     apiKeyId?: SortOrder
+    companyId?: SortOrder
     endpoint?: SortOrder
     method?: SortOrder
     statusCode?: SortOrder
     requestBody?: SortOrder
+    responseBody?: SortOrder
+    responseTime?: SortOrder
+    ipAddress?: SortOrder
+    userAgent?: SortOrder
     createdAt?: SortOrder
   }
 
   export type ApiLogAvgOrderByAggregateInput = {
     id?: SortOrder
     apiKeyId?: SortOrder
+    companyId?: SortOrder
     statusCode?: SortOrder
+    responseTime?: SortOrder
   }
 
   export type ApiLogMaxOrderByAggregateInput = {
     id?: SortOrder
     apiKeyId?: SortOrder
+    companyId?: SortOrder
     endpoint?: SortOrder
     method?: SortOrder
     statusCode?: SortOrder
     requestBody?: SortOrder
+    responseBody?: SortOrder
+    responseTime?: SortOrder
+    ipAddress?: SortOrder
+    userAgent?: SortOrder
     createdAt?: SortOrder
   }
 
   export type ApiLogMinOrderByAggregateInput = {
     id?: SortOrder
     apiKeyId?: SortOrder
+    companyId?: SortOrder
     endpoint?: SortOrder
     method?: SortOrder
     statusCode?: SortOrder
     requestBody?: SortOrder
+    responseBody?: SortOrder
+    responseTime?: SortOrder
+    ipAddress?: SortOrder
+    userAgent?: SortOrder
     createdAt?: SortOrder
   }
 
   export type ApiLogSumOrderByAggregateInput = {
     id?: SortOrder
     apiKeyId?: SortOrder
+    companyId?: SortOrder
     statusCode?: SortOrder
+    responseTime?: SortOrder
   }
 
   export type PermissionListRelationFilter = {
@@ -13135,19 +13285,29 @@ export namespace Prisma {
   }
 
   export type ApiLogCreateWithoutApiKeyInput = {
+    companyId?: number | null
     endpoint: string
     method: string
     statusCode: number
     requestBody?: string | null
+    responseBody?: string | null
+    responseTime?: number | null
+    ipAddress?: string | null
+    userAgent?: string | null
     createdAt?: Date | string
   }
 
   export type ApiLogUncheckedCreateWithoutApiKeyInput = {
     id?: number
+    companyId?: number | null
     endpoint: string
     method: string
     statusCode: number
     requestBody?: string | null
+    responseBody?: string | null
+    responseTime?: number | null
+    ipAddress?: string | null
+    userAgent?: string | null
     createdAt?: Date | string
   }
 
@@ -13215,10 +13375,15 @@ export namespace Prisma {
     NOT?: ApiLogScalarWhereInput | ApiLogScalarWhereInput[]
     id?: IntFilter<"ApiLog"> | number
     apiKeyId?: IntFilter<"ApiLog"> | number
+    companyId?: IntNullableFilter<"ApiLog"> | number | null
     endpoint?: StringFilter<"ApiLog"> | string
     method?: StringFilter<"ApiLog"> | string
     statusCode?: IntFilter<"ApiLog"> | number
     requestBody?: StringNullableFilter<"ApiLog"> | string | null
+    responseBody?: StringNullableFilter<"ApiLog"> | string | null
+    responseTime?: IntNullableFilter<"ApiLog"> | number | null
+    ipAddress?: StringNullableFilter<"ApiLog"> | string | null
+    userAgent?: StringNullableFilter<"ApiLog"> | string | null
     createdAt?: DateTimeFilter<"ApiLog"> | Date | string
   }
 
@@ -13593,36 +13758,56 @@ export namespace Prisma {
 
   export type ApiLogCreateManyApiKeyInput = {
     id?: number
+    companyId?: number | null
     endpoint: string
     method: string
     statusCode: number
     requestBody?: string | null
+    responseBody?: string | null
+    responseTime?: number | null
+    ipAddress?: string | null
+    userAgent?: string | null
     createdAt?: Date | string
   }
 
   export type ApiLogUpdateWithoutApiKeyInput = {
+    companyId?: NullableIntFieldUpdateOperationsInput | number | null
     endpoint?: StringFieldUpdateOperationsInput | string
     method?: StringFieldUpdateOperationsInput | string
     statusCode?: IntFieldUpdateOperationsInput | number
     requestBody?: NullableStringFieldUpdateOperationsInput | string | null
+    responseBody?: NullableStringFieldUpdateOperationsInput | string | null
+    responseTime?: NullableIntFieldUpdateOperationsInput | number | null
+    ipAddress?: NullableStringFieldUpdateOperationsInput | string | null
+    userAgent?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type ApiLogUncheckedUpdateWithoutApiKeyInput = {
     id?: IntFieldUpdateOperationsInput | number
+    companyId?: NullableIntFieldUpdateOperationsInput | number | null
     endpoint?: StringFieldUpdateOperationsInput | string
     method?: StringFieldUpdateOperationsInput | string
     statusCode?: IntFieldUpdateOperationsInput | number
     requestBody?: NullableStringFieldUpdateOperationsInput | string | null
+    responseBody?: NullableStringFieldUpdateOperationsInput | string | null
+    responseTime?: NullableIntFieldUpdateOperationsInput | number | null
+    ipAddress?: NullableStringFieldUpdateOperationsInput | string | null
+    userAgent?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type ApiLogUncheckedUpdateManyWithoutApiKeyInput = {
     id?: IntFieldUpdateOperationsInput | number
+    companyId?: NullableIntFieldUpdateOperationsInput | number | null
     endpoint?: StringFieldUpdateOperationsInput | string
     method?: StringFieldUpdateOperationsInput | string
     statusCode?: IntFieldUpdateOperationsInput | number
     requestBody?: NullableStringFieldUpdateOperationsInput | string | null
+    responseBody?: NullableStringFieldUpdateOperationsInput | string | null
+    responseTime?: NullableIntFieldUpdateOperationsInput | number | null
+    ipAddress?: NullableStringFieldUpdateOperationsInput | string | null
+    userAgent?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 

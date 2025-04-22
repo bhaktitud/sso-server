@@ -84,14 +84,19 @@ model ApiKey {
 
 // Model untuk API Log (mencatat penggunaan API)
 model ApiLog {
-  id          Int      @id @default(autoincrement())
-  apiKeyId    Int
-  apiKey      ApiKey   @relation(fields: [apiKeyId], references: [id], onDelete: Cascade)
-  endpoint    String // Endpoint yang diakses
-  method      String // HTTP method (GET, POST, PUT, DELETE, dll)
-  statusCode  Int // HTTP status code
-  requestBody String?  @db.Text // Request body (opsional, untuk debugging)
-  createdAt   DateTime @default(now())
+  id           Int      @id @default(autoincrement())
+  apiKeyId     Int
+  apiKey       ApiKey   @relation(fields: [apiKeyId], references: [id], onDelete: Cascade)
+  companyId    Int? // Untuk memudahkan query berdasarkan perusahaan
+  endpoint     String // Endpoint yang diakses
+  method       String // HTTP method (GET, POST, PUT, DELETE, dll)
+  statusCode   Int // HTTP status code
+  requestBody  String?  @db.Text // Request body (opsional, untuk debugging)
+  responseBody String?  @db.Text // Response body (opsional, untuk debugging)
+  responseTime Int? // Waktu respons dalam milidetik
+  ipAddress    String? // IP address dari client
+  userAgent    String?  @db.Text // User agent dari client
+  createdAt    DateTime @default(now())
 }
 
 // Model untuk Peran (Role) - Menggantikan enum Role sebelumnya

@@ -205,7 +205,9 @@ export class AuthController {
   })
   @ApiResponse({ status: 400, description: 'Invalid or expired token' })
   @RequireApiKey(false)
-  async verifyEmail(@Param('token') token: string): Promise<{ message: string }> {
+  async verifyEmail(
+    @Param('token') token: string,
+  ): Promise<{ message: string }> {
     return this.authService.verifyEmail(token);
   }
 

@@ -26,7 +26,7 @@ export class CreateApikeyDto {
   description?: string;
 
   @ApiProperty({
-    description: 'ID perusahaan yang memiliki API key',
+    description: 'ID perusahaan yang memiliki API key. Catatan: Maksimum 3 API key per perusahaan.',
     example: 1,
   })
   @IsNotEmpty()

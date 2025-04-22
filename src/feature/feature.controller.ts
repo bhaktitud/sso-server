@@ -50,7 +50,10 @@ export class FeatureController {
     type: FeatureResponseDto,
   })
   @ApiResponse({ status: 400, description: 'Validasi gagal.' })
-  @ApiResponse({ status: 409, description: 'Fitur dengan nama atau kode tersebut sudah ada.' })
+  @ApiResponse({
+    status: 409,
+    description: 'Fitur dengan nama atau kode tersebut sudah ada.',
+  })
   @ApiResponse({
     status: 403,
     description: 'Dilarang. Tidak memiliki izin yang diperlukan.',
@@ -105,7 +108,10 @@ export class FeatureController {
   })
   @ApiResponse({ status: 400, description: 'Validasi gagal.' })
   @ApiResponse({ status: 404, description: 'Fitur tidak ditemukan.' })
-  @ApiResponse({ status: 409, description: 'Fitur dengan nama atau kode tersebut sudah ada.' })
+  @ApiResponse({
+    status: 409,
+    description: 'Fitur dengan nama atau kode tersebut sudah ada.',
+  })
   @ApiResponse({
     status: 403,
     description: 'Dilarang. Tidak memiliki izin yang diperlukan.',
@@ -126,7 +132,8 @@ export class FeatureController {
   @ApiResponse({ status: 404, description: 'Fitur tidak ditemukan.' })
   @ApiResponse({
     status: 409,
-    description: 'Konflik (misalnya, fitur masih terhubung dengan profil admin).',
+    description:
+      'Konflik (misalnya, fitur masih terhubung dengan profil admin).',
   })
   @ApiResponse({
     status: 403,
@@ -142,8 +149,14 @@ export class FeatureController {
   @ApiOperation({ summary: 'Menetapkan fitur ke admin' })
   @ApiParam({ name: 'featureId', description: 'ID Fitur', type: Number })
   @ApiParam({ name: 'adminId', description: 'ID Admin', type: Number })
-  @ApiResponse({ status: 204, description: 'Fitur berhasil ditetapkan ke admin.' })
-  @ApiResponse({ status: 404, description: 'Fitur atau admin tidak ditemukan.' })
+  @ApiResponse({
+    status: 204,
+    description: 'Fitur berhasil ditetapkan ke admin.',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Fitur atau admin tidak ditemukan.',
+  })
   @ApiResponse({
     status: 403,
     description: 'Dilarang. Tidak memiliki izin yang diperlukan.',
@@ -161,8 +174,14 @@ export class FeatureController {
   @ApiOperation({ summary: 'Menghapus fitur dari admin' })
   @ApiParam({ name: 'featureId', description: 'ID Fitur', type: Number })
   @ApiParam({ name: 'adminId', description: 'ID Admin', type: Number })
-  @ApiResponse({ status: 204, description: 'Fitur berhasil dihapus dari admin.' })
-  @ApiResponse({ status: 404, description: 'Fitur atau admin tidak ditemukan.' })
+  @ApiResponse({
+    status: 204,
+    description: 'Fitur berhasil dihapus dari admin.',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Fitur atau admin tidak ditemukan.',
+  })
   @ApiResponse({
     status: 403,
     description: 'Dilarang. Tidak memiliki izin yang diperlukan.',
@@ -174,4 +193,4 @@ export class FeatureController {
   ): Promise<void> {
     await this.featureService.removeFromAdmin(featureId, adminId);
   }
-} 
+}

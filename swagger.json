@@ -1698,7 +1698,7 @@
             }
           },
           "400": {
-            "description": "Data tidak valid"
+            "description": "Data tidak valid atau sudah mencapai batas maksimal 3 API key per perusahaan"
           },
           "404": {
             "description": "Perusahaan tidak ditemukan"
@@ -1917,6 +1917,201 @@
           }
         ],
         "summary": "Mendapatkan log penggunaan API untuk API key tertentu",
+        "tags": [
+          "api-keys"
+        ]
+      }
+    },
+    "/api-keys/logs/search": {
+      "get": {
+        "operationId": "ApikeyController_searchApiLogs",
+        "parameters": [
+          {
+            "name": "companyId",
+            "required": false,
+            "in": "query",
+            "description": "Filter berdasarkan ID perusahaan",
+            "schema": {
+              "example": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "endpoint",
+            "required": false,
+            "in": "query",
+            "description": "Filter berdasarkan endpoint (mendukung pencarian sebagian)",
+            "schema": {
+              "example": "/users",
+              "type": "string"
+            }
+          },
+          {
+            "name": "method",
+            "required": false,
+            "in": "query",
+            "description": "Filter berdasarkan HTTP method",
+            "schema": {
+              "example": "GET",
+              "type": "string"
+            }
+          },
+          {
+            "name": "status",
+            "required": false,
+            "in": "query",
+            "description": "Filter berdasarkan kategori status code",
+            "schema": {
+              "default": "all",
+              "type": "string",
+              "enum": [
+                "success",
+                "error",
+                "all"
+              ]
+            }
+          },
+          {
+            "name": "ipAddress",
+            "required": false,
+            "in": "query",
+            "description": "Filter berdasarkan IP address (mendukung pencarian sebagian)",
+            "schema": {
+              "example": "192.168",
+              "type": "string"
+            }
+          },
+          {
+            "name": "startDate",
+            "required": false,
+            "in": "query",
+            "description": "Filter berdasarkan tanggal mulai (format ISO)",
+            "schema": {
+              "example": "2023-01-01T00:00:00Z",
+              "type": "string"
+            }
+          },
+          {
+            "name": "endDate",
+            "required": false,
+            "in": "query",
+            "description": "Filter berdasarkan tanggal akhir (format ISO)",
+            "schema": {
+              "example": "2023-12-31T23:59:59Z",
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "description": "Jumlah maksimum log yang dikembalikan",
+            "schema": {
+              "default": 50,
+              "example": 100,
+              "type": "number"
+            }
+          },
+          {
+            "name": "offset",
+            "required": false,
+            "in": "query",
+            "description": "Offset untuk pagination",
+            "schema": {
+              "default": 0,
+              "example": 0,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Daftar log API yang sesuai dengan filter"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Mencari log penggunaan API dengan berbagai filter",
+        "tags": [
+          "api-keys"
+        ]
+      }
+    },
+    "/api-keys/stats": {
+      "get": {
+        "operationId": "ApikeyController_getApiUsageStats",
+        "parameters": [
+          {
+            "name": "companyId",
+            "required": false,
+            "in": "query",
+            "description": "ID perusahaan untuk filter statistik",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "days",
+            "required": false,
+            "in": "query",
+            "description": "Jumlah hari terakhir untuk statistik (default: 30)",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Statistik penggunaan API"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Mendapatkan statistik penggunaan API",
+        "tags": [
+          "api-keys"
+        ]
+      }
+    },
+    "/api-keys/company/{companyId}/stats": {
+      "get": {
+        "operationId": "ApikeyController_getCompanyApiUsageStats",
+        "parameters": [
+          {
+            "name": "companyId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "days",
+            "required": false,
+            "in": "query",
+            "description": "Jumlah hari terakhir untuk statistik (default: 30)",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Statistik penggunaan API untuk perusahaan tertentu"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Mendapatkan statistik penggunaan API untuk perusahaan tertentu",
         "tags": [
           "api-keys"
         ]
@@ -3019,7 +3214,7 @@
           },
           "companyId": {
             "type": "number",
-            "description": "ID perusahaan yang memiliki API key",
+            "description": "ID perusahaan yang memiliki API key. Catatan: Maksimum 3 API key per perusahaan.",
             "example": 1
           },
           "expiresAt": {
@@ -3049,7 +3244,7 @@
           },
           "companyId": {
             "type": "number",
-            "description": "ID perusahaan yang memiliki API key",
+            "description": "ID perusahaan yang memiliki API key. Catatan: Maksimum 3 API key per perusahaan.",
             "example": 1
           },
           "expiresAt": {
@@ -3078,6 +3273,11 @@
             "description": "ID API key yang digunakan",
             "example": 1
           },
+          "companyId": {
+            "type": "number",
+            "description": "ID Perusahaan terkait",
+            "example": 1
+          },
           "endpoint": {
             "type": "string",
             "description": "Endpoint yang diakses",
@@ -3097,6 +3297,26 @@
             "type": "string",
             "description": "Request body yang dikirim (jika ada)",
             "example": "{\"name\": \"Test Data\"}"
+          },
+          "responseBody": {
+            "type": "string",
+            "description": "Response body yang diterima (jika ada)",
+            "example": "{\"id\": 1, \"name\": \"Test Data\", \"success\": true}"
+          },
+          "responseTime": {
+            "type": "number",
+            "description": "Waktu respons dalam milidetik",
+            "example": 125
+          },
+          "ipAddress": {
+            "type": "string",
+            "description": "IP address client",
+            "example": "192.168.1.1"
+          },
+          "userAgent": {
+            "type": "string",
+            "description": "User agent client",
+            "example": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
           },
           "createdAt": {
             "format": "date-time",

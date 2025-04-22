@@ -167,10 +167,15 @@ exports.Prisma.ApiKeyScalarFieldEnum = {
 exports.Prisma.ApiLogScalarFieldEnum = {
   id: 'id',
   apiKeyId: 'apiKeyId',
+  companyId: 'companyId',
   endpoint: 'endpoint',
   method: 'method',
   statusCode: 'statusCode',
   requestBody: 'requestBody',
+  responseBody: 'responseBody',
+  responseTime: 'responseTime',
+  ipAddress: 'ipAddress',
+  userAgent: 'userAgent',
   createdAt: 'createdAt'
 };
 
@@ -239,7 +244,10 @@ exports.Prisma.ApiKeyOrderByRelevanceFieldEnum = {
 exports.Prisma.ApiLogOrderByRelevanceFieldEnum = {
   endpoint: 'endpoint',
   method: 'method',
-  requestBody: 'requestBody'
+  requestBody: 'requestBody',
+  responseBody: 'responseBody',
+  ipAddress: 'ipAddress',
+  userAgent: 'userAgent'
 };
 
 exports.Prisma.RoleOrderByRelevanceFieldEnum = {
