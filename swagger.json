@@ -2009,6 +2009,308 @@
           "api-examples"
         ]
       }
+    },
+    "/features": {
+      "post": {
+        "operationId": "FeatureController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateFeatureDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Fitur berhasil dibuat.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FeatureResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validasi gagal."
+          },
+          "403": {
+            "description": "Dilarang. Tidak memiliki izin yang diperlukan."
+          },
+          "409": {
+            "description": "Fitur dengan nama atau kode tersebut sudah ada."
+          }
+        },
+        "security": [
+          {
+            "jwt": []
+          }
+        ],
+        "summary": "Membuat fitur baru",
+        "tags": [
+          "Features Management"
+        ]
+      },
+      "get": {
+        "operationId": "FeatureController_findAll",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Daftar fitur.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/FeatureResponseDto"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Dilarang. Tidak memiliki izin yang diperlukan."
+          }
+        },
+        "security": [
+          {
+            "jwt": []
+          }
+        ],
+        "summary": "Mendapatkan daftar semua fitur",
+        "tags": [
+          "Features Management"
+        ]
+      }
+    },
+    "/features/{id}": {
+      "get": {
+        "operationId": "FeatureController_findOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "ID Fitur",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Detail fitur.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FeatureResponseDto"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Dilarang. Tidak memiliki izin yang diperlukan."
+          },
+          "404": {
+            "description": "Fitur tidak ditemukan."
+          }
+        },
+        "security": [
+          {
+            "jwt": []
+          }
+        ],
+        "summary": "Mendapatkan fitur berdasarkan ID",
+        "tags": [
+          "Features Management"
+        ]
+      },
+      "patch": {
+        "operationId": "FeatureController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "ID Fitur",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateFeatureDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Fitur berhasil diperbarui.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FeatureResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validasi gagal."
+          },
+          "403": {
+            "description": "Dilarang. Tidak memiliki izin yang diperlukan."
+          },
+          "404": {
+            "description": "Fitur tidak ditemukan."
+          },
+          "409": {
+            "description": "Fitur dengan nama atau kode tersebut sudah ada."
+          }
+        },
+        "security": [
+          {
+            "jwt": []
+          }
+        ],
+        "summary": "Memperbarui fitur",
+        "tags": [
+          "Features Management"
+        ]
+      },
+      "delete": {
+        "operationId": "FeatureController_remove",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "ID Fitur",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Fitur berhasil dihapus."
+          },
+          "403": {
+            "description": "Dilarang. Tidak memiliki izin yang diperlukan."
+          },
+          "404": {
+            "description": "Fitur tidak ditemukan."
+          },
+          "409": {
+            "description": "Konflik (misalnya, fitur masih terhubung dengan profil admin)."
+          }
+        },
+        "security": [
+          {
+            "jwt": []
+          }
+        ],
+        "summary": "Menghapus fitur",
+        "tags": [
+          "Features Management"
+        ]
+      }
+    },
+    "/features/{featureId}/admin/{adminId}": {
+      "post": {
+        "operationId": "FeatureController_assignToAdmin",
+        "parameters": [
+          {
+            "name": "featureId",
+            "required": true,
+            "in": "path",
+            "description": "ID Fitur",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "adminId",
+            "required": true,
+            "in": "path",
+            "description": "ID Admin",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Fitur berhasil ditetapkan ke admin."
+          },
+          "403": {
+            "description": "Dilarang. Tidak memiliki izin yang diperlukan."
+          },
+          "404": {
+            "description": "Fitur atau admin tidak ditemukan."
+          }
+        },
+        "security": [
+          {
+            "jwt": []
+          }
+        ],
+        "summary": "Menetapkan fitur ke admin",
+        "tags": [
+          "Features Management"
+        ]
+      },
+      "delete": {
+        "operationId": "FeatureController_removeFromAdmin",
+        "parameters": [
+          {
+            "name": "featureId",
+            "required": true,
+            "in": "path",
+            "description": "ID Fitur",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "adminId",
+            "required": true,
+            "in": "path",
+            "description": "ID Admin",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Fitur berhasil dihapus dari admin."
+          },
+          "403": {
+            "description": "Dilarang. Tidak memiliki izin yang diperlukan."
+          },
+          "404": {
+            "description": "Fitur atau admin tidak ditemukan."
+          }
+        },
+        "security": [
+          {
+            "jwt": []
+          }
+        ],
+        "summary": "Menghapus fitur dari admin",
+        "tags": [
+          "Features Management"
+        ]
+      }
     }
   },
   "info": {
@@ -2823,6 +3125,114 @@
       "CreateExampleResponseDto": {
         "type": "object",
         "properties": {}
+      },
+      "CreateFeatureDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "Dashboard Analytics",
+            "description": "Nama fitur",
+            "maxLength": 100
+          },
+          "code": {
+            "type": "string",
+            "example": "dashboard_analytics",
+            "description": "Kode unik untuk identifikasi fitur",
+            "maxLength": 50
+          },
+          "description": {
+            "type": "string",
+            "example": "Fitur analitik dashboard yang menampilkan grafik dan statistik",
+            "description": "Deskripsi tentang fitur",
+            "maxLength": 500
+          },
+          "isActive": {
+            "type": "boolean",
+            "example": true,
+            "description": "Status aktif fitur",
+            "default": true
+          }
+        },
+        "required": [
+          "name",
+          "code"
+        ]
+      },
+      "FeatureResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number",
+            "example": 1,
+            "description": "ID unik dari fitur"
+          },
+          "name": {
+            "type": "string",
+            "example": "Dashboard Analytics",
+            "description": "Nama fitur"
+          },
+          "code": {
+            "type": "string",
+            "example": "dashboard_analytics",
+            "description": "Kode unik untuk identifikasi fitur"
+          },
+          "description": {
+            "type": "object",
+            "example": "Fitur analitik dashboard yang menampilkan grafik dan statistik",
+            "description": "Deskripsi tentang fitur",
+            "nullable": true
+          },
+          "isActive": {
+            "type": "boolean",
+            "example": true,
+            "description": "Status aktif fitur"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "code",
+          "isActive",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "UpdateFeatureDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "Dashboard Analytics Updated",
+            "description": "Nama fitur yang diperbarui",
+            "maxLength": 100
+          },
+          "code": {
+            "type": "string",
+            "example": "dashboard_analytics_updated",
+            "description": "Kode unik fitur yang diperbarui",
+            "maxLength": 50
+          },
+          "description": {
+            "type": "string",
+            "example": "Deskripsi fitur yang diperbarui",
+            "description": "Deskripsi tentang fitur",
+            "maxLength": 500
+          },
+          "isActive": {
+            "type": "boolean",
+            "example": false,
+            "description": "Status aktif fitur yang diperbarui"
+          }
+        }
       }
     }
   }

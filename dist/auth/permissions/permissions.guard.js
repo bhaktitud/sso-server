@@ -33,12 +33,15 @@ let PermissionsGuard = class PermissionsGuard {
             console.error(`PermissionsGuard Error: 'permissions' array not found or invalid on user object (user ID: ${user.userId ?? 'N/A'}). Payload:`, user);
             throw new common_1.ForbiddenException('Could not determine user permissions.');
         }
+        if (userPermissions.includes('manage:all')) {
+            return true;
+        }
         const hasAllPermissions = requiredPermissions.every((permission) => userPermissions.includes(permission));
         if (hasAllPermissions) {
             return true;
         }
         else {
-            throw new common_1.ForbiddenException('You do not have the required permissions to access this resource.');
+            throw new common_1.ForbiddenException('Anda tidak memiliki izin yang diperlukan untuk mengakses sumber daya ini.');
         }
     }
 };

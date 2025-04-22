@@ -9,23 +9,23 @@ export declare class AdminController {
     getProfile(req: any): Promise<{
         email: string | undefined;
         apiKeys: {
-            name: string;
             id: number;
-            createdAt: Date;
-            updatedAt: Date;
-            companyId: number;
-            description: string | null;
             key: string;
+            name: string;
+            description: string | null;
             isActive: boolean;
+            companyId: number;
             lastUsedAt: Date | null;
             expiresAt: Date | null;
+            createdAt: Date;
+            updatedAt: Date;
         }[];
-        name: string;
         id: number;
+        name: string;
+        companyId: number | null;
         createdAt: Date;
         updatedAt: Date;
         userId: number;
-        companyId: number | null;
         user: Partial<User>;
         company?: {
             apiKeys: ApiKey[];

@@ -49,6 +49,11 @@ export class PermissionsGuard implements CanActivate {
       throw new ForbiddenException('Could not determine user permissions.');
     }
 
+    // Periksa jika user memiliki izin 'manage:all' (superuser)
+    if (userPermissions.includes('manage:all')) {
+      return true; // Superuser dapat mengakses semua fitur
+    }
+
     // 4. Periksa apakah user memiliki SEMUA permission yang dibutuhkan
     const hasAllPermissions = requiredPermissions.every((permission) =>
       userPermissions.includes(permission),
@@ -59,7 +64,7 @@ export class PermissionsGuard implements CanActivate {
     } else {
       // Tolak akses jika ada permission yang kurang
       throw new ForbiddenException(
-        'You do not have the required permissions to access this resource.',
+        'Anda tidak memiliki izin yang diperlukan untuk mengakses sumber daya ini.',
       );
     }
   }

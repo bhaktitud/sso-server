@@ -190,6 +190,16 @@ exports.Prisma.PermissionScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
+exports.Prisma.FeatureScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  code: 'code',
+  description: 'description',
+  isActive: 'isActive',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -241,6 +251,12 @@ exports.Prisma.PermissionOrderByRelevanceFieldEnum = {
   action: 'action',
   subject: 'subject'
 };
+
+exports.Prisma.FeatureOrderByRelevanceFieldEnum = {
+  name: 'name',
+  code: 'code',
+  description: 'description'
+};
 exports.UserType = exports.$Enums.UserType = {
   APP_USER: 'APP_USER',
   ADMIN_USER: 'ADMIN_USER'
@@ -253,7 +269,8 @@ exports.Prisma.ModelName = {
   ApiKey: 'ApiKey',
   ApiLog: 'ApiLog',
   Role: 'Role',
-  Permission: 'Permission'
+  Permission: 'Permission',
+  Feature: 'Feature'
 };
 
 /**

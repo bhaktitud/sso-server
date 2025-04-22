@@ -37,6 +37,7 @@ import { ResetPasswordDto } from './dto/reset-password.dto';
 import { AdminLoginDto } from './dto/admin-login.dto';
 import { ResendVerificationEmailDto } from './dto/resend-verification-email.dto';
 import { Public } from './decorators/public.decorator';
+import { RequireApiKey } from './decorators/require-apikey.decorator';
 
 // Tipe untuk req.user setelah LocalAuthGuard
 type AuthenticatedUser = Omit<User, 'password'>;
@@ -81,6 +82,7 @@ export class AuthController {
   })
   @ApiResponse({ status: 400, description: 'Validation failed' })
   @ApiResponse({ status: 409, description: 'Email already exists' })
+  @RequireApiKey(false)
   async register(
     @Body() registerDto: RegisterDto,
   ): Promise<{ message: string }> {
@@ -202,9 +204,8 @@ export class AuthController {
     type: SuccessMessageResponse,
   })
   @ApiResponse({ status: 400, description: 'Invalid or expired token' })
-  async verifyEmail(
-    @Param('token') token: string,
-  ): Promise<{ message: string }> {
+  @RequireApiKey(false)
+  async verifyEmail(@Param('token') token: string): Promise<{ message: string }> {
     return this.authService.verifyEmail(token);
   }
 

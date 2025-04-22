@@ -24,6 +24,7 @@ const schedule_1 = require("@nestjs/schedule");
 const tasks_module_1 = require("./tasks/tasks.module");
 const apikey_module_1 = require("./apikey/apikey.module");
 const api_module_1 = require("./api/api.module");
+const feature_module_1 = require("./feature/feature.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -54,6 +55,7 @@ exports.AppModule = AppModule = __decorate([
             tasks_module_1.TasksModule,
             apikey_module_1.ApikeyModule,
             api_module_1.ApiModule,
+            feature_module_1.FeatureModule,
         ],
         controllers: [app_controller_1.AppController],
         providers: [

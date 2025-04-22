@@ -15,6 +15,7 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { TasksModule } from './tasks/tasks.module';
 import { ApikeyModule } from './apikey/apikey.module';
 import { ApiModule } from './api/api.module';
+import { FeatureModule } from './feature/feature.module';
 
 @Module({
   imports: [
@@ -44,6 +45,7 @@ import { ApiModule } from './api/api.module';
     TasksModule,
     ApikeyModule,
     ApiModule,
+    FeatureModule,
   ],
   controllers: [AppController],
   providers: [

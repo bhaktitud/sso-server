@@ -41,15 +41,16 @@ model User {
 
 // Model untuk detail spesifik pengguna admin panel
 model AdminProfile {
-  id        Int      @id @default(autoincrement()) // Menggunakan Int ID
-  userId    Int      @unique // Kunci asing ke User (Int)
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id        Int       @id @default(autoincrement()) // Menggunakan Int ID
+  userId    Int       @unique // Kunci asing ke User (Int)
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   name      String
   companyId Int? // Kunci asing ke Company (Int) - Opsional
-  company   Company? @relation(fields: [companyId], references: [id])
-  roles     Role[]   @relation("AdminRoles") // Relasi Many-to-Many ke Role
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  company   Company?  @relation(fields: [companyId], references: [id])
+  roles     Role[]    @relation("AdminRoles") // Relasi Many-to-Many ke Role
+  features  Feature[] @relation("AdminFeatures") // Relasi Many-to-Many ke Feature
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 }
 
 // Model untuk Perusahaan
@@ -114,4 +115,16 @@ model Permission {
   updatedAt DateTime @updatedAt
 
   @@unique([action, subject]) // Kombinasi action & subject harus unik
+}
+
+// Model untuk Fitur
+model Feature {
+  id          Int            @id @default(autoincrement())
+  name        String         @unique
+  code        String         @unique // Kode unik untuk identifikasi fitur
+  description String?
+  isActive    Boolean        @default(true)
+  admins      AdminProfile[] @relation("AdminFeatures") // Relasi Many-to-Many ke AdminProfile
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
 }

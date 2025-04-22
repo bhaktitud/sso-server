@@ -48,6 +48,11 @@ export type Role = $Result.DefaultSelection<Prisma.$RolePayload>
  * 
  */
 export type Permission = $Result.DefaultSelection<Prisma.$PermissionPayload>
+/**
+ * Model Feature
+ * 
+ */
+export type Feature = $Result.DefaultSelection<Prisma.$FeaturePayload>
 
 /**
  * Enums
@@ -260,6 +265,16 @@ export class PrismaClient<
     * ```
     */
   get permission(): Prisma.PermissionDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.feature`: Exposes CRUD operations for the **Feature** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more Features
+    * const features = await prisma.feature.findMany()
+    * ```
+    */
+  get feature(): Prisma.FeatureDelegate<ExtArgs, ClientOptions>;
 }
 
 export namespace Prisma {
@@ -706,7 +721,8 @@ export namespace Prisma {
     ApiKey: 'ApiKey',
     ApiLog: 'ApiLog',
     Role: 'Role',
-    Permission: 'Permission'
+    Permission: 'Permission',
+    Feature: 'Feature'
   };
 
   export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -725,7 +741,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "user" | "adminProfile" | "company" | "apiKey" | "apiLog" | "role" | "permission"
+      modelProps: "user" | "adminProfile" | "company" | "apiKey" | "apiLog" | "role" | "permission" | "feature"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -1191,6 +1207,72 @@ export namespace Prisma {
           }
         }
       }
+      Feature: {
+        payload: Prisma.$FeaturePayload<ExtArgs>
+        fields: Prisma.FeatureFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.FeatureFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FeaturePayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.FeatureFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FeaturePayload>
+          }
+          findFirst: {
+            args: Prisma.FeatureFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FeaturePayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.FeatureFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FeaturePayload>
+          }
+          findMany: {
+            args: Prisma.FeatureFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FeaturePayload>[]
+          }
+          create: {
+            args: Prisma.FeatureCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FeaturePayload>
+          }
+          createMany: {
+            args: Prisma.FeatureCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          delete: {
+            args: Prisma.FeatureDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FeaturePayload>
+          }
+          update: {
+            args: Prisma.FeatureUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FeaturePayload>
+          }
+          deleteMany: {
+            args: Prisma.FeatureDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.FeatureUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          upsert: {
+            args: Prisma.FeatureUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FeaturePayload>
+          }
+          aggregate: {
+            args: Prisma.FeatureAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateFeature>
+          }
+          groupBy: {
+            args: Prisma.FeatureGroupByArgs<ExtArgs>
+            result: $Utils.Optional<FeatureGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.FeatureCountArgs<ExtArgs>
+            result: $Utils.Optional<FeatureCountAggregateOutputType> | number
+          }
+        }
+      }
     }
   } & {
     other: {
@@ -1282,6 +1364,7 @@ export namespace Prisma {
     apiLog?: ApiLogOmit
     role?: RoleOmit
     permission?: PermissionOmit
+    feature?: FeatureOmit
   }
 
   /* Types for Logging */
@@ -1377,10 +1460,12 @@ export namespace Prisma {
 
   export type AdminProfileCountOutputType = {
     roles: number
+    features: number
   }
 
   export type AdminProfileCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     roles?: boolean | AdminProfileCountOutputTypeCountRolesArgs
+    features?: boolean | AdminProfileCountOutputTypeCountFeaturesArgs
   }
 
   // Custom InputTypes
@@ -1399,6 +1484,13 @@ export namespace Prisma {
    */
   export type AdminProfileCountOutputTypeCountRolesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: RoleWhereInput
+  }
+
+  /**
+   * AdminProfileCountOutputType without action
+   */
+  export type AdminProfileCountOutputTypeCountFeaturesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: FeatureWhereInput
   }
 
 
@@ -1541,6 +1633,37 @@ export namespace Prisma {
    */
   export type PermissionCountOutputTypeCountRolesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: RoleWhereInput
+  }
+
+
+  /**
+   * Count Type FeatureCountOutputType
+   */
+
+  export type FeatureCountOutputType = {
+    admins: number
+  }
+
+  export type FeatureCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    admins?: boolean | FeatureCountOutputTypeCountAdminsArgs
+  }
+
+  // Custom InputTypes
+  /**
+   * FeatureCountOutputType without action
+   */
+  export type FeatureCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FeatureCountOutputType
+     */
+    select?: FeatureCountOutputTypeSelect<ExtArgs> | null
+  }
+
+  /**
+   * FeatureCountOutputType without action
+   */
+  export type FeatureCountOutputTypeCountAdminsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: AdminProfileWhereInput
   }
 
 
@@ -2824,6 +2947,7 @@ export namespace Prisma {
     user?: boolean | UserDefaultArgs<ExtArgs>
     company?: boolean | AdminProfile$companyArgs<ExtArgs>
     roles?: boolean | AdminProfile$rolesArgs<ExtArgs>
+    features?: boolean | AdminProfile$featuresArgs<ExtArgs>
     _count?: boolean | AdminProfileCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["adminProfile"]>
 
@@ -2843,6 +2967,7 @@ export namespace Prisma {
     user?: boolean | UserDefaultArgs<ExtArgs>
     company?: boolean | AdminProfile$companyArgs<ExtArgs>
     roles?: boolean | AdminProfile$rolesArgs<ExtArgs>
+    features?: boolean | AdminProfile$featuresArgs<ExtArgs>
     _count?: boolean | AdminProfileCountOutputTypeDefaultArgs<ExtArgs>
   }
 
@@ -2852,6 +2977,7 @@ export namespace Prisma {
       user: Prisma.$UserPayload<ExtArgs>
       company: Prisma.$CompanyPayload<ExtArgs> | null
       roles: Prisma.$RolePayload<ExtArgs>[]
+      features: Prisma.$FeaturePayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: number
@@ -3203,6 +3329,7 @@ export namespace Prisma {
     user<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     company<T extends AdminProfile$companyArgs<ExtArgs> = {}>(args?: Subset<T, AdminProfile$companyArgs<ExtArgs>>): Prisma__CompanyClient<$Result.GetResult<Prisma.$CompanyPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     roles<T extends AdminProfile$rolesArgs<ExtArgs> = {}>(args?: Subset<T, AdminProfile$rolesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$RolePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    features<T extends AdminProfile$featuresArgs<ExtArgs> = {}>(args?: Subset<T, AdminProfile$featuresArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FeaturePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -3621,6 +3748,30 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: RoleScalarFieldEnum | RoleScalarFieldEnum[]
+  }
+
+  /**
+   * AdminProfile.features
+   */
+  export type AdminProfile$featuresArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Feature
+     */
+    select?: FeatureSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Feature
+     */
+    omit?: FeatureOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FeatureInclude<ExtArgs> | null
+    where?: FeatureWhereInput
+    orderBy?: FeatureOrderByWithRelationInput | FeatureOrderByWithRelationInput[]
+    cursor?: FeatureWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: FeatureScalarFieldEnum | FeatureScalarFieldEnum[]
   }
 
   /**
@@ -8733,6 +8884,1017 @@ export namespace Prisma {
 
 
   /**
+   * Model Feature
+   */
+
+  export type AggregateFeature = {
+    _count: FeatureCountAggregateOutputType | null
+    _avg: FeatureAvgAggregateOutputType | null
+    _sum: FeatureSumAggregateOutputType | null
+    _min: FeatureMinAggregateOutputType | null
+    _max: FeatureMaxAggregateOutputType | null
+  }
+
+  export type FeatureAvgAggregateOutputType = {
+    id: number | null
+  }
+
+  export type FeatureSumAggregateOutputType = {
+    id: number | null
+  }
+
+  export type FeatureMinAggregateOutputType = {
+    id: number | null
+    name: string | null
+    code: string | null
+    description: string | null
+    isActive: boolean | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type FeatureMaxAggregateOutputType = {
+    id: number | null
+    name: string | null
+    code: string | null
+    description: string | null
+    isActive: boolean | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type FeatureCountAggregateOutputType = {
+    id: number
+    name: number
+    code: number
+    description: number
+    isActive: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type FeatureAvgAggregateInputType = {
+    id?: true
+  }
+
+  export type FeatureSumAggregateInputType = {
+    id?: true
+  }
+
+  export type FeatureMinAggregateInputType = {
+    id?: true
+    name?: true
+    code?: true
+    description?: true
+    isActive?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type FeatureMaxAggregateInputType = {
+    id?: true
+    name?: true
+    code?: true
+    description?: true
+    isActive?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type FeatureCountAggregateInputType = {
+    id?: true
+    name?: true
+    code?: true
+    description?: true
+    isActive?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type FeatureAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which Feature to aggregate.
+     */
+    where?: FeatureWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Features to fetch.
+     */
+    orderBy?: FeatureOrderByWithRelationInput | FeatureOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: FeatureWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Features from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Features.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned Features
+    **/
+    _count?: true | FeatureCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: FeatureAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: FeatureSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: FeatureMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: FeatureMaxAggregateInputType
+  }
+
+  export type GetFeatureAggregateType<T extends FeatureAggregateArgs> = {
+        [P in keyof T & keyof AggregateFeature]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateFeature[P]>
+      : GetScalarType<T[P], AggregateFeature[P]>
+  }
+
+
+
+
+  export type FeatureGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: FeatureWhereInput
+    orderBy?: FeatureOrderByWithAggregationInput | FeatureOrderByWithAggregationInput[]
+    by: FeatureScalarFieldEnum[] | FeatureScalarFieldEnum
+    having?: FeatureScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: FeatureCountAggregateInputType | true
+    _avg?: FeatureAvgAggregateInputType
+    _sum?: FeatureSumAggregateInputType
+    _min?: FeatureMinAggregateInputType
+    _max?: FeatureMaxAggregateInputType
+  }
+
+  export type FeatureGroupByOutputType = {
+    id: number
+    name: string
+    code: string
+    description: string | null
+    isActive: boolean
+    createdAt: Date
+    updatedAt: Date
+    _count: FeatureCountAggregateOutputType | null
+    _avg: FeatureAvgAggregateOutputType | null
+    _sum: FeatureSumAggregateOutputType | null
+    _min: FeatureMinAggregateOutputType | null
+    _max: FeatureMaxAggregateOutputType | null
+  }
+
+  type GetFeatureGroupByPayload<T extends FeatureGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<FeatureGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof FeatureGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], FeatureGroupByOutputType[P]>
+            : GetScalarType<T[P], FeatureGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type FeatureSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    name?: boolean
+    code?: boolean
+    description?: boolean
+    isActive?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    admins?: boolean | Feature$adminsArgs<ExtArgs>
+    _count?: boolean | FeatureCountOutputTypeDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["feature"]>
+
+
+
+  export type FeatureSelectScalar = {
+    id?: boolean
+    name?: boolean
+    code?: boolean
+    description?: boolean
+    isActive?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type FeatureOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "code" | "description" | "isActive" | "createdAt" | "updatedAt", ExtArgs["result"]["feature"]>
+  export type FeatureInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    admins?: boolean | Feature$adminsArgs<ExtArgs>
+    _count?: boolean | FeatureCountOutputTypeDefaultArgs<ExtArgs>
+  }
+
+  export type $FeaturePayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "Feature"
+    objects: {
+      admins: Prisma.$AdminProfilePayload<ExtArgs>[]
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: number
+      name: string
+      code: string
+      description: string | null
+      isActive: boolean
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["feature"]>
+    composites: {}
+  }
+
+  type FeatureGetPayload<S extends boolean | null | undefined | FeatureDefaultArgs> = $Result.GetResult<Prisma.$FeaturePayload, S>
+
+  type FeatureCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<FeatureFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: FeatureCountAggregateInputType | true
+    }
+
+  export interface FeatureDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['Feature'], meta: { name: 'Feature' } }
+    /**
+     * Find zero or one Feature that matches the filter.
+     * @param {FeatureFindUniqueArgs} args - Arguments to find a Feature
+     * @example
+     * // Get one Feature
+     * const feature = await prisma.feature.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends FeatureFindUniqueArgs>(args: SelectSubset<T, FeatureFindUniqueArgs<ExtArgs>>): Prisma__FeatureClient<$Result.GetResult<Prisma.$FeaturePayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one Feature that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {FeatureFindUniqueOrThrowArgs} args - Arguments to find a Feature
+     * @example
+     * // Get one Feature
+     * const feature = await prisma.feature.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends FeatureFindUniqueOrThrowArgs>(args: SelectSubset<T, FeatureFindUniqueOrThrowArgs<ExtArgs>>): Prisma__FeatureClient<$Result.GetResult<Prisma.$FeaturePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first Feature that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FeatureFindFirstArgs} args - Arguments to find a Feature
+     * @example
+     * // Get one Feature
+     * const feature = await prisma.feature.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends FeatureFindFirstArgs>(args?: SelectSubset<T, FeatureFindFirstArgs<ExtArgs>>): Prisma__FeatureClient<$Result.GetResult<Prisma.$FeaturePayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first Feature that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FeatureFindFirstOrThrowArgs} args - Arguments to find a Feature
+     * @example
+     * // Get one Feature
+     * const feature = await prisma.feature.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends FeatureFindFirstOrThrowArgs>(args?: SelectSubset<T, FeatureFindFirstOrThrowArgs<ExtArgs>>): Prisma__FeatureClient<$Result.GetResult<Prisma.$FeaturePayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more Features that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FeatureFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all Features
+     * const features = await prisma.feature.findMany()
+     * 
+     * // Get first 10 Features
+     * const features = await prisma.feature.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const featureWithIdOnly = await prisma.feature.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends FeatureFindManyArgs>(args?: SelectSubset<T, FeatureFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FeaturePayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a Feature.
+     * @param {FeatureCreateArgs} args - Arguments to create a Feature.
+     * @example
+     * // Create one Feature
+     * const Feature = await prisma.feature.create({
+     *   data: {
+     *     // ... data to create a Feature
+     *   }
+     * })
+     * 
+     */
+    create<T extends FeatureCreateArgs>(args: SelectSubset<T, FeatureCreateArgs<ExtArgs>>): Prisma__FeatureClient<$Result.GetResult<Prisma.$FeaturePayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many Features.
+     * @param {FeatureCreateManyArgs} args - Arguments to create many Features.
+     * @example
+     * // Create many Features
+     * const feature = await prisma.feature.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends FeatureCreateManyArgs>(args?: SelectSubset<T, FeatureCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Delete a Feature.
+     * @param {FeatureDeleteArgs} args - Arguments to delete one Feature.
+     * @example
+     * // Delete one Feature
+     * const Feature = await prisma.feature.delete({
+     *   where: {
+     *     // ... filter to delete one Feature
+     *   }
+     * })
+     * 
+     */
+    delete<T extends FeatureDeleteArgs>(args: SelectSubset<T, FeatureDeleteArgs<ExtArgs>>): Prisma__FeatureClient<$Result.GetResult<Prisma.$FeaturePayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one Feature.
+     * @param {FeatureUpdateArgs} args - Arguments to update one Feature.
+     * @example
+     * // Update one Feature
+     * const feature = await prisma.feature.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends FeatureUpdateArgs>(args: SelectSubset<T, FeatureUpdateArgs<ExtArgs>>): Prisma__FeatureClient<$Result.GetResult<Prisma.$FeaturePayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more Features.
+     * @param {FeatureDeleteManyArgs} args - Arguments to filter Features to delete.
+     * @example
+     * // Delete a few Features
+     * const { count } = await prisma.feature.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends FeatureDeleteManyArgs>(args?: SelectSubset<T, FeatureDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more Features.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FeatureUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many Features
+     * const feature = await prisma.feature.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends FeatureUpdateManyArgs>(args: SelectSubset<T, FeatureUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create or update one Feature.
+     * @param {FeatureUpsertArgs} args - Arguments to update or create a Feature.
+     * @example
+     * // Update or create a Feature
+     * const feature = await prisma.feature.upsert({
+     *   create: {
+     *     // ... data to create a Feature
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the Feature we want to update
+     *   }
+     * })
+     */
+    upsert<T extends FeatureUpsertArgs>(args: SelectSubset<T, FeatureUpsertArgs<ExtArgs>>): Prisma__FeatureClient<$Result.GetResult<Prisma.$FeaturePayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of Features.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FeatureCountArgs} args - Arguments to filter Features to count.
+     * @example
+     * // Count the number of Features
+     * const count = await prisma.feature.count({
+     *   where: {
+     *     // ... the filter for the Features we want to count
+     *   }
+     * })
+    **/
+    count<T extends FeatureCountArgs>(
+      args?: Subset<T, FeatureCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], FeatureCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a Feature.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FeatureAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends FeatureAggregateArgs>(args: Subset<T, FeatureAggregateArgs>): Prisma.PrismaPromise<GetFeatureAggregateType<T>>
+
+    /**
+     * Group by Feature.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FeatureGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends FeatureGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: FeatureGroupByArgs['orderBy'] }
+        : { orderBy?: FeatureGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, FeatureGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetFeatureGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the Feature model
+   */
+  readonly fields: FeatureFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for Feature.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__FeatureClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    admins<T extends Feature$adminsArgs<ExtArgs> = {}>(args?: Subset<T, Feature$adminsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AdminProfilePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the Feature model
+   */
+  interface FeatureFieldRefs {
+    readonly id: FieldRef<"Feature", 'Int'>
+    readonly name: FieldRef<"Feature", 'String'>
+    readonly code: FieldRef<"Feature", 'String'>
+    readonly description: FieldRef<"Feature", 'String'>
+    readonly isActive: FieldRef<"Feature", 'Boolean'>
+    readonly createdAt: FieldRef<"Feature", 'DateTime'>
+    readonly updatedAt: FieldRef<"Feature", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * Feature findUnique
+   */
+  export type FeatureFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Feature
+     */
+    select?: FeatureSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Feature
+     */
+    omit?: FeatureOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FeatureInclude<ExtArgs> | null
+    /**
+     * Filter, which Feature to fetch.
+     */
+    where: FeatureWhereUniqueInput
+  }
+
+  /**
+   * Feature findUniqueOrThrow
+   */
+  export type FeatureFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Feature
+     */
+    select?: FeatureSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Feature
+     */
+    omit?: FeatureOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FeatureInclude<ExtArgs> | null
+    /**
+     * Filter, which Feature to fetch.
+     */
+    where: FeatureWhereUniqueInput
+  }
+
+  /**
+   * Feature findFirst
+   */
+  export type FeatureFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Feature
+     */
+    select?: FeatureSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Feature
+     */
+    omit?: FeatureOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FeatureInclude<ExtArgs> | null
+    /**
+     * Filter, which Feature to fetch.
+     */
+    where?: FeatureWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Features to fetch.
+     */
+    orderBy?: FeatureOrderByWithRelationInput | FeatureOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for Features.
+     */
+    cursor?: FeatureWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Features from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Features.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of Features.
+     */
+    distinct?: FeatureScalarFieldEnum | FeatureScalarFieldEnum[]
+  }
+
+  /**
+   * Feature findFirstOrThrow
+   */
+  export type FeatureFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Feature
+     */
+    select?: FeatureSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Feature
+     */
+    omit?: FeatureOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FeatureInclude<ExtArgs> | null
+    /**
+     * Filter, which Feature to fetch.
+     */
+    where?: FeatureWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Features to fetch.
+     */
+    orderBy?: FeatureOrderByWithRelationInput | FeatureOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for Features.
+     */
+    cursor?: FeatureWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Features from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Features.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of Features.
+     */
+    distinct?: FeatureScalarFieldEnum | FeatureScalarFieldEnum[]
+  }
+
+  /**
+   * Feature findMany
+   */
+  export type FeatureFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Feature
+     */
+    select?: FeatureSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Feature
+     */
+    omit?: FeatureOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FeatureInclude<ExtArgs> | null
+    /**
+     * Filter, which Features to fetch.
+     */
+    where?: FeatureWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Features to fetch.
+     */
+    orderBy?: FeatureOrderByWithRelationInput | FeatureOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing Features.
+     */
+    cursor?: FeatureWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Features from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Features.
+     */
+    skip?: number
+    distinct?: FeatureScalarFieldEnum | FeatureScalarFieldEnum[]
+  }
+
+  /**
+   * Feature create
+   */
+  export type FeatureCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Feature
+     */
+    select?: FeatureSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Feature
+     */
+    omit?: FeatureOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FeatureInclude<ExtArgs> | null
+    /**
+     * The data needed to create a Feature.
+     */
+    data: XOR<FeatureCreateInput, FeatureUncheckedCreateInput>
+  }
+
+  /**
+   * Feature createMany
+   */
+  export type FeatureCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many Features.
+     */
+    data: FeatureCreateManyInput | FeatureCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * Feature update
+   */
+  export type FeatureUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Feature
+     */
+    select?: FeatureSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Feature
+     */
+    omit?: FeatureOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FeatureInclude<ExtArgs> | null
+    /**
+     * The data needed to update a Feature.
+     */
+    data: XOR<FeatureUpdateInput, FeatureUncheckedUpdateInput>
+    /**
+     * Choose, which Feature to update.
+     */
+    where: FeatureWhereUniqueInput
+  }
+
+  /**
+   * Feature updateMany
+   */
+  export type FeatureUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update Features.
+     */
+    data: XOR<FeatureUpdateManyMutationInput, FeatureUncheckedUpdateManyInput>
+    /**
+     * Filter which Features to update
+     */
+    where?: FeatureWhereInput
+    /**
+     * Limit how many Features to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * Feature upsert
+   */
+  export type FeatureUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Feature
+     */
+    select?: FeatureSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Feature
+     */
+    omit?: FeatureOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FeatureInclude<ExtArgs> | null
+    /**
+     * The filter to search for the Feature to update in case it exists.
+     */
+    where: FeatureWhereUniqueInput
+    /**
+     * In case the Feature found by the `where` argument doesn't exist, create a new Feature with this data.
+     */
+    create: XOR<FeatureCreateInput, FeatureUncheckedCreateInput>
+    /**
+     * In case the Feature was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<FeatureUpdateInput, FeatureUncheckedUpdateInput>
+  }
+
+  /**
+   * Feature delete
+   */
+  export type FeatureDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Feature
+     */
+    select?: FeatureSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Feature
+     */
+    omit?: FeatureOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FeatureInclude<ExtArgs> | null
+    /**
+     * Filter which Feature to delete.
+     */
+    where: FeatureWhereUniqueInput
+  }
+
+  /**
+   * Feature deleteMany
+   */
+  export type FeatureDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which Features to delete
+     */
+    where?: FeatureWhereInput
+    /**
+     * Limit how many Features to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * Feature.admins
+   */
+  export type Feature$adminsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AdminProfile
+     */
+    select?: AdminProfileSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AdminProfile
+     */
+    omit?: AdminProfileOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AdminProfileInclude<ExtArgs> | null
+    where?: AdminProfileWhereInput
+    orderBy?: AdminProfileOrderByWithRelationInput | AdminProfileOrderByWithRelationInput[]
+    cursor?: AdminProfileWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: AdminProfileScalarFieldEnum | AdminProfileScalarFieldEnum[]
+  }
+
+  /**
+   * Feature without action
+   */
+  export type FeatureDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Feature
+     */
+    select?: FeatureSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Feature
+     */
+    omit?: FeatureOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FeatureInclude<ExtArgs> | null
+  }
+
+
+  /**
    * Enums
    */
 
@@ -8840,6 +10002,19 @@ export namespace Prisma {
   export type PermissionScalarFieldEnum = (typeof PermissionScalarFieldEnum)[keyof typeof PermissionScalarFieldEnum]
 
 
+  export const FeatureScalarFieldEnum: {
+    id: 'id',
+    name: 'name',
+    code: 'code',
+    description: 'description',
+    isActive: 'isActive',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type FeatureScalarFieldEnum = (typeof FeatureScalarFieldEnum)[keyof typeof FeatureScalarFieldEnum]
+
+
   export const SortOrder: {
     asc: 'asc',
     desc: 'desc'
@@ -8917,6 +10092,15 @@ export namespace Prisma {
   };
 
   export type PermissionOrderByRelevanceFieldEnum = (typeof PermissionOrderByRelevanceFieldEnum)[keyof typeof PermissionOrderByRelevanceFieldEnum]
+
+
+  export const FeatureOrderByRelevanceFieldEnum: {
+    name: 'name',
+    code: 'code',
+    description: 'description'
+  };
+
+  export type FeatureOrderByRelevanceFieldEnum = (typeof FeatureOrderByRelevanceFieldEnum)[keyof typeof FeatureOrderByRelevanceFieldEnum]
 
 
   /**
@@ -9075,6 +10259,7 @@ export namespace Prisma {
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
     company?: XOR<CompanyNullableScalarRelationFilter, CompanyWhereInput> | null
     roles?: RoleListRelationFilter
+    features?: FeatureListRelationFilter
   }
 
   export type AdminProfileOrderByWithRelationInput = {
@@ -9087,6 +10272,7 @@ export namespace Prisma {
     user?: UserOrderByWithRelationInput
     company?: CompanyOrderByWithRelationInput
     roles?: RoleOrderByRelationAggregateInput
+    features?: FeatureOrderByRelationAggregateInput
     _relevance?: AdminProfileOrderByRelevanceInput
   }
 
@@ -9103,6 +10289,7 @@ export namespace Prisma {
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
     company?: XOR<CompanyNullableScalarRelationFilter, CompanyWhereInput> | null
     roles?: RoleListRelationFilter
+    features?: FeatureListRelationFilter
   }, "id" | "userId">
 
   export type AdminProfileOrderByWithAggregationInput = {
@@ -9476,6 +10663,74 @@ export namespace Prisma {
     updatedAt?: DateTimeWithAggregatesFilter<"Permission"> | Date | string
   }
 
+  export type FeatureWhereInput = {
+    AND?: FeatureWhereInput | FeatureWhereInput[]
+    OR?: FeatureWhereInput[]
+    NOT?: FeatureWhereInput | FeatureWhereInput[]
+    id?: IntFilter<"Feature"> | number
+    name?: StringFilter<"Feature"> | string
+    code?: StringFilter<"Feature"> | string
+    description?: StringNullableFilter<"Feature"> | string | null
+    isActive?: BoolFilter<"Feature"> | boolean
+    createdAt?: DateTimeFilter<"Feature"> | Date | string
+    updatedAt?: DateTimeFilter<"Feature"> | Date | string
+    admins?: AdminProfileListRelationFilter
+  }
+
+  export type FeatureOrderByWithRelationInput = {
+    id?: SortOrder
+    name?: SortOrder
+    code?: SortOrder
+    description?: SortOrderInput | SortOrder
+    isActive?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    admins?: AdminProfileOrderByRelationAggregateInput
+    _relevance?: FeatureOrderByRelevanceInput
+  }
+
+  export type FeatureWhereUniqueInput = Prisma.AtLeast<{
+    id?: number
+    name?: string
+    code?: string
+    AND?: FeatureWhereInput | FeatureWhereInput[]
+    OR?: FeatureWhereInput[]
+    NOT?: FeatureWhereInput | FeatureWhereInput[]
+    description?: StringNullableFilter<"Feature"> | string | null
+    isActive?: BoolFilter<"Feature"> | boolean
+    createdAt?: DateTimeFilter<"Feature"> | Date | string
+    updatedAt?: DateTimeFilter<"Feature"> | Date | string
+    admins?: AdminProfileListRelationFilter
+  }, "id" | "name" | "code">
+
+  export type FeatureOrderByWithAggregationInput = {
+    id?: SortOrder
+    name?: SortOrder
+    code?: SortOrder
+    description?: SortOrderInput | SortOrder
+    isActive?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: FeatureCountOrderByAggregateInput
+    _avg?: FeatureAvgOrderByAggregateInput
+    _max?: FeatureMaxOrderByAggregateInput
+    _min?: FeatureMinOrderByAggregateInput
+    _sum?: FeatureSumOrderByAggregateInput
+  }
+
+  export type FeatureScalarWhereWithAggregatesInput = {
+    AND?: FeatureScalarWhereWithAggregatesInput | FeatureScalarWhereWithAggregatesInput[]
+    OR?: FeatureScalarWhereWithAggregatesInput[]
+    NOT?: FeatureScalarWhereWithAggregatesInput | FeatureScalarWhereWithAggregatesInput[]
+    id?: IntWithAggregatesFilter<"Feature"> | number
+    name?: StringWithAggregatesFilter<"Feature"> | string
+    code?: StringWithAggregatesFilter<"Feature"> | string
+    description?: StringNullableWithAggregatesFilter<"Feature"> | string | null
+    isActive?: BoolWithAggregatesFilter<"Feature"> | boolean
+    createdAt?: DateTimeWithAggregatesFilter<"Feature"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"Feature"> | Date | string
+  }
+
   export type UserCreateInput = {
     email: string
     password: string
@@ -9589,6 +10844,7 @@ export namespace Prisma {
     user: UserCreateNestedOneWithoutAdminProfileInput
     company?: CompanyCreateNestedOneWithoutAdminsInput
     roles?: RoleCreateNestedManyWithoutAdminsInput
+    features?: FeatureCreateNestedManyWithoutAdminsInput
   }
 
   export type AdminProfileUncheckedCreateInput = {
@@ -9599,6 +10855,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     roles?: RoleUncheckedCreateNestedManyWithoutAdminsInput
+    features?: FeatureUncheckedCreateNestedManyWithoutAdminsInput
   }
 
   export type AdminProfileUpdateInput = {
@@ -9608,6 +10865,7 @@ export namespace Prisma {
     user?: UserUpdateOneRequiredWithoutAdminProfileNestedInput
     company?: CompanyUpdateOneWithoutAdminsNestedInput
     roles?: RoleUpdateManyWithoutAdminsNestedInput
+    features?: FeatureUpdateManyWithoutAdminsNestedInput
   }
 
   export type AdminProfileUncheckedUpdateInput = {
@@ -9618,6 +10876,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     roles?: RoleUncheckedUpdateManyWithoutAdminsNestedInput
+    features?: FeatureUncheckedUpdateManyWithoutAdminsNestedInput
   }
 
   export type AdminProfileCreateManyInput = {
@@ -9994,6 +11253,77 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type FeatureCreateInput = {
+    name: string
+    code: string
+    description?: string | null
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    admins?: AdminProfileCreateNestedManyWithoutFeaturesInput
+  }
+
+  export type FeatureUncheckedCreateInput = {
+    id?: number
+    name: string
+    code: string
+    description?: string | null
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    admins?: AdminProfileUncheckedCreateNestedManyWithoutFeaturesInput
+  }
+
+  export type FeatureUpdateInput = {
+    name?: StringFieldUpdateOperationsInput | string
+    code?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    admins?: AdminProfileUpdateManyWithoutFeaturesNestedInput
+  }
+
+  export type FeatureUncheckedUpdateInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    name?: StringFieldUpdateOperationsInput | string
+    code?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    admins?: AdminProfileUncheckedUpdateManyWithoutFeaturesNestedInput
+  }
+
+  export type FeatureCreateManyInput = {
+    id?: number
+    name: string
+    code: string
+    description?: string | null
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type FeatureUpdateManyMutationInput = {
+    name?: StringFieldUpdateOperationsInput | string
+    code?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type FeatureUncheckedUpdateManyInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    name?: StringFieldUpdateOperationsInput | string
+    code?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type IntFilter<$PrismaModel = never> = {
     equals?: number | IntFieldRefInput<$PrismaModel>
     in?: number[]
@@ -10263,7 +11593,17 @@ export namespace Prisma {
     none?: RoleWhereInput
   }
 
+  export type FeatureListRelationFilter = {
+    every?: FeatureWhereInput
+    some?: FeatureWhereInput
+    none?: FeatureWhereInput
+  }
+
   export type RoleOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type FeatureOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -10606,6 +11946,50 @@ export namespace Prisma {
     id?: SortOrder
   }
 
+  export type FeatureOrderByRelevanceInput = {
+    fields: FeatureOrderByRelevanceFieldEnum | FeatureOrderByRelevanceFieldEnum[]
+    sort: SortOrder
+    search: string
+  }
+
+  export type FeatureCountOrderByAggregateInput = {
+    id?: SortOrder
+    name?: SortOrder
+    code?: SortOrder
+    description?: SortOrder
+    isActive?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type FeatureAvgOrderByAggregateInput = {
+    id?: SortOrder
+  }
+
+  export type FeatureMaxOrderByAggregateInput = {
+    id?: SortOrder
+    name?: SortOrder
+    code?: SortOrder
+    description?: SortOrder
+    isActive?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type FeatureMinOrderByAggregateInput = {
+    id?: SortOrder
+    name?: SortOrder
+    code?: SortOrder
+    description?: SortOrder
+    isActive?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type FeatureSumOrderByAggregateInput = {
+    id?: SortOrder
+  }
+
   export type AdminProfileCreateNestedOneWithoutUserInput = {
     create?: XOR<AdminProfileCreateWithoutUserInput, AdminProfileUncheckedCreateWithoutUserInput>
     connectOrCreate?: AdminProfileCreateOrConnectWithoutUserInput
@@ -10688,10 +12072,22 @@ export namespace Prisma {
     connect?: RoleWhereUniqueInput | RoleWhereUniqueInput[]
   }
 
+  export type FeatureCreateNestedManyWithoutAdminsInput = {
+    create?: XOR<FeatureCreateWithoutAdminsInput, FeatureUncheckedCreateWithoutAdminsInput> | FeatureCreateWithoutAdminsInput[] | FeatureUncheckedCreateWithoutAdminsInput[]
+    connectOrCreate?: FeatureCreateOrConnectWithoutAdminsInput | FeatureCreateOrConnectWithoutAdminsInput[]
+    connect?: FeatureWhereUniqueInput | FeatureWhereUniqueInput[]
+  }
+
   export type RoleUncheckedCreateNestedManyWithoutAdminsInput = {
     create?: XOR<RoleCreateWithoutAdminsInput, RoleUncheckedCreateWithoutAdminsInput> | RoleCreateWithoutAdminsInput[] | RoleUncheckedCreateWithoutAdminsInput[]
     connectOrCreate?: RoleCreateOrConnectWithoutAdminsInput | RoleCreateOrConnectWithoutAdminsInput[]
     connect?: RoleWhereUniqueInput | RoleWhereUniqueInput[]
+  }
+
+  export type FeatureUncheckedCreateNestedManyWithoutAdminsInput = {
+    create?: XOR<FeatureCreateWithoutAdminsInput, FeatureUncheckedCreateWithoutAdminsInput> | FeatureCreateWithoutAdminsInput[] | FeatureUncheckedCreateWithoutAdminsInput[]
+    connectOrCreate?: FeatureCreateOrConnectWithoutAdminsInput | FeatureCreateOrConnectWithoutAdminsInput[]
+    connect?: FeatureWhereUniqueInput | FeatureWhereUniqueInput[]
   }
 
   export type UserUpdateOneRequiredWithoutAdminProfileNestedInput = {
@@ -10725,6 +12121,19 @@ export namespace Prisma {
     deleteMany?: RoleScalarWhereInput | RoleScalarWhereInput[]
   }
 
+  export type FeatureUpdateManyWithoutAdminsNestedInput = {
+    create?: XOR<FeatureCreateWithoutAdminsInput, FeatureUncheckedCreateWithoutAdminsInput> | FeatureCreateWithoutAdminsInput[] | FeatureUncheckedCreateWithoutAdminsInput[]
+    connectOrCreate?: FeatureCreateOrConnectWithoutAdminsInput | FeatureCreateOrConnectWithoutAdminsInput[]
+    upsert?: FeatureUpsertWithWhereUniqueWithoutAdminsInput | FeatureUpsertWithWhereUniqueWithoutAdminsInput[]
+    set?: FeatureWhereUniqueInput | FeatureWhereUniqueInput[]
+    disconnect?: FeatureWhereUniqueInput | FeatureWhereUniqueInput[]
+    delete?: FeatureWhereUniqueInput | FeatureWhereUniqueInput[]
+    connect?: FeatureWhereUniqueInput | FeatureWhereUniqueInput[]
+    update?: FeatureUpdateWithWhereUniqueWithoutAdminsInput | FeatureUpdateWithWhereUniqueWithoutAdminsInput[]
+    updateMany?: FeatureUpdateManyWithWhereWithoutAdminsInput | FeatureUpdateManyWithWhereWithoutAdminsInput[]
+    deleteMany?: FeatureScalarWhereInput | FeatureScalarWhereInput[]
+  }
+
   export type NullableIntFieldUpdateOperationsInput = {
     set?: number | null
     increment?: number
@@ -10744,6 +12153,19 @@ export namespace Prisma {
     update?: RoleUpdateWithWhereUniqueWithoutAdminsInput | RoleUpdateWithWhereUniqueWithoutAdminsInput[]
     updateMany?: RoleUpdateManyWithWhereWithoutAdminsInput | RoleUpdateManyWithWhereWithoutAdminsInput[]
     deleteMany?: RoleScalarWhereInput | RoleScalarWhereInput[]
+  }
+
+  export type FeatureUncheckedUpdateManyWithoutAdminsNestedInput = {
+    create?: XOR<FeatureCreateWithoutAdminsInput, FeatureUncheckedCreateWithoutAdminsInput> | FeatureCreateWithoutAdminsInput[] | FeatureUncheckedCreateWithoutAdminsInput[]
+    connectOrCreate?: FeatureCreateOrConnectWithoutAdminsInput | FeatureCreateOrConnectWithoutAdminsInput[]
+    upsert?: FeatureUpsertWithWhereUniqueWithoutAdminsInput | FeatureUpsertWithWhereUniqueWithoutAdminsInput[]
+    set?: FeatureWhereUniqueInput | FeatureWhereUniqueInput[]
+    disconnect?: FeatureWhereUniqueInput | FeatureWhereUniqueInput[]
+    delete?: FeatureWhereUniqueInput | FeatureWhereUniqueInput[]
+    connect?: FeatureWhereUniqueInput | FeatureWhereUniqueInput[]
+    update?: FeatureUpdateWithWhereUniqueWithoutAdminsInput | FeatureUpdateWithWhereUniqueWithoutAdminsInput[]
+    updateMany?: FeatureUpdateManyWithWhereWithoutAdminsInput | FeatureUpdateManyWithWhereWithoutAdminsInput[]
+    deleteMany?: FeatureScalarWhereInput | FeatureScalarWhereInput[]
   }
 
   export type AdminProfileCreateNestedManyWithoutCompanyInput = {
@@ -11014,6 +12436,44 @@ export namespace Prisma {
     deleteMany?: RoleScalarWhereInput | RoleScalarWhereInput[]
   }
 
+  export type AdminProfileCreateNestedManyWithoutFeaturesInput = {
+    create?: XOR<AdminProfileCreateWithoutFeaturesInput, AdminProfileUncheckedCreateWithoutFeaturesInput> | AdminProfileCreateWithoutFeaturesInput[] | AdminProfileUncheckedCreateWithoutFeaturesInput[]
+    connectOrCreate?: AdminProfileCreateOrConnectWithoutFeaturesInput | AdminProfileCreateOrConnectWithoutFeaturesInput[]
+    connect?: AdminProfileWhereUniqueInput | AdminProfileWhereUniqueInput[]
+  }
+
+  export type AdminProfileUncheckedCreateNestedManyWithoutFeaturesInput = {
+    create?: XOR<AdminProfileCreateWithoutFeaturesInput, AdminProfileUncheckedCreateWithoutFeaturesInput> | AdminProfileCreateWithoutFeaturesInput[] | AdminProfileUncheckedCreateWithoutFeaturesInput[]
+    connectOrCreate?: AdminProfileCreateOrConnectWithoutFeaturesInput | AdminProfileCreateOrConnectWithoutFeaturesInput[]
+    connect?: AdminProfileWhereUniqueInput | AdminProfileWhereUniqueInput[]
+  }
+
+  export type AdminProfileUpdateManyWithoutFeaturesNestedInput = {
+    create?: XOR<AdminProfileCreateWithoutFeaturesInput, AdminProfileUncheckedCreateWithoutFeaturesInput> | AdminProfileCreateWithoutFeaturesInput[] | AdminProfileUncheckedCreateWithoutFeaturesInput[]
+    connectOrCreate?: AdminProfileCreateOrConnectWithoutFeaturesInput | AdminProfileCreateOrConnectWithoutFeaturesInput[]
+    upsert?: AdminProfileUpsertWithWhereUniqueWithoutFeaturesInput | AdminProfileUpsertWithWhereUniqueWithoutFeaturesInput[]
+    set?: AdminProfileWhereUniqueInput | AdminProfileWhereUniqueInput[]
+    disconnect?: AdminProfileWhereUniqueInput | AdminProfileWhereUniqueInput[]
+    delete?: AdminProfileWhereUniqueInput | AdminProfileWhereUniqueInput[]
+    connect?: AdminProfileWhereUniqueInput | AdminProfileWhereUniqueInput[]
+    update?: AdminProfileUpdateWithWhereUniqueWithoutFeaturesInput | AdminProfileUpdateWithWhereUniqueWithoutFeaturesInput[]
+    updateMany?: AdminProfileUpdateManyWithWhereWithoutFeaturesInput | AdminProfileUpdateManyWithWhereWithoutFeaturesInput[]
+    deleteMany?: AdminProfileScalarWhereInput | AdminProfileScalarWhereInput[]
+  }
+
+  export type AdminProfileUncheckedUpdateManyWithoutFeaturesNestedInput = {
+    create?: XOR<AdminProfileCreateWithoutFeaturesInput, AdminProfileUncheckedCreateWithoutFeaturesInput> | AdminProfileCreateWithoutFeaturesInput[] | AdminProfileUncheckedCreateWithoutFeaturesInput[]
+    connectOrCreate?: AdminProfileCreateOrConnectWithoutFeaturesInput | AdminProfileCreateOrConnectWithoutFeaturesInput[]
+    upsert?: AdminProfileUpsertWithWhereUniqueWithoutFeaturesInput | AdminProfileUpsertWithWhereUniqueWithoutFeaturesInput[]
+    set?: AdminProfileWhereUniqueInput | AdminProfileWhereUniqueInput[]
+    disconnect?: AdminProfileWhereUniqueInput | AdminProfileWhereUniqueInput[]
+    delete?: AdminProfileWhereUniqueInput | AdminProfileWhereUniqueInput[]
+    connect?: AdminProfileWhereUniqueInput | AdminProfileWhereUniqueInput[]
+    update?: AdminProfileUpdateWithWhereUniqueWithoutFeaturesInput | AdminProfileUpdateWithWhereUniqueWithoutFeaturesInput[]
+    updateMany?: AdminProfileUpdateManyWithWhereWithoutFeaturesInput | AdminProfileUpdateManyWithWhereWithoutFeaturesInput[]
+    deleteMany?: AdminProfileScalarWhereInput | AdminProfileScalarWhereInput[]
+  }
+
   export type NestedIntFilter<$PrismaModel = never> = {
     equals?: number | IntFieldRefInput<$PrismaModel>
     in?: number[]
@@ -11242,6 +12702,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     company?: CompanyCreateNestedOneWithoutAdminsInput
     roles?: RoleCreateNestedManyWithoutAdminsInput
+    features?: FeatureCreateNestedManyWithoutAdminsInput
   }
 
   export type AdminProfileUncheckedCreateWithoutUserInput = {
@@ -11251,6 +12712,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     roles?: RoleUncheckedCreateNestedManyWithoutAdminsInput
+    features?: FeatureUncheckedCreateNestedManyWithoutAdminsInput
   }
 
   export type AdminProfileCreateOrConnectWithoutUserInput = {
@@ -11275,6 +12737,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     company?: CompanyUpdateOneWithoutAdminsNestedInput
     roles?: RoleUpdateManyWithoutAdminsNestedInput
+    features?: FeatureUpdateManyWithoutAdminsNestedInput
   }
 
   export type AdminProfileUncheckedUpdateWithoutUserInput = {
@@ -11284,6 +12747,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     roles?: RoleUncheckedUpdateManyWithoutAdminsNestedInput
+    features?: FeatureUncheckedUpdateManyWithoutAdminsNestedInput
   }
 
   export type UserCreateWithoutAdminProfileInput = {
@@ -11366,6 +12830,30 @@ export namespace Prisma {
   export type RoleCreateOrConnectWithoutAdminsInput = {
     where: RoleWhereUniqueInput
     create: XOR<RoleCreateWithoutAdminsInput, RoleUncheckedCreateWithoutAdminsInput>
+  }
+
+  export type FeatureCreateWithoutAdminsInput = {
+    name: string
+    code: string
+    description?: string | null
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type FeatureUncheckedCreateWithoutAdminsInput = {
+    id?: number
+    name: string
+    code: string
+    description?: string | null
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type FeatureCreateOrConnectWithoutAdminsInput = {
+    where: FeatureWhereUniqueInput
+    create: XOR<FeatureCreateWithoutAdminsInput, FeatureUncheckedCreateWithoutAdminsInput>
   }
 
   export type UserUpsertWithoutAdminProfileInput = {
@@ -11467,12 +12955,42 @@ export namespace Prisma {
     updatedAt?: DateTimeFilter<"Role"> | Date | string
   }
 
+  export type FeatureUpsertWithWhereUniqueWithoutAdminsInput = {
+    where: FeatureWhereUniqueInput
+    update: XOR<FeatureUpdateWithoutAdminsInput, FeatureUncheckedUpdateWithoutAdminsInput>
+    create: XOR<FeatureCreateWithoutAdminsInput, FeatureUncheckedCreateWithoutAdminsInput>
+  }
+
+  export type FeatureUpdateWithWhereUniqueWithoutAdminsInput = {
+    where: FeatureWhereUniqueInput
+    data: XOR<FeatureUpdateWithoutAdminsInput, FeatureUncheckedUpdateWithoutAdminsInput>
+  }
+
+  export type FeatureUpdateManyWithWhereWithoutAdminsInput = {
+    where: FeatureScalarWhereInput
+    data: XOR<FeatureUpdateManyMutationInput, FeatureUncheckedUpdateManyWithoutAdminsInput>
+  }
+
+  export type FeatureScalarWhereInput = {
+    AND?: FeatureScalarWhereInput | FeatureScalarWhereInput[]
+    OR?: FeatureScalarWhereInput[]
+    NOT?: FeatureScalarWhereInput | FeatureScalarWhereInput[]
+    id?: IntFilter<"Feature"> | number
+    name?: StringFilter<"Feature"> | string
+    code?: StringFilter<"Feature"> | string
+    description?: StringNullableFilter<"Feature"> | string | null
+    isActive?: BoolFilter<"Feature"> | boolean
+    createdAt?: DateTimeFilter<"Feature"> | Date | string
+    updatedAt?: DateTimeFilter<"Feature"> | Date | string
+  }
+
   export type AdminProfileCreateWithoutCompanyInput = {
     name: string
     createdAt?: Date | string
     updatedAt?: Date | string
     user: UserCreateNestedOneWithoutAdminProfileInput
     roles?: RoleCreateNestedManyWithoutAdminsInput
+    features?: FeatureCreateNestedManyWithoutAdminsInput
   }
 
   export type AdminProfileUncheckedCreateWithoutCompanyInput = {
@@ -11482,6 +13000,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     roles?: RoleUncheckedCreateNestedManyWithoutAdminsInput
+    features?: FeatureUncheckedCreateNestedManyWithoutAdminsInput
   }
 
   export type AdminProfileCreateOrConnectWithoutCompanyInput = {
@@ -11775,6 +13294,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     user: UserCreateNestedOneWithoutAdminProfileInput
     company?: CompanyCreateNestedOneWithoutAdminsInput
+    features?: FeatureCreateNestedManyWithoutAdminsInput
   }
 
   export type AdminProfileUncheckedCreateWithoutRolesInput = {
@@ -11784,6 +13304,7 @@ export namespace Prisma {
     companyId?: number | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    features?: FeatureUncheckedCreateNestedManyWithoutAdminsInput
   }
 
   export type AdminProfileCreateOrConnectWithoutRolesInput = {
@@ -11892,6 +13413,46 @@ export namespace Prisma {
     data: XOR<RoleUpdateManyMutationInput, RoleUncheckedUpdateManyWithoutPermissionsInput>
   }
 
+  export type AdminProfileCreateWithoutFeaturesInput = {
+    name: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    user: UserCreateNestedOneWithoutAdminProfileInput
+    company?: CompanyCreateNestedOneWithoutAdminsInput
+    roles?: RoleCreateNestedManyWithoutAdminsInput
+  }
+
+  export type AdminProfileUncheckedCreateWithoutFeaturesInput = {
+    id?: number
+    userId: number
+    name: string
+    companyId?: number | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    roles?: RoleUncheckedCreateNestedManyWithoutAdminsInput
+  }
+
+  export type AdminProfileCreateOrConnectWithoutFeaturesInput = {
+    where: AdminProfileWhereUniqueInput
+    create: XOR<AdminProfileCreateWithoutFeaturesInput, AdminProfileUncheckedCreateWithoutFeaturesInput>
+  }
+
+  export type AdminProfileUpsertWithWhereUniqueWithoutFeaturesInput = {
+    where: AdminProfileWhereUniqueInput
+    update: XOR<AdminProfileUpdateWithoutFeaturesInput, AdminProfileUncheckedUpdateWithoutFeaturesInput>
+    create: XOR<AdminProfileCreateWithoutFeaturesInput, AdminProfileUncheckedCreateWithoutFeaturesInput>
+  }
+
+  export type AdminProfileUpdateWithWhereUniqueWithoutFeaturesInput = {
+    where: AdminProfileWhereUniqueInput
+    data: XOR<AdminProfileUpdateWithoutFeaturesInput, AdminProfileUncheckedUpdateWithoutFeaturesInput>
+  }
+
+  export type AdminProfileUpdateManyWithWhereWithoutFeaturesInput = {
+    where: AdminProfileScalarWhereInput
+    data: XOR<AdminProfileUpdateManyMutationInput, AdminProfileUncheckedUpdateManyWithoutFeaturesInput>
+  }
+
   export type RoleUpdateWithoutAdminsInput = {
     name?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
@@ -11913,6 +13474,35 @@ export namespace Prisma {
     id?: IntFieldUpdateOperationsInput | number
     name?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type FeatureUpdateWithoutAdminsInput = {
+    name?: StringFieldUpdateOperationsInput | string
+    code?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type FeatureUncheckedUpdateWithoutAdminsInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    name?: StringFieldUpdateOperationsInput | string
+    code?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type FeatureUncheckedUpdateManyWithoutAdminsInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    name?: StringFieldUpdateOperationsInput | string
+    code?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -11943,6 +13533,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutAdminProfileNestedInput
     roles?: RoleUpdateManyWithoutAdminsNestedInput
+    features?: FeatureUpdateManyWithoutAdminsNestedInput
   }
 
   export type AdminProfileUncheckedUpdateWithoutCompanyInput = {
@@ -11952,6 +13543,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     roles?: RoleUncheckedUpdateManyWithoutAdminsNestedInput
+    features?: FeatureUncheckedUpdateManyWithoutAdminsNestedInput
   }
 
   export type AdminProfileUncheckedUpdateManyWithoutCompanyInput = {
@@ -12040,6 +13632,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutAdminProfileNestedInput
     company?: CompanyUpdateOneWithoutAdminsNestedInput
+    features?: FeatureUpdateManyWithoutAdminsNestedInput
   }
 
   export type AdminProfileUncheckedUpdateWithoutRolesInput = {
@@ -12049,6 +13642,7 @@ export namespace Prisma {
     companyId?: NullableIntFieldUpdateOperationsInput | number | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    features?: FeatureUncheckedUpdateManyWithoutAdminsNestedInput
   }
 
   export type AdminProfileUncheckedUpdateManyWithoutRolesInput = {
@@ -12104,6 +13698,34 @@ export namespace Prisma {
     id?: IntFieldUpdateOperationsInput | number
     name?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type AdminProfileUpdateWithoutFeaturesInput = {
+    name?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: UserUpdateOneRequiredWithoutAdminProfileNestedInput
+    company?: CompanyUpdateOneWithoutAdminsNestedInput
+    roles?: RoleUpdateManyWithoutAdminsNestedInput
+  }
+
+  export type AdminProfileUncheckedUpdateWithoutFeaturesInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    userId?: IntFieldUpdateOperationsInput | number
+    name?: StringFieldUpdateOperationsInput | string
+    companyId?: NullableIntFieldUpdateOperationsInput | number | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    roles?: RoleUncheckedUpdateManyWithoutAdminsNestedInput
+  }
+
+  export type AdminProfileUncheckedUpdateManyWithoutFeaturesInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    userId?: IntFieldUpdateOperationsInput | number
+    name?: StringFieldUpdateOperationsInput | string
+    companyId?: NullableIntFieldUpdateOperationsInput | number | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }

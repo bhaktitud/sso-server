@@ -34,6 +34,7 @@ const reset_password_dto_1 = require("./dto/reset-password.dto");
 const admin_login_dto_1 = require("./dto/admin-login.dto");
 const resend_verification_email_dto_1 = require("./dto/resend-verification-email.dto");
 const public_decorator_1 = require("./decorators/public.decorator");
+const require_apikey_decorator_1 = require("./decorators/require-apikey.decorator");
 class SuccessMessageResponse {
     message;
 }
@@ -101,6 +102,7 @@ __decorate([
     }),
     (0, swagger_1.ApiResponse)({ status: 400, description: 'Validation failed' }),
     (0, swagger_1.ApiResponse)({ status: 409, description: 'Email already exists' }),
+    (0, require_apikey_decorator_1.RequireApiKey)(false),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [register_dto_1.RegisterDto]),
@@ -196,6 +198,7 @@ __decorate([
         type: SuccessMessageResponse,
     }),
     (0, swagger_1.ApiResponse)({ status: 400, description: 'Invalid or expired token' }),
+    (0, require_apikey_decorator_1.RequireApiKey)(false),
     __param(0, (0, common_1.Param)('token')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),

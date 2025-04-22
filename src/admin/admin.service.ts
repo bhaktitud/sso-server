@@ -37,6 +37,7 @@ export class AdminService {
     await Promise.all(
       roleIds.map(async (roleId) => {
         try {
+          console.log('roleId', roleId);
           await this.rbacService.findRoleById(roleId);
         } catch (error) {
           throw new BadRequestException(
