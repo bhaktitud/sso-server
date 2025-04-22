@@ -18,4 +18,18 @@ export class UpdateCompanyDto extends PartialType(CreateCompanyDto) {
     required: false,
   })
   description?: string;
+
+  @ApiProperty({
+    example: 'a1b2c3d4e5f6',
+    description: 'Updated Client ID for OAuth authentication',
+    required: false,
+  })
+  clientId?: string;
+
+  @ApiProperty({
+    example: 'secret-xyz-123',
+    description: 'Updated Client Secret for OAuth authentication',
+    required: false,
+  })
+  clientSecret?: string;
 }

@@ -3666,6 +3666,8 @@ export namespace Prisma {
     id: number | null
     name: string | null
     description: string | null
+    clientId: string | null
+    clientSecret: string | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -3674,6 +3676,8 @@ export namespace Prisma {
     id: number | null
     name: string | null
     description: string | null
+    clientId: string | null
+    clientSecret: string | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -3682,6 +3686,8 @@ export namespace Prisma {
     id: number
     name: number
     description: number
+    clientId: number
+    clientSecret: number
     createdAt: number
     updatedAt: number
     _all: number
@@ -3700,6 +3706,8 @@ export namespace Prisma {
     id?: true
     name?: true
     description?: true
+    clientId?: true
+    clientSecret?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -3708,6 +3716,8 @@ export namespace Prisma {
     id?: true
     name?: true
     description?: true
+    clientId?: true
+    clientSecret?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -3716,6 +3726,8 @@ export namespace Prisma {
     id?: true
     name?: true
     description?: true
+    clientId?: true
+    clientSecret?: true
     createdAt?: true
     updatedAt?: true
     _all?: true
@@ -3811,6 +3823,8 @@ export namespace Prisma {
     id: number
     name: string
     description: string | null
+    clientId: string | null
+    clientSecret: string | null
     createdAt: Date
     updatedAt: Date
     _count: CompanyCountAggregateOutputType | null
@@ -3838,6 +3852,8 @@ export namespace Prisma {
     id?: boolean
     name?: boolean
     description?: boolean
+    clientId?: boolean
+    clientSecret?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     admins?: boolean | Company$adminsArgs<ExtArgs>
@@ -3851,11 +3867,13 @@ export namespace Prisma {
     id?: boolean
     name?: boolean
     description?: boolean
+    clientId?: boolean
+    clientSecret?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type CompanyOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "description" | "createdAt" | "updatedAt", ExtArgs["result"]["company"]>
+  export type CompanyOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "description" | "clientId" | "clientSecret" | "createdAt" | "updatedAt", ExtArgs["result"]["company"]>
   export type CompanyInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     admins?: boolean | Company$adminsArgs<ExtArgs>
     apiKeys?: boolean | Company$apiKeysArgs<ExtArgs>
@@ -3872,6 +3890,8 @@ export namespace Prisma {
       id: number
       name: string
       description: string | null
+      clientId: string | null
+      clientSecret: string | null
       createdAt: Date
       updatedAt: Date
     }, ExtArgs["result"]["company"]>
@@ -4248,6 +4268,8 @@ export namespace Prisma {
     readonly id: FieldRef<"Company", 'Int'>
     readonly name: FieldRef<"Company", 'String'>
     readonly description: FieldRef<"Company", 'String'>
+    readonly clientId: FieldRef<"Company", 'String'>
+    readonly clientSecret: FieldRef<"Company", 'String'>
     readonly createdAt: FieldRef<"Company", 'DateTime'>
     readonly updatedAt: FieldRef<"Company", 'DateTime'>
   }
@@ -8758,6 +8780,8 @@ export namespace Prisma {
     id: 'id',
     name: 'name',
     description: 'description',
+    clientId: 'clientId',
+    clientSecret: 'clientSecret',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
   };
@@ -8853,7 +8877,9 @@ export namespace Prisma {
 
   export const CompanyOrderByRelevanceFieldEnum: {
     name: 'name',
-    description: 'description'
+    description: 'description',
+    clientId: 'clientId',
+    clientSecret: 'clientSecret'
   };
 
   export type CompanyOrderByRelevanceFieldEnum = (typeof CompanyOrderByRelevanceFieldEnum)[keyof typeof CompanyOrderByRelevanceFieldEnum]
@@ -9112,6 +9138,8 @@ export namespace Prisma {
     id?: IntFilter<"Company"> | number
     name?: StringFilter<"Company"> | string
     description?: StringNullableFilter<"Company"> | string | null
+    clientId?: StringNullableFilter<"Company"> | string | null
+    clientSecret?: StringNullableFilter<"Company"> | string | null
     createdAt?: DateTimeFilter<"Company"> | Date | string
     updatedAt?: DateTimeFilter<"Company"> | Date | string
     admins?: AdminProfileListRelationFilter
@@ -9122,6 +9150,8 @@ export namespace Prisma {
     id?: SortOrder
     name?: SortOrder
     description?: SortOrderInput | SortOrder
+    clientId?: SortOrderInput | SortOrder
+    clientSecret?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     admins?: AdminProfileOrderByRelationAggregateInput
@@ -9131,21 +9161,25 @@ export namespace Prisma {
 
   export type CompanyWhereUniqueInput = Prisma.AtLeast<{
     id?: number
+    clientId?: string
     AND?: CompanyWhereInput | CompanyWhereInput[]
     OR?: CompanyWhereInput[]
     NOT?: CompanyWhereInput | CompanyWhereInput[]
     name?: StringFilter<"Company"> | string
     description?: StringNullableFilter<"Company"> | string | null
+    clientSecret?: StringNullableFilter<"Company"> | string | null
     createdAt?: DateTimeFilter<"Company"> | Date | string
     updatedAt?: DateTimeFilter<"Company"> | Date | string
     admins?: AdminProfileListRelationFilter
     apiKeys?: ApiKeyListRelationFilter
-  }, "id">
+  }, "id" | "clientId">
 
   export type CompanyOrderByWithAggregationInput = {
     id?: SortOrder
     name?: SortOrder
     description?: SortOrderInput | SortOrder
+    clientId?: SortOrderInput | SortOrder
+    clientSecret?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     _count?: CompanyCountOrderByAggregateInput
@@ -9162,6 +9196,8 @@ export namespace Prisma {
     id?: IntWithAggregatesFilter<"Company"> | number
     name?: StringWithAggregatesFilter<"Company"> | string
     description?: StringNullableWithAggregatesFilter<"Company"> | string | null
+    clientId?: StringNullableWithAggregatesFilter<"Company"> | string | null
+    clientSecret?: StringNullableWithAggregatesFilter<"Company"> | string | null
     createdAt?: DateTimeWithAggregatesFilter<"Company"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"Company"> | Date | string
   }
@@ -9611,6 +9647,8 @@ export namespace Prisma {
   export type CompanyCreateInput = {
     name: string
     description?: string | null
+    clientId?: string | null
+    clientSecret?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     admins?: AdminProfileCreateNestedManyWithoutCompanyInput
@@ -9621,6 +9659,8 @@ export namespace Prisma {
     id?: number
     name: string
     description?: string | null
+    clientId?: string | null
+    clientSecret?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     admins?: AdminProfileUncheckedCreateNestedManyWithoutCompanyInput
@@ -9630,6 +9670,8 @@ export namespace Prisma {
   export type CompanyUpdateInput = {
     name?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
+    clientId?: NullableStringFieldUpdateOperationsInput | string | null
+    clientSecret?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     admins?: AdminProfileUpdateManyWithoutCompanyNestedInput
@@ -9640,6 +9682,8 @@ export namespace Prisma {
     id?: IntFieldUpdateOperationsInput | number
     name?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
+    clientId?: NullableStringFieldUpdateOperationsInput | string | null
+    clientSecret?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     admins?: AdminProfileUncheckedUpdateManyWithoutCompanyNestedInput
@@ -9650,6 +9694,8 @@ export namespace Prisma {
     id?: number
     name: string
     description?: string | null
+    clientId?: string | null
+    clientSecret?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -9657,6 +9703,8 @@ export namespace Prisma {
   export type CompanyUpdateManyMutationInput = {
     name?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
+    clientId?: NullableStringFieldUpdateOperationsInput | string | null
+    clientSecret?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -9665,6 +9713,8 @@ export namespace Prisma {
     id?: IntFieldUpdateOperationsInput | number
     name?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
+    clientId?: NullableStringFieldUpdateOperationsInput | string | null
+    clientSecret?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -10308,6 +10358,8 @@ export namespace Prisma {
     id?: SortOrder
     name?: SortOrder
     description?: SortOrder
+    clientId?: SortOrder
+    clientSecret?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -10320,6 +10372,8 @@ export namespace Prisma {
     id?: SortOrder
     name?: SortOrder
     description?: SortOrder
+    clientId?: SortOrder
+    clientSecret?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -10328,6 +10382,8 @@ export namespace Prisma {
     id?: SortOrder
     name?: SortOrder
     description?: SortOrder
+    clientId?: SortOrder
+    clientSecret?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -11267,6 +11323,8 @@ export namespace Prisma {
   export type CompanyCreateWithoutAdminsInput = {
     name: string
     description?: string | null
+    clientId?: string | null
+    clientSecret?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     apiKeys?: ApiKeyCreateNestedManyWithoutCompanyInput
@@ -11276,6 +11334,8 @@ export namespace Prisma {
     id?: number
     name: string
     description?: string | null
+    clientId?: string | null
+    clientSecret?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     apiKeys?: ApiKeyUncheckedCreateNestedManyWithoutCompanyInput
@@ -11362,6 +11422,8 @@ export namespace Prisma {
   export type CompanyUpdateWithoutAdminsInput = {
     name?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
+    clientId?: NullableStringFieldUpdateOperationsInput | string | null
+    clientSecret?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     apiKeys?: ApiKeyUpdateManyWithoutCompanyNestedInput
@@ -11371,6 +11433,8 @@ export namespace Prisma {
     id?: IntFieldUpdateOperationsInput | number
     name?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
+    clientId?: NullableStringFieldUpdateOperationsInput | string | null
+    clientSecret?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     apiKeys?: ApiKeyUncheckedUpdateManyWithoutCompanyNestedInput
@@ -11528,6 +11592,8 @@ export namespace Prisma {
   export type CompanyCreateWithoutApiKeysInput = {
     name: string
     description?: string | null
+    clientId?: string | null
+    clientSecret?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     admins?: AdminProfileCreateNestedManyWithoutCompanyInput
@@ -11537,6 +11603,8 @@ export namespace Prisma {
     id?: number
     name: string
     description?: string | null
+    clientId?: string | null
+    clientSecret?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     admins?: AdminProfileUncheckedCreateNestedManyWithoutCompanyInput
@@ -11588,6 +11656,8 @@ export namespace Prisma {
   export type CompanyUpdateWithoutApiKeysInput = {
     name?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
+    clientId?: NullableStringFieldUpdateOperationsInput | string | null
+    clientSecret?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     admins?: AdminProfileUpdateManyWithoutCompanyNestedInput
@@ -11597,6 +11667,8 @@ export namespace Prisma {
     id?: IntFieldUpdateOperationsInput | number
     name?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
+    clientId?: NullableStringFieldUpdateOperationsInput | string | null
+    clientSecret?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     admins?: AdminProfileUncheckedUpdateManyWithoutCompanyNestedInput

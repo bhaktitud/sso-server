@@ -9,5 +9,6 @@ export declare class CompanyService {
     findAll(): Promise<Company[]>;
     findOne(id: number): Promise<Company>;
     update(id: number, updateCompanyDto: UpdateCompanyDto): Promise<Company>;
+    regenerateClientCredentials(id: number): Promise<Company>;
     remove(id: number): Promise<Company>;
 }

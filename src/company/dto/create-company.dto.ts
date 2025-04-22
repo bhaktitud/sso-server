@@ -23,4 +23,22 @@ export class CreateCompanyDto {
   @IsOptional()
   @MaxLength(500)
   description?: string;
+
+  @ApiProperty({
+    example: 'a1b2c3d4e5f6',
+    description: 'Client ID for OAuth authentication (auto-generated if not provided)',
+    required: false,
+  })
+  @IsString()
+  @IsOptional()
+  clientId?: string;
+
+  @ApiProperty({
+    example: 'secret-xyz-123',
+    description: 'Client Secret for OAuth authentication (auto-generated if not provided)',
+    required: false,
+  })
+  @IsString()
+  @IsOptional()
+  clientSecret?: string;
 }

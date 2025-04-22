@@ -54,13 +54,15 @@ model AdminProfile {
 
 // Model untuk Perusahaan
 model Company {
-  id          Int            @id @default(autoincrement()) // Menggunakan Int ID
-  name        String
-  description String?
-  admins      AdminProfile[] // Relasi One-to-Many ke AdminProfile
-  createdAt   DateTime       @default(now())
-  updatedAt   DateTime       @updatedAt
-  apiKeys     ApiKey[] // Relasi One-to-Many ke ApiKey
+  id           Int            @id @default(autoincrement()) // Menggunakan Int ID
+  name         String
+  description  String?
+  clientId     String?        @unique // Client ID unik untuk OAuth
+  clientSecret String? // Client Secret untuk OAuth
+  admins       AdminProfile[] // Relasi One-to-Many ke AdminProfile
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  apiKeys      ApiKey[] // Relasi One-to-Many ke ApiKey
 }
 
 // Model untuk API Key

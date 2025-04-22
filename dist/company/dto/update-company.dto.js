@@ -16,6 +16,8 @@ const swagger_1 = require("@nestjs/swagger");
 class UpdateCompanyDto extends (0, mapped_types_1.PartialType)(create_company_dto_1.CreateCompanyDto) {
     name;
     description;
+    clientId;
+    clientSecret;
 }
 exports.UpdateCompanyDto = UpdateCompanyDto;
 __decorate([
@@ -36,4 +38,20 @@ __decorate([
     }),
     __metadata("design:type", String)
 ], UpdateCompanyDto.prototype, "description", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({
+        example: 'a1b2c3d4e5f6',
+        description: 'Updated Client ID for OAuth authentication',
+        required: false,
+    }),
+    __metadata("design:type", String)
+], UpdateCompanyDto.prototype, "clientId", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({
+        example: 'secret-xyz-123',
+        description: 'Updated Client Secret for OAuth authentication',
+        required: false,
+    }),
+    __metadata("design:type", String)
+], UpdateCompanyDto.prototype, "clientSecret", void 0);
 //# sourceMappingURL=update-company.dto.js.map

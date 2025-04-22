@@ -40,7 +40,7 @@ import { RequireApiKey } from '@src/auth/decorators/require-apikey.decorator';
 @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
 @ApiBearerAuth('jwt')
 @RequireApiKey(false)
-@UseGuards(JwtAuthGuard, PermissionsGuard)
+@UseGuards(JwtAuthGuard)
 // TODO: Tambahkan Guard di level controller untuk memastikan hanya admin yang bisa akses
 export class RbacController {
   constructor(private readonly rbacService: RbacService) {}

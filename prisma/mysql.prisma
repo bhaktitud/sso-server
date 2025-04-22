@@ -57,6 +57,8 @@ model Company {
   id          Int            @id @default(autoincrement()) // Menggunakan Int ID
   name        String
   description String?
+  clientId    String?        @unique // Client ID unik untuk OAuth
+  clientSecret String?       // Client Secret untuk OAuth
   admins      AdminProfile[] // Relasi One-to-Many ke AdminProfile
   createdAt   DateTime       @default(now())
   updatedAt   DateTime       @updatedAt

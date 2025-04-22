@@ -43,6 +43,9 @@ let CompanyController = class CompanyController {
     async remove(id) {
         await this.companyService.remove(id);
     }
+    async regenerateClientCredentials(id) {
+        return await this.companyService.regenerateClientCredentials(id);
+    }
 };
 exports.CompanyController = CompanyController;
 __decorate([
@@ -147,6 +150,22 @@ __decorate([
     __metadata("design:paramtypes", [Number]),
     __metadata("design:returntype", Promise)
 ], CompanyController.prototype, "remove", null);
+__decorate([
+    (0, common_1.Post)(':id/regenerate-credentials'),
+    (0, swagger_1.ApiOperation)({ summary: 'Regenerate client credentials for a company' }),
+    (0, swagger_1.ApiParam)({ name: 'id', description: 'Company ID' }),
+    (0, swagger_1.ApiResponse)({
+        status: 200,
+        description: 'Client credentials regenerated successfully',
+        type: company_response_dto_1.CompanyResponseDto,
+    }),
+    (0, swagger_1.ApiResponse)({ status: 404, description: 'Company not found' }),
+    (0, permissions_decorator_1.RequirePermissions)('update:company'),
+    __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number]),
+    __metadata("design:returntype", Promise)
+], CompanyController.prototype, "regenerateClientCredentials", null);
 exports.CompanyController = CompanyController = __decorate([
     (0, swagger_1.ApiTags)('Companies Management'),
     (0, common_1.Controller)('companies'),

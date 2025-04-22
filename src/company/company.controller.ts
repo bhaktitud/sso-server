@@ -134,4 +134,20 @@ export class CompanyController {
   async remove(@Param('id', ParseIntPipe) id: number): Promise<void> {
     await this.companyService.remove(id);
   }
+
+  @Post(':id/regenerate-credentials')
+  @ApiOperation({ summary: 'Regenerate client credentials for a company' })
+  @ApiParam({ name: 'id', description: 'Company ID' })
+  @ApiResponse({
+    status: 200,
+    description: 'Client credentials regenerated successfully',
+    type: CompanyResponseDto,
+  })
+  @ApiResponse({ status: 404, description: 'Company not found' })
+  @RequirePermissions('update:company')
+  async regenerateClientCredentials(
+    @Param('id', ParseIntPipe) id: number,
+  ): Promise<CompanyResponseDto> {
+    return await this.companyService.regenerateClientCredentials(id);
+  }
 }

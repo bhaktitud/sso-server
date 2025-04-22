@@ -23,6 +23,22 @@ export class CompanyResponseDto {
   description?: string | null;
 
   @ApiProperty({
+    example: 'a1b2c3d4e5f6',
+    description: 'Client ID for OAuth authentication',
+    required: false,
+    nullable: true,
+  })
+  clientId?: string | null;
+
+  @ApiProperty({
+    example: 'secret-xyz-123',
+    description: 'Client Secret for OAuth authentication',
+    required: false,
+    nullable: true,
+  })
+  clientSecret?: string | null;
+
+  @ApiProperty({
     type: () => [ApiKeyEntity],
     description: 'API keys belonging to the company',
     required: false,

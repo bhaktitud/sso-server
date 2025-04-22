@@ -1292,6 +1292,46 @@
         ]
       }
     },
+    "/companies/{id}/regenerate-credentials": {
+      "post": {
+        "operationId": "CompanyController_regenerateClientCredentials",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Company ID",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Client credentials regenerated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CompanyResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Company not found"
+          }
+        },
+        "security": [
+          {
+            "jwt": []
+          }
+        ],
+        "summary": "Regenerate client credentials for a company",
+        "tags": [
+          "Companies Management"
+        ]
+      }
+    },
     "/admins": {
       "post": {
         "operationId": "AdminController_create",
@@ -2354,6 +2394,16 @@
             "example": "A leading provider of services and products",
             "description": "Brief description about the company",
             "maxLength": 500
+          },
+          "clientId": {
+            "type": "string",
+            "example": "a1b2c3d4e5f6",
+            "description": "Client ID for OAuth authentication (auto-generated if not provided)"
+          },
+          "clientSecret": {
+            "type": "string",
+            "example": "secret-xyz-123",
+            "description": "Client Secret for OAuth authentication (auto-generated if not provided)"
           }
         },
         "required": [
@@ -2447,6 +2497,18 @@
             "description": "Company description",
             "nullable": true
           },
+          "clientId": {
+            "type": "object",
+            "example": "a1b2c3d4e5f6",
+            "description": "Client ID for OAuth authentication",
+            "nullable": true
+          },
+          "clientSecret": {
+            "type": "object",
+            "example": "secret-xyz-123",
+            "description": "Client Secret for OAuth authentication",
+            "nullable": true
+          },
           "apiKeys": {
             "description": "API keys belonging to the company",
             "type": "array",
@@ -2484,6 +2546,16 @@
             "example": "Updated description for the company",
             "description": "Updated company description",
             "maxLength": 500
+          },
+          "clientId": {
+            "type": "string",
+            "example": "a1b2c3d4e5f6",
+            "description": "Updated Client ID for OAuth authentication"
+          },
+          "clientSecret": {
+            "type": "string",
+            "example": "secret-xyz-123",
+            "description": "Updated Client Secret for OAuth authentication"
           }
         }
       },

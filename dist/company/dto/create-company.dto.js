@@ -15,6 +15,8 @@ const swagger_1 = require("@nestjs/swagger");
 class CreateCompanyDto {
     name;
     description;
+    clientId;
+    clientSecret;
 }
 exports.CreateCompanyDto = CreateCompanyDto;
 __decorate([
@@ -41,4 +43,24 @@ __decorate([
     (0, class_validator_1.MaxLength)(500),
     __metadata("design:type", String)
 ], CreateCompanyDto.prototype, "description", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({
+        example: 'a1b2c3d4e5f6',
+        description: 'Client ID for OAuth authentication (auto-generated if not provided)',
+        required: false,
+    }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], CreateCompanyDto.prototype, "clientId", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({
+        example: 'secret-xyz-123',
+        description: 'Client Secret for OAuth authentication (auto-generated if not provided)',
+        required: false,
+    }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], CreateCompanyDto.prototype, "clientSecret", void 0);
 //# sourceMappingURL=create-company.dto.js.map

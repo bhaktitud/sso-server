@@ -7,14 +7,22 @@ import { PrismaService } from '@src/prisma/prisma.service';
 import { Company, Prisma } from '../../generated/mysql';
 import { CreateCompanyDto } from './dto/create-company.dto';
 import { UpdateCompanyDto } from './dto/update-company.dto';
+import { randomUUID } from 'crypto';
 
 @Injectable()
 export class CompanyService {
   constructor(private prisma: PrismaService) {}
 
   async create(createCompanyDto: CreateCompanyDto): Promise<Company> {
+    // Generate clientId and clientSecret if not provided
+    const data = {
+      ...createCompanyDto,
+      clientId: createCompanyDto.clientId || `cid_${randomUUID()}`,
+      clientSecret: createCompanyDto.clientSecret || `cs_${randomUUID()}`,
+    };
+
     return await this.prisma.mysql.company.create({
-      data: createCompanyDto,
+      data,
     });
     // Note: Tambahkan penanganan error jika nama company harus unik (perlu @unique di skema)
   }
@@ -43,6 +51,18 @@ export class CompanyService {
       data: updateCompanyDto,
     });
     // Note: Tambahkan penanganan error jika nama company harus unik
+  }
+
+  async regenerateClientCredentials(id: number): Promise<Company> {
+    const company = await this.findOne(id); // Ensure company exists
+    
+    return await this.prisma.mysql.company.update({
+      where: { id },
+      data: {
+        clientId: `cid_${randomUUID()}`,
+        clientSecret: `cs_${randomUUID()}`,
+      },
+    });
   }
 
   async remove(id: number): Promise<Company> {

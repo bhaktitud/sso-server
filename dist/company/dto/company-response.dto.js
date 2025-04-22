@@ -16,6 +16,8 @@ class CompanyResponseDto {
     id;
     name;
     description;
+    clientId;
+    clientSecret;
     apiKeys;
     createdAt;
     updatedAt;
@@ -44,6 +46,24 @@ __decorate([
     }),
     __metadata("design:type", Object)
 ], CompanyResponseDto.prototype, "description", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({
+        example: 'a1b2c3d4e5f6',
+        description: 'Client ID for OAuth authentication',
+        required: false,
+        nullable: true,
+    }),
+    __metadata("design:type", Object)
+], CompanyResponseDto.prototype, "clientId", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({
+        example: 'secret-xyz-123',
+        description: 'Client Secret for OAuth authentication',
+        required: false,
+        nullable: true,
+    }),
+    __metadata("design:type", Object)
+], CompanyResponseDto.prototype, "clientSecret", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({
         type: () => [api_key_entity_1.ApiKeyEntity],

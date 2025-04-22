@@ -145,6 +145,8 @@ exports.Prisma.CompanyScalarFieldEnum = {
   id: 'id',
   name: 'name',
   description: 'description',
+  clientId: 'clientId',
+  clientSecret: 'clientSecret',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -213,7 +215,9 @@ exports.Prisma.AdminProfileOrderByRelevanceFieldEnum = {
 
 exports.Prisma.CompanyOrderByRelevanceFieldEnum = {
   name: 'name',
-  description: 'description'
+  description: 'description',
+  clientId: 'clientId',
+  clientSecret: 'clientSecret'
 };
 
 exports.Prisma.ApiKeyOrderByRelevanceFieldEnum = {

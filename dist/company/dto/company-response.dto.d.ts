@@ -3,6 +3,8 @@ export declare class CompanyResponseDto {
     id: number;
     name: string;
     description?: string | null;
+    clientId?: string | null;
+    clientSecret?: string | null;
     apiKeys?: ApiKeyEntity[];
     createdAt: Date;
     updatedAt: Date;

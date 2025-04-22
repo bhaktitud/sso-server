@@ -13,14 +13,20 @@ exports.CompanyService = void 0;
 const common_1 = require("@nestjs/common");
 const prisma_service_1 = require("../prisma/prisma.service");
 const mysql_1 = require("../../generated/mysql");
+const crypto_1 = require("crypto");
 let CompanyService = class CompanyService {
     prisma;
     constructor(prisma) {
         this.prisma = prisma;
     }
     async create(createCompanyDto) {
+        const data = {
+            ...createCompanyDto,
+            clientId: createCompanyDto.clientId || `cid_${(0, crypto_1.randomUUID)()}`,
+            clientSecret: createCompanyDto.clientSecret || `cs_${(0, crypto_1.randomUUID)()}`,
+        };
         return await this.prisma.mysql.company.create({
-            data: createCompanyDto,
+            data,
         });
     }
     async findAll() {
@@ -40,6 +46,16 @@ let CompanyService = class CompanyService {
         return await this.prisma.mysql.company.update({
             where: { id },
             data: updateCompanyDto,
+        });
+    }
+    async regenerateClientCredentials(id) {
+        const company = await this.findOne(id);
+        return await this.prisma.mysql.company.update({
+            where: { id },
+            data: {
+                clientId: `cid_${(0, crypto_1.randomUUID)()}`,
+                clientSecret: `cs_${(0, crypto_1.randomUUID)()}`,
+            },
         });
     }
     async remove(id) {
