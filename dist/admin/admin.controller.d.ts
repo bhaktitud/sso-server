@@ -11,21 +11,21 @@ export declare class AdminController {
         apiKeys: {
             name: string;
             id: number;
-            companyId: number;
             createdAt: Date;
             updatedAt: Date;
-            key: string;
+            companyId: number;
             description: string | null;
             isActive: boolean;
+            key: string;
             lastUsedAt: Date | null;
             expiresAt: Date | null;
         }[];
         name: string;
         id: number;
-        userId: number;
-        companyId: number | null;
         createdAt: Date;
         updatedAt: Date;
+        userId: number;
+        companyId: number | null;
         user: Partial<User>;
         company?: {
             apiKeys: ApiKey[];
