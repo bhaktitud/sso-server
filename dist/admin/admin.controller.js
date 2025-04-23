@@ -91,14 +91,21 @@ __decorate([
 ], AdminController.prototype, "create", null);
 __decorate([
     (0, common_1.Get)('profile'),
-    (0, require_apikey_decorator_1.RequireApiKey)(false),
-    (0, swagger_1.ApiOperation)({ summary: 'Mendapatkan profil admin yang sedang login' }),
+    (0, swagger_1.ApiOperation)({
+        summary: 'Mendapatkan profil admin yang sedang login',
+        description: 'Mengambil profil admin berdasarkan JWT token yang diberikan. Membutuhkan Authorization Bearer token.',
+    }),
+    (0, swagger_1.ApiBearerAuth)('jwt'),
     (0, swagger_1.ApiResponse)({
         status: 200,
         description: 'Detail profil admin, termasuk perusahaan dan API keys',
         type: admin_profile_response_dto_1.AdminProfileResponseDto,
     }),
-    (0, swagger_1.ApiResponse)({ status: 401, description: 'Unauthorized' }),
+    (0, swagger_1.ApiResponse)({
+        status: 401,
+        description: 'Unauthorized - Invalid atau missing token',
+    }),
+    (0, permissions_decorator_1.RequirePermissions)(permissions_1.PERMISSIONS_KEY.ALL_MANAGE),
     __param(0, (0, common_1.Request)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object]),
@@ -238,8 +245,9 @@ exports.AdminController = AdminController = __decorate([
     (0, swagger_1.ApiTags)('Admins Management'),
     (0, common_1.Controller)('admins'),
     (0, common_1.UsePipes)(new common_1.ValidationPipe({ whitelist: true, transform: true })),
-    (0, swagger_1.ApiBearerAuth)(),
+    (0, swagger_1.ApiBearerAuth)('jwt'),
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
+    (0, require_apikey_decorator_1.RequireApiKey)(false),
     __metadata("design:paramtypes", [admin_service_1.AdminService])
 ], AdminController);
 //# sourceMappingURL=admin.controller.js.map

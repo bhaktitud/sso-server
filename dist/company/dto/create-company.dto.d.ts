@@ -3,4 +3,5 @@ export declare class CreateCompanyDto {
     description?: string;
     clientId?: string;
     clientSecret?: string;
+    roleType?: string;
 }

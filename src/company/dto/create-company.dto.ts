@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsOptional, IsString, MaxLength } from 'class-validator';
+import { IsNotEmpty, IsOptional, IsString, MaxLength, IsEnum } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateCompanyDto {
@@ -41,4 +41,15 @@ export class CreateCompanyDto {
   @IsString()
   @IsOptional()
   clientSecret?: string;
+
+  @ApiProperty({
+    example: 'basic',
+    description: 'Role type for permissions (basic, premium, admin)',
+    required: false,
+    enum: ['basic', 'premium', 'admin'],
+    default: 'basic',
+  })
+  @IsEnum(['basic', 'premium', 'admin'])
+  @IsOptional()
+  roleType?: string;
 }

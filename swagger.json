@@ -1369,7 +1369,7 @@
         },
         "security": [
           {
-            "bearer": []
+            "jwt": []
           }
         ],
         "summary": "Create a new admin user and profile",
@@ -1400,7 +1400,7 @@
         },
         "security": [
           {
-            "bearer": []
+            "jwt": []
           }
         ],
         "summary": "Get a list of all admin profiles",
@@ -1411,6 +1411,7 @@
     },
     "/admins/profile": {
       "get": {
+        "description": "Mengambil profil admin berdasarkan JWT token yang diberikan. Membutuhkan Authorization Bearer token.",
         "operationId": "AdminController_getProfile",
         "parameters": [],
         "responses": {
@@ -1425,12 +1426,15 @@
             }
           },
           "401": {
-            "description": "Unauthorized"
+            "description": "Unauthorized - Invalid atau missing token"
           }
         },
         "security": [
           {
-            "bearer": []
+            "jwt": []
+          },
+          {
+            "jwt": []
           }
         ],
         "summary": "Mendapatkan profil admin yang sedang login",
@@ -1473,7 +1477,7 @@
         },
         "security": [
           {
-            "bearer": []
+            "jwt": []
           }
         ],
         "summary": "Get a specific admin profile by ID",
@@ -1527,7 +1531,7 @@
         },
         "security": [
           {
-            "bearer": []
+            "jwt": []
           }
         ],
         "summary": "Update an admin profile",
@@ -1561,7 +1565,7 @@
         },
         "security": [
           {
-            "bearer": []
+            "jwt": []
           }
         ],
         "summary": "Delete an admin profile (and associated user)",
@@ -1613,7 +1617,7 @@
         },
         "security": [
           {
-            "bearer": []
+            "jwt": []
           }
         ],
         "summary": "Assign a role to an admin",
@@ -1663,7 +1667,7 @@
         },
         "security": [
           {
-            "bearer": []
+            "jwt": []
           }
         ],
         "summary": "Remove a role from an admin",
@@ -2901,6 +2905,17 @@
             "type": "string",
             "example": "secret-xyz-123",
             "description": "Client Secret for OAuth authentication (auto-generated if not provided)"
+          },
+          "roleType": {
+            "type": "string",
+            "example": "basic",
+            "description": "Role type for permissions (basic, premium, admin)",
+            "enum": [
+              "basic",
+              "premium",
+              "admin"
+            ],
+            "default": "basic"
           }
         },
         "required": [

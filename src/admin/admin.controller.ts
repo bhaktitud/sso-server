@@ -46,8 +46,9 @@ type AdminProfileWithDetails = AdminProfile & {
 @ApiTags('Admins Management')
 @Controller('admins')
 @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
-@ApiBearerAuth()
+@ApiBearerAuth('jwt')
 @UseGuards(JwtAuthGuard)
+@RequireApiKey(false)
 export class AdminController {
   constructor(private readonly adminService: AdminService) {}
 
@@ -76,14 +77,22 @@ export class AdminController {
   }
 
   @Get('profile')
-  @RequireApiKey(false)
-  @ApiOperation({ summary: 'Mendapatkan profil admin yang sedang login' })
+  @ApiOperation({
+    summary: 'Mendapatkan profil admin yang sedang login',
+    description:
+      'Mengambil profil admin berdasarkan JWT token yang diberikan. Membutuhkan Authorization Bearer token.',
+  })
+  @ApiBearerAuth('jwt')
   @ApiResponse({
     status: 200,
     description: 'Detail profil admin, termasuk perusahaan dan API keys',
     type: AdminProfileResponseDto,
   })
-  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({
+    status: 401,
+    description: 'Unauthorized - Invalid atau missing token',
+  })
+  @RequirePermissions(PERMISSIONS_KEY.ALL_MANAGE)
   async getProfile(@Request() req: any) {
     const userId = req.user.userId;
     const adminProfile = (await this.adminService.findAdminProfileWithDetails(

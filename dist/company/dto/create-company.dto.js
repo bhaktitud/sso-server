@@ -17,6 +17,7 @@ class CreateCompanyDto {
     description;
     clientId;
     clientSecret;
+    roleType;
 }
 exports.CreateCompanyDto = CreateCompanyDto;
 __decorate([
@@ -63,4 +64,16 @@ __decorate([
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)
 ], CreateCompanyDto.prototype, "clientSecret", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({
+        example: 'basic',
+        description: 'Role type for permissions (basic, premium, admin)',
+        required: false,
+        enum: ['basic', 'premium', 'admin'],
+        default: 'basic',
+    }),
+    (0, class_validator_1.IsEnum)(['basic', 'premium', 'admin']),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], CreateCompanyDto.prototype, "roleType", void 0);
 //# sourceMappingURL=create-company.dto.js.map

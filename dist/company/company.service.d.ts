@@ -11,4 +11,10 @@ export declare class CompanyService {
     update(id: number, updateCompanyDto: UpdateCompanyDto): Promise<Company>;
     regenerateClientCredentials(id: number): Promise<Company>;
     remove(id: number): Promise<Company>;
+    private generateClientId;
+    extractPermissionsFromClientId(clientId: string): string;
+    extractCompanyInfoFromClientId(clientId: string): {
+        companyPrefix: string;
+    } | null;
+    private generateClientSecret;
 }
